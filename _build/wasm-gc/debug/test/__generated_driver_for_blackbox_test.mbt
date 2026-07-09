@@ -397,7 +397,15 @@ fn moonbit_test_driver_internal_catch_error(
 let moonbit_test_driver_internal_no_args_tests : MoonBitTestDriverInternalTestMap[
   () -> Unit raise,
 ] = {
+  "seqio.mbt": {
+  },
+  "seq_record.mbt": {
+  },
   "seq.mbt": {
+  },
+  "fastq_io.mbt": {
+  },
+  "fasta_io.mbt": {
   },
   "complement.mbt": {
   },

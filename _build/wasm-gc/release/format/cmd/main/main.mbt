@@ -255,20 +255,5 @@ fn invalid_codon() -> String {
 
 ///|
 fn main {
-  let cases = run_cases()
-  // Emit JSON: [{"name":"...","result":"..."}, ...]
-  let buf = StringBuilder::new()
-  buf.write_char('[')
-  for i, c in cases {
-    if i > 0 {
-      buf.write_char(',')
-    }
-    buf.write_string("{\"name\":\"")
-    buf.write_string(c.name)
-    buf.write_string("\",\"result\":\"")
-    buf.write_string(c.result)
-    buf.write_string("\"}")
-  }
-  buf.write_char(']')
-  println(buf.to_string())
+  seqio_test()
 }

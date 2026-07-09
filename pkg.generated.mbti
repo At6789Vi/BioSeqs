@@ -2,10 +2,29 @@
 package "biolab/bio_seq"
 
 // Values
+pub fn parse_fasta(String) -> Array[SeqRecord]
+
+pub fn parse_fastq(String) -> Array[SeqRecord] raise SeqIOError
+
+pub fn seqio_parse(String, String) -> Array[SeqRecord] raise SeqIOError
+
+pub fn seqio_read(String, String) -> SeqRecord raise SeqIOError
+
+pub fn seqio_to_dict(Array[SeqRecord]) -> Map[String, SeqRecord]
+
+pub fn seqio_write(Array[SeqRecord], String) -> String raise SeqIOError
+
+pub fn write_fasta(Array[SeqRecord]) -> String
+
+pub fn write_fastq(Array[SeqRecord]) -> String raise SeqIOError
 
 // Errors
 pub suberror SeqError {
   SeqError(String)
+}
+
+pub suberror SeqIOError {
+  SeqIOError(String)
 }
 
 // Types and methods
@@ -45,6 +64,20 @@ pub fn Seq::transcribe(Self) -> Self
 pub fn Seq::translate(Self, stop_symbol? : Char, to_stop? : Bool, cds? : Bool, gap? : Char) -> Self raise SeqError
 pub fn Seq::upper(Self) -> Self
 pub impl Add for Seq
+
+pub struct SeqRecord {
+  seq : Seq
+  id : String
+  name : String
+  description : String
+  letter_annotations : Map[String, Array[Int]]
+} derive(Eq)
+pub fn SeqRecord::from_seq(Seq) -> Self
+pub fn SeqRecord::length(Self) -> Int
+pub fn SeqRecord::new(Seq, id? : String, name? : String, description? : String) -> Self
+pub fn SeqRecord::phred_quality(Self) -> Array[Int]?
+pub fn SeqRecord::repr(Self) -> String
+pub fn SeqRecord::set_phred_quality(Self, Array[Int]) -> Self
 
 // Type aliases
 
