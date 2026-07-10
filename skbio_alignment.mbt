@@ -371,41 +371,89 @@ fn nucleotide_substitution_matrix(c1 : Char, c2 : Char) -> Double {
 }
 
 ///|
-/// BLOSUM62 substitution matrix.
-fn blosum62(c1 : Char, c2 : Char) -> Double {
-  let blosum = Map([
-    ("A", Map([("A", 4.0), ("R", -1.0), ("N", -2.0), ("D", -2.0), ("C", 0.0), ("Q", -1.0), ("E", -1.0), ("G", 0.0), ("H", -2.0), ("I", -1.0), ("L", -1.0), ("K", -1.0), ("M", -1.0), ("F", -2.0), ("P", -1.0), ("S", 1.0), ("T", 0.0), ("W", -3.0), ("Y", -2.0), ("V", 0.0)])),
-    ("R", Map([("A", -1.0), ("R", 5.0), ("N", 0.0), ("D", -2.0), ("C", -3.0), ("Q", 1.0), ("E", 0.0), ("G", -2.0), ("H", 0.0), ("I", -3.0), ("L", -2.0), ("K", 2.0), ("M", -1.0), ("F", -3.0), ("P", -2.0), ("S", -1.0), ("T", -1.0), ("W", -3.0), ("Y", -2.0), ("V", -3.0)])),
-    ("N", Map([("A", -2.0), ("R", 0.0), ("N", 6.0), ("D", 1.0), ("C", -3.0), ("Q", 0.0), ("E", 0.0), ("G", 0.0), ("H", 1.0), ("I", -3.0), ("L", -3.0), ("K", 0.0), ("M", -2.0), ("F", -3.0), ("P", -2.0), ("S", 1.0), ("T", 0.0), ("W", -4.0), ("Y", -2.0), ("V", -3.0)])),
-    ("D", Map([("A", -2.0), ("R", -2.0), ("N", 1.0), ("D", 6.0), ("C", -3.0), ("Q", 0.0), ("E", 2.0), ("G", -1.0), ("H", -1.0), ("I", -3.0), ("L", -4.0), ("K", -1.0), ("M", -3.0), ("F", -3.0), ("P", -1.0), ("S", 0.0), ("T", -1.0), ("W", -4.0), ("Y", -3.0), ("V", -3.0)])),
-    ("C", Map([("A", 0.0), ("R", -3.0), ("N", -3.0), ("D", -3.0), ("C", 9.0), ("Q", -3.0), ("E", -4.0), ("G", -3.0), ("H", -3.0), ("I", -1.0), ("L", -1.0), ("K", -3.0), ("M", -1.0), ("F", -2.0), ("P", -3.0), ("S", -1.0), ("T", -1.0), ("W", -2.0), ("Y", -2.0), ("V", -1.0)])),
-    ("Q", Map([("A", -1.0), ("R", 1.0), ("N", 0.0), ("D", 0.0), ("C", -3.0), ("Q", 5.0), ("E", 2.0), ("G", -2.0), ("H", 0.0), ("I", -3.0), ("L", -2.0), ("K", 1.0), ("M", 0.0), ("F", -3.0), ("P", -1.0), ("S", 0.0), ("T", -1.0), ("W", -2.0), ("Y", -1.0), ("V", -2.0)])),
-    ("E", Map([("A", -1.0), ("R", 0.0), ("N", 0.0), ("D", 2.0), ("C", -4.0), ("Q", 2.0), ("E", 5.0), ("G", -2.0), ("H", 0.0), ("I", -3.0), ("L", -3.0), ("K", 1.0), ("M", -2.0), ("F", -3.0), ("P", -1.0), ("S", 0.0), ("T", -1.0), ("W", -3.0), ("Y", -2.0), ("V", -3.0)])),
-    ("G", Map([("A", 0.0), ("R", -2.0), ("N", 0.0), ("D", -1.0), ("C", -3.0), ("Q", -2.0), ("E", -2.0), ("G", 6.0), ("H", -2.0), ("I", -4.0), ("L", -4.0), ("K", -2.0), ("M", -3.0), ("F", -3.0), ("P", -2.0), ("S", 0.0), ("T", -2.0), ("W", -2.0), ("Y", -3.0), ("V", -3.0)])),
-    ("H", Map([("A", -2.0), ("R", 0.0), ("N", 1.0), ("D", -1.0), ("C", -3.0), ("Q", 0.0), ("E", 0.0), ("G", -2.0), ("H", 8.0), ("I", -3.0), ("L", -3.0), ("K", -1.0), ("M", -2.0), ("F", -1.0), ("P", -2.0), ("S", -1.0), ("T", -2.0), ("W", -2.0), ("Y", 2.0), ("V", -3.0)])),
-    ("I", Map([("A", -1.0), ("R", -3.0), ("N", -3.0), ("D", -3.0), ("C", -1.0), ("Q", -3.0), ("E", -3.0), ("G", -4.0), ("H", -3.0), ("I", 4.0), ("L", 2.0), ("K", -3.0), ("M", 1.0), ("F", 0.0), ("P", -3.0), ("S", -2.0), ("T", -1.0), ("W", -3.0), ("Y", -1.0), ("V", 3.0)])),
-    ("L", Map([("A", -1.0), ("R", -2.0), ("N", -3.0), ("D", -4.0), ("C", -1.0), ("Q", -2.0), ("E", -3.0), ("G", -4.0), ("H", -3.0), ("I", 2.0), ("L", 4.0), ("K", -2.0), ("M", 2.0), ("F", 0.0), ("P", -3.0), ("S", -2.0), ("T", -1.0), ("W", -2.0), ("Y", -1.0), ("V", 1.0)])),
-    ("K", Map([("A", -1.0), ("R", 2.0), ("N", 0.0), ("D", -1.0), ("C", -3.0), ("Q", 1.0), ("E", 1.0), ("G", -2.0), ("H", -1.0), ("I", -3.0), ("L", -2.0), ("K", 5.0), ("M", -1.0), ("F", -3.0), ("P", -1.0), ("S", 0.0), ("T", -1.0), ("W", -3.0), ("Y", -2.0), ("V", -3.0)])),
-    ("M", Map([("A", -1.0), ("R", -1.0), ("N", -2.0), ("D", -3.0), ("C", -1.0), ("Q", 0.0), ("E", -2.0), ("G", -3.0), ("H", -2.0), ("I", 1.0), ("L", 2.0), ("K", -1.0), ("M", 5.0), ("F", 0.0), ("P", -2.0), ("S", -1.0), ("T", -1.0), ("W", -1.0), ("Y", -1.0), ("V", 1.0)])),
-    ("F", Map([("A", -2.0), ("R", -3.0), ("N", -3.0), ("D", -3.0), ("C", -2.0), ("Q", -3.0), ("E", -3.0), ("G", -3.0), ("H", -1.0), ("I", 0.0), ("L", 0.0), ("K", -3.0), ("M", 0.0), ("F", 6.0), ("P", -4.0), ("S", -2.0), ("T", -2.0), ("W", 1.0), ("Y", 3.0), ("V", -1.0)])),
-    ("P", Map([("A", -1.0), ("R", -2.0), ("N", -2.0), ("D", -1.0), ("C", -3.0), ("Q", -1.0), ("E", -1.0), ("G", -2.0), ("H", -2.0), ("I", -3.0), ("L", -3.0), ("K", -1.0), ("M", -2.0), ("F", -4.0), ("P", 7.0), ("S", -1.0), ("T", -1.0), ("W", -4.0), ("Y", -3.0), ("V", -2.0)])),
-    ("S", Map([("A", 1.0), ("R", -1.0), ("N", 1.0), ("D", 0.0), ("C", -1.0), ("Q", 0.0), ("E", 0.0), ("G", 0.0), ("H", -1.0), ("I", -2.0), ("L", -2.0), ("K", 0.0), ("M", -1.0), ("F", -2.0), ("P", -1.0), ("S", 4.0), ("T", 1.0), ("W", -3.0), ("Y", -2.0), ("V", -2.0)])),
-    ("T", Map([("A", 0.0), ("R", -1.0), ("N", 0.0), ("D", -1.0), ("C", -1.0), ("Q", -1.0), ("E", -1.0), ("G", -2.0), ("H", -2.0), ("I", -1.0), ("L", -1.0), ("K", -1.0), ("M", -1.0), ("F", -2.0), ("P", -1.0), ("S", 1.0), ("T", 4.0), ("W", -2.0), ("Y", -2.0), ("V", 0.0)])),
-    ("W", Map([("A", -3.0), ("R", -3.0), ("N", -4.0), ("D", -4.0), ("C", -2.0), ("Q", -2.0), ("E", -3.0), ("G", -2.0), ("H", -2.0), ("I", -3.0), ("L", -2.0), ("K", -3.0), ("M", -1.0), ("F", 1.0), ("P", -4.0), ("S", -3.0), ("T", -2.0), ("W", 11.0), ("Y", 2.0), ("V", -3.0)])),
-    ("Y", Map([("A", -2.0), ("R", -2.0), ("N", -2.0), ("D", -3.0), ("C", -2.0), ("Q", -1.0), ("E", -2.0), ("G", -3.0), ("H", 2.0), ("I", -1.0), ("L", -1.0), ("K", -2.0), ("M", -1.0), ("F", 3.0), ("P", -3.0), ("S", -2.0), ("T", -2.0), ("W", 2.0), ("Y", 7.0), ("V", -1.0)])),
-    ("V", Map([("A", 0.0), ("R", -3.0), ("N", -3.0), ("D", -3.0), ("C", -1.0), ("Q", -2.0), ("E", -3.0), ("G", -3.0), ("H", -3.0), ("I", 3.0), ("L", 1.0), ("K", -3.0), ("M", 1.0), ("F", -1.0), ("P", -2.0), ("S", -2.0), ("T", 0.0), ("W", -3.0), ("Y", -1.0), ("V", 4.0)])),
-  ], capacity=20)
-  
-  let c1_str = c1.to_string().to_upper()
-  let c2_str = c2.to_string().to_upper()
-  
-  match blosum.get(c1_str) {
-    Some(row) => match row.get(c2_str) {
-      Some(v) => v
-      None => -4.0
+/// Amino acid characters for BLOSUM62 indexing.
+fn amino_acids() -> FixedArray[Char] {
+  let arr : FixedArray[Char] = FixedArray::make(20, ' ')
+  arr[0] = 'A'; arr[1] = 'R'; arr[2] = 'N'; arr[3] = 'D'; arr[4] = 'C'
+  arr[5] = 'Q'; arr[6] = 'E'; arr[7] = 'G'; arr[8] = 'H'; arr[9] = 'I'
+  arr[10] = 'L'; arr[11] = 'K'; arr[12] = 'M'; arr[13] = 'F'; arr[14] = 'P'
+  arr[15] = 'S'; arr[16] = 'T'; arr[17] = 'W'; arr[18] = 'Y'; arr[19] = 'V'
+  arr
+}
+
+///|
+/// Get amino acid index (0-19) or -1 for unknown.
+fn aa_to_idx(c : Char) -> Int {
+  let aa = amino_acids()
+  for i = 0; i < 20; i = i + 1 {
+    let a = aa[i]
+    if c == a || c == a.to_string().to_lower().unsafe_get(0).unsafe_to_char() {
+      return i
     }
-    None => -4.0
   }
+  -1
+}
+
+///|
+/// BLOSUM62 substitution matrix lookup.
+fn blosum62(c1 : Char, c2 : Char) -> Double {
+  let i = aa_to_idx(c1)
+  let j = aa_to_idx(c2)
+  if i < 0 || j < 0 {
+    return -4.0
+  }
+  
+  let blosum = blosum62_matrix()
+  blosum[i][j]
+}
+
+///|
+/// BLOSUM62 substitution matrix.
+fn blosum62_matrix() -> FixedArray[FixedArray[Double]] {
+  let mat : FixedArray[FixedArray[Double]] = FixedArray::make(20, FixedArray::make(20, 0.0))
+  
+  mat[0] = make_blosum_row([ 4.0, -1.0, -2.0, -2.0,  0.0, -1.0, -1.0,  0.0, -2.0, -1.0, -1.0, -1.0, -1.0, -2.0, -1.0,  1.0,  0.0, -3.0, -2.0,  0.0 ])
+  mat[1] = make_blosum_row([-1.0,  5.0,  0.0, -2.0, -3.0,  1.0,  0.0, -2.0,  0.0, -3.0, -2.0,  2.0, -1.0, -3.0, -2.0, -1.0, -1.0, -3.0, -2.0, -3.0 ])
+  mat[2] = make_blosum_row([-2.0,  0.0,  6.0,  1.0, -3.0,  0.0,  0.0,  0.0,  1.0, -3.0, -3.0,  0.0, -2.0, -3.0, -2.0,  1.0,  0.0, -4.0, -2.0, -3.0 ])
+  mat[3] = make_blosum_row([-2.0, -2.0,  1.0,  6.0, -3.0,  0.0,  2.0, -1.0, -1.0, -3.0, -4.0, -1.0, -3.0, -3.0, -1.0,  0.0, -1.0, -4.0, -3.0, -3.0 ])
+  mat[4] = make_blosum_row([ 0.0, -3.0, -3.0, -3.0,  9.0, -3.0, -4.0, -3.0, -3.0, -1.0, -1.0, -3.0, -1.0, -2.0, -3.0, -1.0, -1.0, -2.0, -2.0, -1.0 ])
+  mat[5] = make_blosum_row([-1.0,  1.0,  0.0,  0.0, -3.0,  5.0,  2.0, -2.0,  0.0, -3.0, -2.0,  1.0,  0.0, -3.0, -1.0,  0.0, -1.0, -2.0, -1.0, -2.0 ])
+  mat[6] = make_blosum_row([-1.0,  0.0,  0.0,  2.0, -4.0,  2.0,  5.0, -2.0,  0.0, -3.0, -3.0,  1.0, -2.0, -3.0, -1.0,  0.0, -1.0, -3.0, -2.0, -3.0 ])
+  mat[7] = make_blosum_row([ 0.0, -2.0,  0.0, -1.0, -3.0, -2.0, -2.0,  6.0, -2.0, -4.0, -4.0, -2.0, -3.0, -3.0, -2.0,  0.0, -2.0, -2.0, -3.0, -3.0 ])
+  mat[8] = make_blosum_row([-2.0,  0.0,  1.0, -1.0, -3.0,  0.0,  0.0, -2.0,  8.0, -3.0, -3.0, -1.0, -2.0, -1.0, -2.0, -1.0, -2.0, -2.0,  2.0, -3.0 ])
+  mat[9] = make_blosum_row([-1.0, -3.0, -3.0, -3.0, -1.0, -3.0, -3.0, -4.0, -3.0,  4.0,  2.0, -3.0,  1.0,  0.0, -3.0, -2.0, -1.0, -3.0, -1.0,  3.0 ])
+  mat[10] = make_blosum_row([-1.0, -2.0, -3.0, -4.0, -1.0, -2.0, -3.0, -4.0, -3.0,  2.0,  4.0, -2.0,  2.0,  0.0, -3.0, -2.0, -1.0, -2.0, -1.0,  1.0 ])
+  mat[11] = make_blosum_row([-1.0,  2.0,  0.0, -1.0, -3.0,  1.0,  1.0, -2.0, -1.0, -3.0, -2.0,  5.0, -1.0, -3.0, -1.0,  0.0, -1.0, -3.0, -2.0, -3.0 ])
+  mat[12] = make_blosum_row([-1.0, -1.0, -2.0, -3.0, -1.0,  0.0, -2.0, -3.0, -2.0,  1.0,  2.0, -1.0,  5.0,  0.0, -2.0, -1.0, -1.0, -1.0, -1.0,  1.0 ])
+  mat[13] = make_blosum_row([-2.0, -3.0, -3.0, -3.0, -2.0, -3.0, -3.0, -3.0, -1.0,  0.0,  0.0, -3.0,  0.0,  6.0, -4.0, -2.0, -2.0,  1.0,  3.0, -1.0 ])
+  mat[14] = make_blosum_row([-1.0, -2.0, -2.0, -1.0, -3.0, -1.0, -1.0, -2.0, -2.0, -3.0, -3.0, -1.0, -2.0, -4.0,  7.0, -1.0, -1.0, -4.0, -3.0, -2.0 ])
+  mat[15] = make_blosum_row([ 1.0, -1.0,  1.0,  0.0, -1.0,  0.0,  0.0,  0.0, -1.0, -2.0, -2.0,  0.0, -1.0, -2.0, -1.0,  4.0,  1.0, -3.0, -2.0, -2.0 ])
+  mat[16] = make_blosum_row([ 0.0, -1.0,  0.0, -1.0, -1.0, -1.0, -1.0, -2.0, -2.0, -1.0, -1.0, -1.0, -1.0, -2.0, -1.0,  1.0,  4.0, -2.0, -2.0,  0.0 ])
+  mat[17] = make_blosum_row([-3.0, -3.0, -4.0, -4.0, -2.0, -2.0, -3.0, -2.0, -2.0, -3.0, -2.0, -3.0, -1.0,  1.0, -4.0, -3.0, -2.0, 11.0,  2.0, -3.0 ])
+  mat[18] = make_blosum_row([-2.0, -2.0, -2.0, -3.0, -2.0, -1.0, -2.0, -3.0,  2.0, -1.0, -1.0, -2.0, -1.0,  3.0, -3.0, -2.0, -2.0,  2.0,  7.0, -1.0 ])
+  mat[19] = make_blosum_row([ 0.0, -3.0, -3.0, -3.0, -1.0, -2.0, -3.0, -3.0, -3.0,  3.0,  1.0, -3.0,  1.0, -1.0, -2.0, -2.0,  0.0, -3.0, -1.0,  4.0 ])
+  
+  mat
+}
+
+///|
+/// Helper function to create a BLOSUM row.
+fn make_blosum_row(values : Array[Double]) -> FixedArray[Double] {
+  let row : FixedArray[Double] = FixedArray::make(20, 0.0)
+  for i = 0; i < 20; i = i + 1 {
+    row[i] = values[i]
+  }
+  row
+}
+
+///|
+/// Create string from a slice of FixedArray[Char].
+fn fixedarray_char_slice_to_string(arr : FixedArray[Char], start : Int, end : Int) -> String {
+  let buf = StringBuilder::new(size_hint=end - start)
+  for i = start; i < end; i = i + 1 {
+    buf.write_char(arr[i])
+  }
+  buf.to_string()
 }
 
 ///|
@@ -423,6 +471,15 @@ pub fn global_pairwise_align_nucleotide(
   
   let n = s1.length()
   let m = s2.length()
+  
+  let chars1 : FixedArray[Char] = FixedArray::make(n, ' ')
+  let chars2 : FixedArray[Char] = FixedArray::make(m, ' ')
+  for i = 0; i < n; i = i + 1 {
+    chars1[i] = s1.unsafe_get(i).unsafe_to_char()
+  }
+  for i = 0; i < m; i = i + 1 {
+    chars2[i] = s2.unsafe_get(i).unsafe_to_char()
+  }
   
   let score_matrix : FixedArray[FixedArray[Double]] = FixedArray::make(n + 1, FixedArray::make(m + 1, 0.0))
   let trace_matrix : FixedArray[FixedArray[Int]] = FixedArray::make(n + 1, FixedArray::make(m + 1, 0))
@@ -444,8 +501,8 @@ pub fn global_pairwise_align_nucleotide(
   
   for i = 1; i <= n; i = i + 1 {
     for j = 1; j <= m; j = j + 1 {
-      let c1 = s1.unsafe_get(i - 1).unsafe_to_char()
-      let c2 = s2.unsafe_get(j - 1).unsafe_to_char()
+      let c1 = chars1[i - 1]
+      let c2 = chars2[j - 1]
       
       let match_score_val = if c1 == c2 { match_score } else { mismatch_score }
       let diag_score = score_matrix[i - 1][j - 1] + match_score_val
@@ -475,35 +532,39 @@ pub fn global_pairwise_align_nucleotide(
     }
   }
   
+  let max_len = n + m
+  let aligned1_chars : FixedArray[Char] = FixedArray::make(max_len, ' ')
+  let aligned2_chars : FixedArray[Char] = FixedArray::make(max_len, ' ')
+  let mut pos = max_len - 1
+  
   let mut i = n
   let mut j = m
-  let aligned1 = StringBuilder::new()
-  let aligned2 = StringBuilder::new()
   
   while i > 0 || j > 0 {
     match trace_matrix[i][j] {
       0 => {
-        aligned1.write_char(s1.unsafe_get(i - 1).unsafe_to_char())
-        aligned2.write_char(s2.unsafe_get(j - 1).unsafe_to_char())
+        aligned1_chars[pos] = chars1[i - 1]
+        aligned2_chars[pos] = chars2[j - 1]
         i = i - 1
         j = j - 1
       }
       1 => {
-        aligned1.write_char(s1.unsafe_get(i - 1).unsafe_to_char())
-        aligned2.write_char('-')
+        aligned1_chars[pos] = chars1[i - 1]
+        aligned2_chars[pos] = '-'
         i = i - 1
       }
       2 => {
-        aligned1.write_char('-')
-        aligned2.write_char(s2.unsafe_get(j - 1).unsafe_to_char())
+        aligned1_chars[pos] = '-'
+        aligned2_chars[pos] = chars2[j - 1]
         j = j - 1
       }
       _ => break
     }
+    pos = pos - 1
   }
   
-  let aligned_seq1 = Seq::new(aligned1.to_string()).reverse()
-  let aligned_seq2 = Seq::new(aligned2.to_string()).reverse()
+  let aligned_seq1 = Seq::new(fixedarray_char_slice_to_string(aligned1_chars, pos + 1, max_len))
+  let aligned_seq2 = Seq::new(fixedarray_char_slice_to_string(aligned2_chars, pos + 1, max_len))
   
   let record1 = SeqRecord::new(aligned_seq1, id="seq1")
   let record2 = SeqRecord::new(aligned_seq2, id="seq2")
@@ -531,6 +592,15 @@ pub fn local_pairwise_align_nucleotide(
   let n = s1.length()
   let m = s2.length()
   
+  let chars1 : FixedArray[Char] = FixedArray::make(n, ' ')
+  let chars2 : FixedArray[Char] = FixedArray::make(m, ' ')
+  for i = 0; i < n; i = i + 1 {
+    chars1[i] = s1.unsafe_get(i).unsafe_to_char()
+  }
+  for i = 0; i < m; i = i + 1 {
+    chars2[i] = s2.unsafe_get(i).unsafe_to_char()
+  }
+  
   let score_matrix : FixedArray[FixedArray[Double]] = FixedArray::make(n + 1, FixedArray::make(m + 1, 0.0))
   let trace_matrix : FixedArray[FixedArray[Int]] = FixedArray::make(n + 1, FixedArray::make(m + 1, 0))
   
@@ -545,8 +615,8 @@ pub fn local_pairwise_align_nucleotide(
   
   for i = 1; i <= n; i = i + 1 {
     for j = 1; j <= m; j = j + 1 {
-      let c1 = s1.unsafe_get(i - 1).unsafe_to_char()
-      let c2 = s2.unsafe_get(j - 1).unsafe_to_char()
+      let c1 = chars1[i - 1]
+      let c2 = chars2[j - 1]
       
       let match_score_val = if c1 == c2 { match_score } else { mismatch_score }
       let diag_score = score_matrix[i - 1][j - 1] + match_score_val
@@ -584,35 +654,39 @@ pub fn local_pairwise_align_nucleotide(
     }
   }
   
+  let max_len = n + m
+  let aligned1_chars : FixedArray[Char] = FixedArray::make(max_len, ' ')
+  let aligned2_chars : FixedArray[Char] = FixedArray::make(max_len, ' ')
+  let mut pos = max_len - 1
+  
   let mut i = max_i
   let mut j = max_j
-  let aligned1 = StringBuilder::new()
-  let aligned2 = StringBuilder::new()
   
   while i > 0 && j > 0 && score_matrix[i][j] > 0.0 {
     match trace_matrix[i][j] {
       1 => {
-        aligned1.write_char(s1.unsafe_get(i - 1).unsafe_to_char())
-        aligned2.write_char(s2.unsafe_get(j - 1).unsafe_to_char())
+        aligned1_chars[pos] = chars1[i - 1]
+        aligned2_chars[pos] = chars2[j - 1]
         i = i - 1
         j = j - 1
       }
       2 => {
-        aligned1.write_char(s1.unsafe_get(i - 1).unsafe_to_char())
-        aligned2.write_char('-')
+        aligned1_chars[pos] = chars1[i - 1]
+        aligned2_chars[pos] = '-'
         i = i - 1
       }
       3 => {
-        aligned1.write_char('-')
-        aligned2.write_char(s2.unsafe_get(j - 1).unsafe_to_char())
+        aligned1_chars[pos] = '-'
+        aligned2_chars[pos] = chars2[j - 1]
         j = j - 1
       }
       _ => break
     }
+    pos = pos - 1
   }
   
-  let aligned_seq1 = Seq::new(aligned1.to_string()).reverse()
-  let aligned_seq2 = Seq::new(aligned2.to_string()).reverse()
+  let aligned_seq1 = Seq::new(fixedarray_char_slice_to_string(aligned1_chars, pos + 1, max_len))
+  let aligned_seq2 = Seq::new(fixedarray_char_slice_to_string(aligned2_chars, pos + 1, max_len))
   
   let record1 = SeqRecord::new(aligned_seq1, id="seq1")
   let record2 = SeqRecord::new(aligned_seq2, id="seq2")
@@ -638,6 +712,15 @@ pub fn global_pairwise_align_protein(
   let n = s1.length()
   let m = s2.length()
   
+  let chars1 : FixedArray[Char] = FixedArray::make(n, ' ')
+  let chars2 : FixedArray[Char] = FixedArray::make(m, ' ')
+  for i = 0; i < n; i = i + 1 {
+    chars1[i] = s1.unsafe_get(i).unsafe_to_char()
+  }
+  for i = 0; i < m; i = i + 1 {
+    chars2[i] = s2.unsafe_get(i).unsafe_to_char()
+  }
+  
   let score_matrix : FixedArray[FixedArray[Double]] = FixedArray::make(n + 1, FixedArray::make(m + 1, 0.0))
   let trace_matrix : FixedArray[FixedArray[Int]] = FixedArray::make(n + 1, FixedArray::make(m + 1, 0))
   
@@ -658,8 +741,8 @@ pub fn global_pairwise_align_protein(
   
   for i = 1; i <= n; i = i + 1 {
     for j = 1; j <= m; j = j + 1 {
-      let c1 = s1.unsafe_get(i - 1).unsafe_to_char()
-      let c2 = s2.unsafe_get(j - 1).unsafe_to_char()
+      let c1 = chars1[i - 1]
+      let c2 = chars2[j - 1]
       
       let diag_score = score_matrix[i - 1][j - 1] + blosum62(c1, c2)
       
@@ -688,35 +771,39 @@ pub fn global_pairwise_align_protein(
     }
   }
   
+  let max_len = n + m
+  let aligned1_chars : FixedArray[Char] = FixedArray::make(max_len, ' ')
+  let aligned2_chars : FixedArray[Char] = FixedArray::make(max_len, ' ')
+  let mut pos = max_len - 1
+  
   let mut i = n
   let mut j = m
-  let aligned1 = StringBuilder::new()
-  let aligned2 = StringBuilder::new()
   
   while i > 0 || j > 0 {
     match trace_matrix[i][j] {
       0 => {
-        aligned1.write_char(s1.unsafe_get(i - 1).unsafe_to_char())
-        aligned2.write_char(s2.unsafe_get(j - 1).unsafe_to_char())
+        aligned1_chars[pos] = chars1[i - 1]
+        aligned2_chars[pos] = chars2[j - 1]
         i = i - 1
         j = j - 1
       }
       1 => {
-        aligned1.write_char(s1.unsafe_get(i - 1).unsafe_to_char())
-        aligned2.write_char('-')
+        aligned1_chars[pos] = chars1[i - 1]
+        aligned2_chars[pos] = '-'
         i = i - 1
       }
       2 => {
-        aligned1.write_char('-')
-        aligned2.write_char(s2.unsafe_get(j - 1).unsafe_to_char())
+        aligned1_chars[pos] = '-'
+        aligned2_chars[pos] = chars2[j - 1]
         j = j - 1
       }
       _ => break
     }
+    pos = pos - 1
   }
   
-  let aligned_seq1 = Seq::new(aligned1.to_string()).reverse()
-  let aligned_seq2 = Seq::new(aligned2.to_string()).reverse()
+  let aligned_seq1 = Seq::new(fixedarray_char_slice_to_string(aligned1_chars, pos + 1, max_len))
+  let aligned_seq2 = Seq::new(fixedarray_char_slice_to_string(aligned2_chars, pos + 1, max_len))
   
   let record1 = SeqRecord::new(aligned_seq1, id="seq1")
   let record2 = SeqRecord::new(aligned_seq2, id="seq2")
@@ -742,6 +829,15 @@ pub fn local_pairwise_align_protein(
   let n = s1.length()
   let m = s2.length()
   
+  let chars1 : FixedArray[Char] = FixedArray::make(n, ' ')
+  let chars2 : FixedArray[Char] = FixedArray::make(m, ' ')
+  for i = 0; i < n; i = i + 1 {
+    chars1[i] = s1.unsafe_get(i).unsafe_to_char()
+  }
+  for i = 0; i < m; i = i + 1 {
+    chars2[i] = s2.unsafe_get(i).unsafe_to_char()
+  }
+  
   let score_matrix : FixedArray[FixedArray[Double]] = FixedArray::make(n + 1, FixedArray::make(m + 1, 0.0))
   let trace_matrix : FixedArray[FixedArray[Int]] = FixedArray::make(n + 1, FixedArray::make(m + 1, 0))
   
@@ -756,8 +852,8 @@ pub fn local_pairwise_align_protein(
   
   for i = 1; i <= n; i = i + 1 {
     for j = 1; j <= m; j = j + 1 {
-      let c1 = s1.unsafe_get(i - 1).unsafe_to_char()
-      let c2 = s2.unsafe_get(j - 1).unsafe_to_char()
+      let c1 = chars1[i - 1]
+      let c2 = chars2[j - 1]
       
       let diag_score = score_matrix[i - 1][j - 1] + blosum62(c1, c2)
       
@@ -794,35 +890,39 @@ pub fn local_pairwise_align_protein(
     }
   }
   
+  let max_len = n + m
+  let aligned1_chars : FixedArray[Char] = FixedArray::make(max_len, ' ')
+  let aligned2_chars : FixedArray[Char] = FixedArray::make(max_len, ' ')
+  let mut pos = max_len - 1
+  
   let mut i = max_i
   let mut j = max_j
-  let aligned1 = StringBuilder::new()
-  let aligned2 = StringBuilder::new()
   
   while i > 0 && j > 0 && score_matrix[i][j] > 0.0 {
     match trace_matrix[i][j] {
       1 => {
-        aligned1.write_char(s1.unsafe_get(i - 1).unsafe_to_char())
-        aligned2.write_char(s2.unsafe_get(j - 1).unsafe_to_char())
+        aligned1_chars[pos] = chars1[i - 1]
+        aligned2_chars[pos] = chars2[j - 1]
         i = i - 1
         j = j - 1
       }
       2 => {
-        aligned1.write_char(s1.unsafe_get(i - 1).unsafe_to_char())
-        aligned2.write_char('-')
+        aligned1_chars[pos] = chars1[i - 1]
+        aligned2_chars[pos] = '-'
         i = i - 1
       }
       3 => {
-        aligned1.write_char('-')
-        aligned2.write_char(s2.unsafe_get(j - 1).unsafe_to_char())
+        aligned1_chars[pos] = '-'
+        aligned2_chars[pos] = chars2[j - 1]
         j = j - 1
       }
       _ => break
     }
+    pos = pos - 1
   }
   
-  let aligned_seq1 = Seq::new(aligned1.to_string()).reverse()
-  let aligned_seq2 = Seq::new(aligned2.to_string()).reverse()
+  let aligned_seq1 = Seq::new(fixedarray_char_slice_to_string(aligned1_chars, pos + 1, max_len))
+  let aligned_seq2 = Seq::new(fixedarray_char_slice_to_string(aligned2_chars, pos + 1, max_len))
   
   let record1 = SeqRecord::new(aligned_seq1, id="seq1")
   let record2 = SeqRecord::new(aligned_seq2, id="seq2")
