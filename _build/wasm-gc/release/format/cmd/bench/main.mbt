@@ -220,6 +220,71 @@ fn main {
     }),
   )
 
+  // ---------------------------------------------------------------------------
+  // SeqFeature benchmarks
+  // ---------------------------------------------------------------------------
+  println("")
+  println("=== MoonBit SeqFeature benchmark ===")
+  println("")
+
+  let long_seq = @lib.Seq::new(gen_dna(100_000))
+
+  let feat = @lib.SeqFeature::new(feature_type="CDS")
+  let feat_qual = @lib.SeqFeature::new(feature_type="gene")
+  let pos0 = @lib.Position::new_exact(0)
+  let pos1000 = @lib.Position::new_exact(1000)
+  let pos2000 = @lib.Position::new_exact(2000)
+  let pos3000 = @lib.Position::new_exact(3000)
+
+  // Position creation
+  ignore(
+    bench("Position::new_exact", iters_find, fn() {
+      ignore(@lib.Position::new_exact(100))
+    }),
+  )
+
+  // FeatureLocation creation using safe constructor
+  ignore(
+    bench("FeatureLocation::new_safe", iters_find, fn() {
+      ignore(@lib.FeatureLocation::new_safe(pos0, pos1000))
+    }),
+  )
+
+  // SeqFeature creation
+  ignore(
+    bench("SeqFeature::new", iters_find, fn() {
+      ignore(@lib.SeqFeature::new(feature_type="CDS"))
+    }),
+  )
+
+  // SeqFeature with location (uses pre-created positions)
+  ignore(
+    bench("SeqFeature::new with location", iters_find, fn() {
+      ignore(
+        @lib.SeqFeature::new(
+          location=Some(@lib.FeatureLocation::new_safe(pos0, pos1000)),
+          feature_type="CDS",
+        ),
+      )
+    }),
+  )
+
+  // SeqFeature add_qualifier
+  ignore(
+    bench("SeqFeature::add_qualifier", iters_find, fn() {
+      ignore(feat_qual.add_qualifier("gene", "test"))
+    }),
+  )
+
+  // CompoundLocation
+  let loc1 = @lib.FeatureLocation::new_safe(pos0, pos1000)
+  let loc2 = @lib.FeatureLocation::new_safe(pos2000, pos3000)
+  ignore(
+    bench("CompoundLocation::new", iters_find, fn() {
+      ignore(@lib.CompoundLocation::new([loc1, loc2], operator="join"))
+    }),
+  )
+
   println("")
   println("done.")
 }

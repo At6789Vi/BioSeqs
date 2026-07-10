@@ -8,6 +8,14 @@ pub fn alignio_read(String, String) -> MultipleSeqAlignment raise AlignIOError
 
 pub fn alignio_write(Array[MultipleSeqAlignment], String) -> String raise AlignIOError
 
+pub fn bytes_to_base64(Array[Int]) -> String
+
+pub fn crc32(String) -> Int
+
+pub fn gc(String) -> Double
+
+pub fn gcg(String) -> Int
+
 pub fn parse_clustal(String) -> MultipleSeqAlignment raise AlignIOError
 
 pub fn parse_fasta(String) -> Array[SeqRecord]
@@ -20,6 +28,8 @@ pub fn parse_phylip(String) -> MultipleSeqAlignment raise AlignIOError
 
 pub fn parse_phylip_sequential(String) -> MultipleSeqAlignment raise AlignIOError
 
+pub fn seguid(String) -> String
+
 pub fn seqio_parse(String, String) -> Array[SeqRecord] raise SeqIOError
 
 pub fn seqio_read(String, String) -> SeqRecord raise SeqIOError
@@ -27,6 +37,16 @@ pub fn seqio_read(String, String) -> SeqRecord raise SeqIOError
 pub fn seqio_to_dict(Array[SeqRecord]) -> Map[String, SeqRecord]
 
 pub fn seqio_write(Array[SeqRecord], String) -> String raise SeqIOError
+
+pub fn sha1(Array[Int]) -> Array[Int]
+
+pub fn sha1_string(String) -> Array[Int]
+
+pub fn string_to_bytes(String) -> Array[Int]
+
+pub fn tm_gc(String) -> Double
+
+pub fn tm_wallace(String) -> Double
 
 pub fn write_clustal(MultipleSeqAlignment) -> String
 
@@ -43,6 +63,10 @@ pub suberror AlignIOError {
   AlignIOError(String)
 }
 
+pub suberror LocationParserError {
+  LocationParserError(String)
+}
+
 pub suberror SeqError {
   SeqError(String)
 }
@@ -52,6 +76,39 @@ pub suberror SeqIOError {
 }
 
 // Types and methods
+pub struct CompoundLocation {
+  parts : Array[FeatureLocation]
+  operator : String
+  ref_seq : String?
+  ref_db : String?
+} derive(Eq)
+pub fn CompoundLocation::new(Array[FeatureLocation], operator? : String, ref_seq? : String?, ref_db? : String?) -> Self
+pub fn CompoundLocation::operator(Self) -> String
+pub fn CompoundLocation::parts(Self) -> Array[FeatureLocation]
+pub fn CompoundLocation::repr(Self) -> String
+pub fn CompoundLocation::str(Self) -> String
+
+pub struct FeatureLocation {
+  start : Position
+  end : Position
+  strand : Int?
+  ref_seq : String?
+  ref_db : String?
+} derive(Eq)
+pub fn FeatureLocation::end(Self) -> Position
+pub fn FeatureLocation::end_int(Self) -> Int
+pub fn FeatureLocation::extract(Self, Seq) -> Seq raise LocationParserError
+pub fn FeatureLocation::new(Position, Position, strand? : Int?, ref_seq? : String?, ref_db? : String?) -> Self raise LocationParserError
+pub fn FeatureLocation::new_exact(Int, Int, strand? : Int?) -> Self raise LocationParserError
+pub fn FeatureLocation::new_safe(Position, Position, strand? : Int?, ref_seq? : String?, ref_db? : String?) -> Self
+pub fn FeatureLocation::ref_db(Self) -> String?
+pub fn FeatureLocation::ref_seq(Self) -> String?
+pub fn FeatureLocation::repr(Self) -> String
+pub fn FeatureLocation::start(Self) -> Position
+pub fn FeatureLocation::start_int(Self) -> Int
+pub fn FeatureLocation::str(Self) -> String
+pub fn FeatureLocation::strand(Self) -> Int?
+
 pub struct MultipleSeqAlignment {
   records : Array[SeqRecord]
   annotations : Map[String, String]
@@ -66,6 +123,44 @@ pub fn MultipleSeqAlignment::new(Array[SeqRecord], annotations? : Map[String, St
 pub fn MultipleSeqAlignment::num_records(Self) -> Int
 pub fn MultipleSeqAlignment::repr(Self) -> String
 pub fn MultipleSeqAlignment::slice(Self, row_start? : Int, row_end? : Int, col_start? : Int, col_end? : Int) -> Self
+
+pub enum Position {
+  ExactPosition(Int)
+  WithinPosition(Int, Int, Int)
+  BeforePosition(Int)
+  AfterPosition(Int)
+  UncertainPosition(Int)
+  UnknownPosition
+} derive(Eq)
+pub fn Position::new_after(Int) -> Self
+pub fn Position::new_before(Int) -> Self
+pub fn Position::new_exact(Int) -> Self
+pub fn Position::new_uncertain(Int) -> Self
+pub fn Position::new_unknown() -> Self
+pub fn Position::new_within(Int, Int, Int) -> Self raise LocationParserError
+pub fn Position::repr(Self) -> String
+pub fn Position::str(Self) -> String
+pub fn Position::to_int(Self) -> Int
+
+pub struct ProteinAnalysis {
+  sequence : String
+} derive(Eq)
+pub fn ProteinAnalysis::aromaticity(Self) -> Double
+pub fn ProteinAnalysis::count_amino_acids(Self) -> Map[Char, Int]
+pub fn ProteinAnalysis::get_amino_acids_percent(Self) -> Map[Char, Double]
+pub fn ProteinAnalysis::gravy(Self) -> Double
+pub fn ProteinAnalysis::molecular_weight(Self) -> Double
+pub fn ProteinAnalysis::new(String) -> Self
+
+pub struct Reference {
+  authors : String
+  title : String
+  journal : String
+  pubmed_id : String
+  comment : String
+} derive(Eq)
+pub fn Reference::new(authors? : String, title? : String, journal? : String, pubmed_id? : String, comment? : String) -> Self
+pub fn Reference::repr(Self) -> String
 
 pub struct Seq {
   data : String
@@ -103,6 +198,30 @@ pub fn Seq::transcribe(Self) -> Self
 pub fn Seq::translate(Self, stop_symbol? : Char, to_stop? : Bool, cds? : Bool, gap? : Char) -> Self raise SeqError
 pub fn Seq::upper(Self) -> Self
 pub impl Add for Seq
+
+pub struct SeqFeature {
+  location : FeatureLocation?
+  feature_type : String
+  id : String
+  qualifiers : Map[String, Array[String]]
+  sub_features : Array[SeqFeature]
+  ref_seq : String?
+  ref_db : String?
+  strand : Int?
+} derive(Eq)
+pub fn SeqFeature::add_qualifier(Self, String, String) -> Self
+pub fn SeqFeature::extract(Self, Seq) -> Seq raise LocationParserError
+pub fn SeqFeature::feature_type(Self) -> String
+pub fn SeqFeature::id(Self) -> String
+pub fn SeqFeature::location(Self) -> FeatureLocation?
+pub fn SeqFeature::new(location? : FeatureLocation?, feature_type? : String, id? : String, qualifiers? : Map[String, Array[String]], sub_features? : Array[Self], strand? : Int?) -> Self
+pub fn SeqFeature::qualifiers(Self) -> Map[String, Array[String]]
+pub fn SeqFeature::ref_db(Self) -> String?
+pub fn SeqFeature::ref_seq(Self) -> String?
+pub fn SeqFeature::repr(Self) -> String
+pub fn SeqFeature::str(Self) -> String
+pub fn SeqFeature::strand(Self) -> Int?
+pub fn SeqFeature::sub_features(Self) -> Array[Self]
 
 pub struct SeqRecord {
   seq : Seq

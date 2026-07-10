@@ -260,10 +260,12 @@ fn main {
   // SeqFeature with location (uses pre-created positions)
   ignore(
     bench("SeqFeature::new with location", iters_find, fn() {
-      ignore(@lib.SeqFeature::new(
-        location=Some(@lib.FeatureLocation::new_safe(pos0, pos1000)),
-        feature_type="CDS",
-      ))
+      ignore(
+        @lib.SeqFeature::new(
+          location=Some(@lib.FeatureLocation::new_safe(pos0, pos1000)),
+          feature_type="CDS",
+        ),
+      )
     }),
   )
 
