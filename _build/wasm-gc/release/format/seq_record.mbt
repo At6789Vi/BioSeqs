@@ -57,13 +57,20 @@ pub fn SeqRecord::from_seq(seq : Seq) -> SeqRecord {
 
 ///|
 /// Set the phred quality scores (per-base integer quality values).
+/// Returns a new SeqRecord (does not mutate the original).
 pub fn SeqRecord::set_phred_quality(
   self : SeqRecord,
   quals : Array[Int],
 ) -> SeqRecord {
-  let new_record = self
-  new_record.letter_annotations["phred_quality"] = quals
-  new_record
+  let new_annotations : Map[String, Array[Int]] = Map(
+    [],
+    capacity=self.letter_annotations.length() + 1,
+  )
+  for k, v in self.letter_annotations {
+    new_annotations[k] = v
+  }
+  new_annotations["phred_quality"] = quals
+  SeqRecord::{ ..self, letter_annotations: new_annotations }
 }
 
 ///|

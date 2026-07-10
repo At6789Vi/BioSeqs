@@ -19,6 +19,7 @@ pub fn seqio_parse(
   match format {
     "fasta" => parse_fasta(content)
     "fastq" | "fastq-sanger" => parse_fastq(content)
+    "genbank" | "gb" => parse_genbank(content)
     _ => raise SeqIOError("Unknown format: " + format)
   }
 }

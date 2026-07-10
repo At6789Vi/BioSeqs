@@ -16,6 +16,11 @@
       "artifact": "/home/developer/Documents/1/_build/wasm-gc/debug/check/cmd/main/main.mi"
     },
     {
+      "root": "biolab/bio_seq",
+      "rel": "cmd/seqio_main",
+      "artifact": "/home/developer/Documents/1/_build/wasm-gc/debug/check/cmd/seqio_main/seqio_main.mi"
+    },
+    {
       "root": "moonbitlang/core",
       "rel": "abort",
       "artifact": "/home/developer/.moon/lib/core/_build/wasm-gc/release/bundle/abort/abort.mi"

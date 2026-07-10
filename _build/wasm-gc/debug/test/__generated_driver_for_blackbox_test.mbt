@@ -403,6 +403,8 @@ let moonbit_test_driver_internal_no_args_tests : MoonBitTestDriverInternalTestMa
   },
   "seq.mbt": {
   },
+  "genbank_io.mbt": {
+  },
   "fastq_io.mbt": {
   },
   "fasta_io.mbt": {

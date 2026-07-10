@@ -172,6 +172,38 @@ def case_write_fastq():
     emit("write_fastq", out.getvalue())
 
 
+# ---------------------------------------------------------------------------
+# Test GenBank content
+# ---------------------------------------------------------------------------
+
+GENBANK_SAMPLE = """LOCUS       NM_001              48 bp    DNA     linear   PRI 01-JAN-2020
+DEFINITION  Test gene for comparison.
+ACCESSION   NM_001
+VERSION     NM_001.1
+SOURCE      Test organism
+  ORGANISM  Test organism
+            Eukaryota; Test.
+FEATURES             Location/Qualifiers
+     source          1..48
+                     /organism="Test organism"
+     gene            1..48
+                     /gene="test_gene"
+     CDS             1..48
+                     /translation="MKRHPGSTH"
+ORIGIN
+        1 atgcatgcat gcatgcatgc atgcatgcat gcatgcatgc atgcatgc
+//
+"""
+
+
+def case_parse_genbank():
+    records = list(SeqIO.parse(StringIO(GENBANK_SAMPLE), "genbank"))
+    if records:
+        emit("parse_genbank", record_to_dict(records[0]))
+    else:
+        emit("parse_genbank", {})
+
+
 def main():
     case_parse_fasta_multiple()
     case_parse_fasta_lowercase()
@@ -182,6 +214,7 @@ def main():
     case_write_fasta()
     case_parse_fastq()
     case_write_fastq()
+    case_parse_genbank()
 
 
 if __name__ == "__main__":

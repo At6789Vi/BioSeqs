@@ -6,6 +6,8 @@ pub fn parse_fasta(String) -> Array[SeqRecord]
 
 pub fn parse_fastq(String) -> Array[SeqRecord] raise SeqIOError
 
+pub fn parse_genbank(String) -> Array[SeqRecord]
+
 pub fn seqio_parse(String, String) -> Array[SeqRecord] raise SeqIOError
 
 pub fn seqio_read(String, String) -> SeqRecord raise SeqIOError

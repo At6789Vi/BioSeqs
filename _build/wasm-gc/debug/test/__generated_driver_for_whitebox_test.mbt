@@ -391,6 +391,70 @@ fn moonbit_test_driver_internal_catch_error(
 // =========================================================
 // -=================== END JS SPECIFIC ====================
 // =========================================================
+// This file is introduced when tests without args is needed
+
+///|
+let moonbit_test_driver_internal_no_args_tests : MoonBitTestDriverInternalTestMap[
+  () -> Unit raise,
+] = {
+  "seqio_wbtest.mbt": {
+    0: (__test_736571696f5f7762746573742e6d6274_0, ["parse_fasta_basic"]),
+    1: (__test_736571696f5f7762746573742e6d6274_1, ["parse_fasta_multiline"]),
+    2: (__test_736571696f5f7762746573742e6d6274_2, ["parse_fasta_no_description"]),
+    3: (__test_736571696f5f7762746573742e6d6274_3, ["parse_fasta_lowercase"]),
+    4: (__test_736571696f5f7762746573742e6d6274_4, ["parse_fastq_basic"]),
+    5: (__test_736571696f5f7762746573742e6d6274_5, ["parse_fastq_multiple"]),
+    6: (__test_736571696f5f7762746573742e6d6274_6, ["write_fasta_basic"]),
+    7: (__test_736571696f5f7762746573742e6d6274_7, ["write_fasta_wrapping"]),
+    8: (__test_736571696f5f7762746573742e6d6274_8, ["write_fastq_basic"]),
+    9: (__test_736571696f5f7762746573742e6d6274_9, ["seqio_parse_fasta"]),
+    10: (__test_736571696f5f7762746573742e6d6274_10, ["seqio_parse_fastq"]),
+    11: (__test_736571696f5f7762746573742e6d6274_11, ["seqio_parse_unknown_format"]),
+    12: (__test_736571696f5f7762746573742e6d6274_12, ["seqio_read_single"]),
+    13: (__test_736571696f5f7762746573742e6d6274_13, ["seqio_read_multiple_error"]),
+    14: (__test_736571696f5f7762746573742e6d6274_14, ["seqio_read_empty_error"]),
+    15: (__test_736571696f5f7762746573742e6d6274_15, ["seqio_to_dict"]),
+    16: (__test_736571696f5f7762746573742e6d6274_16, ["seqrecord_new"]),
+    17: (__test_736571696f5f7762746573742e6d6274_17, ["seqrecord_set_phred_quality"]),
+    18: (__test_736571696f5f7762746573742e6d6274_18, ["roundtrip_fasta"]),
+    19: (__test_736571696f5f7762746573742e6d6274_19, ["roundtrip_fastq"]),
+  },
+  "bio_seq_wbtest.mbt": {
+  },
+}
+
+
+///|
+impl MoonBit_Test_Driver for MoonBit_Test_Driver_Internal_No_Args with fn run_test(
+  _,
+  filename,
+  index,
+  handle_start,
+  handle_result,
+  error_to_string,
+) {
+  if moonbit_test_driver_internal_no_args_tests.0.get(filename)
+    is Some(index_map) &&
+    index_map.get(index) is Some((f, attrs)) {
+    let name = if attrs is [name, ..] { name } else { "" }
+    if MOONBIT_TEST_DRIVER_INTERNAL_IS_NATIVE {
+      for attr in attrs {
+        if attr is [.. "panic", ..] {
+          raise MoonBitTestDriverInternalSkipTest(name~)
+        }
+      }
+    }
+    handle_start()
+    moonbit_test_driver_internal_catch_error(
+      f,
+      on_ok=() => handle_result(name, "", false),
+      on_err=err => handle_result(name, error_to_string(err), false),
+    )
+    true
+  } else {
+    false
+  }
+}
 ///|
 #cfg(any(target="native", target="llvm"))
 #test_entry

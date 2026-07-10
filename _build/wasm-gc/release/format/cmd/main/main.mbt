@@ -255,5 +255,21 @@ fn invalid_codon() -> String {
 
 ///|
 fn main {
-  seqio_test()
+  // Run the Seq comparison tests (JSON array output for compare.sh)
+  let cases = run_cases()
+  // Output as JSON array
+  let buf = StringBuilder::new()
+  buf.write_char('[')
+  for i, c in cases {
+    if i > 0 {
+      buf.write_char(',')
+    }
+    buf.write_string("{\"name\": \"")
+    buf.write_string(c.name)
+    buf.write_string("\", \"result\": \"")
+    buf.write_string(c.result)
+    buf.write_string("\"}")
+  }
+  buf.write_char(']')
+  println(buf.to_string())
 }
