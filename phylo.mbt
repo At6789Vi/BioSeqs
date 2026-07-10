@@ -45,37 +45,42 @@ pub fn Clade::count_terminals(self : Clade) -> Int {
 ///|
 /// Get all terminal (leaf) clades in this subtree.
 pub fn Clade::get_terminals(self : Clade) -> Array[Clade] {
+  let result = Array::new()
+  self.collect_terminals_into(result)
+  result
+}
+
+///|
+/// Helper to collect terminals into an existing array.
+fn Clade::collect_terminals_into(self : Clade, result : Array[Clade]) -> Unit {
   if self.is_terminal() {
-    let result = Array::new()
     result.push(self)
-    result
   } else {
-    let result = Array::new()
     for clade in self.clades {
-      let terminals = clade.get_terminals()
-      for terminal in terminals {
-        result.push(terminal)
-      }
+      clade.collect_terminals_into(result)
     }
-    result
   }
 }
 
 ///|
 /// Get all non-terminal (internal) clades in this subtree.
 pub fn Clade::get_nonterminals(self : Clade) -> Array[Clade] {
-  if self.is_terminal() {
-    Array::new()
-  } else {
-    let result = Array::new()
+  let result = Array::new()
+  self.collect_nonterminals_into(result)
+  result
+}
+
+///|
+/// Helper to collect non-terminals into an existing array.
+fn Clade::collect_nonterminals_into(
+  self : Clade,
+  result : Array[Clade],
+) -> Unit {
+  if !self.is_terminal() {
     result.push(self)
     for clade in self.clades {
-      let nonterms = clade.get_nonterminals()
-      for nonterm in nonterms {
-        result.push(nonterm)
-      }
+      clade.collect_nonterminals_into(result)
     }
-    result
   }
 }
 
@@ -86,27 +91,33 @@ pub fn Clade::find_clades(
   name? : String? = None,
   terminal? : Bool? = None,
 ) -> Array[Clade] {
-  let match_name = if name is Some(_) { self.name == name } else { true }
+  let result = Array::new()
+  self.find_clades_into(name, terminal, result)
+  result
+}
 
+///|
+/// Helper to find clades and collect into existing array.
+fn Clade::find_clades_into(
+  self : Clade,
+  name : String?,
+  terminal : Bool?,
+  result : Array[Clade],
+) -> Unit {
+  let match_name = if name is Some(_) { self.name == name } else { true }
   let match_terminal = if terminal is Some(_) {
     self.is_terminal() == terminal.unwrap()
   } else {
     true
   }
 
-  let result = Array::new()
   if match_name && match_terminal {
     result.push(self)
   }
 
   for clade in self.clades {
-    let found = clade.find_clades(name~, terminal~)
-    for item in found {
-      result.push(item)
-    }
+    clade.find_clades_into(name, terminal, result)
   }
-
-  result
 }
 
 ///|
@@ -116,12 +127,25 @@ pub fn Clade::find_any(
   name? : String? = None,
   terminal? : Bool? = None,
 ) -> Clade? {
-  let clades = self.find_clades(name~, terminal~)
-  if clades.length() > 0 {
-    Some(clades[0])
+  let match_name = if name is Some(_) { self.name == name } else { true }
+  let match_terminal = if terminal is Some(_) {
+    self.is_terminal() == terminal.unwrap()
   } else {
-    None
+    true
   }
+
+  if match_name && match_terminal {
+    return Some(self)
+  }
+
+  for clade in self.clades {
+    match clade.find_any(name~, terminal~) {
+      Some(found) => return Some(found)
+      None => ()
+    }
+  }
+
+  None
 }
 
 ///|
@@ -170,25 +194,64 @@ pub fn Clade::depths(
   self : Clade,
   current_depth? : Double? = None,
 ) -> Array[(String, Double)] {
+  let result = Array::new()
+  self.depths_helper(current_depth, result)
+  result
+}
+
+///|
+/// Calculate depths and return as a Map for faster lookup.
+pub fn Clade::depths_map(
+  self : Clade,
+  current_depth? : Double? = None,
+) -> Map[String, Double] {
+  let result : Map[String, Double] = Map([], capacity=16)
+  self.depths_map_helper(current_depth, result)
+  result
+}
+
+///|
+/// Helper to collect depths into an existing array.
+fn Clade::depths_helper(
+  self : Clade,
+  current_depth : Double?,
+  result : Array[(String, Double)],
+) -> Unit {
   let depth = match current_depth {
     Some(d) => d + self.branch_length.unwrap_or(0.0)
     None => self.branch_length.unwrap_or(0.0)
   }
 
-  let result = Array::new()
   match self.name {
     Some(n) => result.push((n, depth))
     None => ()
   }
 
   for clade in self.clades {
-    let child_depths = clade.depths(current_depth=Some(depth))
-    for item in child_depths {
-      result.push(item)
-    }
+    clade.depths_helper(Some(depth), result)
+  }
+}
+
+///|
+/// Helper to collect depths into an existing Map.
+fn Clade::depths_map_helper(
+  self : Clade,
+  current_depth : Double?,
+  result : Map[String, Double],
+) -> Unit {
+  let depth = match current_depth {
+    Some(d) => d + self.branch_length.unwrap_or(0.0)
+    None => self.branch_length.unwrap_or(0.0)
   }
 
-  result
+  match self.name {
+    Some(n) => result[n] = depth
+    None => ()
+  }
+
+  for clade in self.clades {
+    clade.depths_map_helper(Some(depth), result)
+  }
 }
 
 ///|

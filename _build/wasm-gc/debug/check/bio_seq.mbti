@@ -88,6 +88,7 @@ pub struct Clade {
 }
 pub fn Clade::count_terminals(Self) -> Int
 pub fn Clade::depths(Self, current_depth? : Double?) -> Array[(String, Double)]
+pub fn Clade::depths_map(Self, current_depth? : Double?) -> Map[String, Double]
 pub fn Clade::find_any(Self, name? : String?, terminal? : Bool?) -> Self?
 pub fn Clade::find_clades(Self, name? : String?, terminal? : Bool?) -> Array[Self]
 pub fn Clade::get_nonterminals(Self) -> Array[Self]

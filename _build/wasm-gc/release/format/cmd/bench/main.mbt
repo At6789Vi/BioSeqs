@@ -330,6 +330,137 @@ fn main {
   )
   ignore(bench("tm_gc", iters_find, fn() { ignore(@lib.tm_gc(dna_seq)) }))
 
+  // ---------------------------------------------------------------------------
+  // Bio.Phylo benchmarks
+  // ---------------------------------------------------------------------------
+  println("")
+  println("=== MoonBit Bio.Phylo benchmark ===")
+  println("")
+
+  let simple_newick = "(A:0.1,B:0.2,(C:0.3,D:0.4):0.5);"
+  let tree = @lib.parse_newick(simple_newick)
+
+  // Newick parsing
+  ignore(
+    bench("parse_newick (simple)", iters_find, fn() {
+      ignore(@lib.parse_newick(simple_newick))
+    }),
+  )
+
+  // Newick writing
+  ignore(
+    bench("write_newick", iters_find, fn() { ignore(@lib.write_newick(tree)) }),
+  )
+
+  // Count terminals
+  ignore(
+    bench("Tree::count_terminals", iters_find, fn() {
+      ignore(tree.count_terminals())
+    }),
+  )
+
+  // Get terminals
+  ignore(
+    bench("Tree::get_terminals", iters_find, fn() {
+      ignore(tree.get_terminals())
+    }),
+  )
+
+  // Get nonterminals
+  ignore(
+    bench("Tree::get_nonterminals", iters_find, fn() {
+      ignore(tree.get_nonterminals())
+    }),
+  )
+
+  // Find clades by name
+  ignore(
+    bench("Tree::find_clades by name", iters_find, fn() {
+      ignore(tree.find_clades(name=Some("A")))
+    }),
+  )
+
+  // Find clades by terminal status
+  ignore(
+    bench("Tree::find_clades terminal=true", iters_find, fn() {
+      ignore(tree.find_clades(terminal=Some(true)))
+    }),
+  )
+
+  // Find any clade
+  ignore(
+    bench("Tree::find_any", iters_find, fn() {
+      ignore(tree.find_any(name=Some("A")))
+    }),
+  )
+
+  // Get path
+  ignore(
+    bench("Tree::get_path", iters_find, fn() { ignore(tree.get_path("C")) }),
+  )
+
+  // Depths
+  ignore(bench("Tree::depths", iters_find, fn() { ignore(tree.depths()) }))
+
+  // Distance
+  ignore(
+    bench("Tree::distance", iters_find, fn() { ignore(tree.distance("A", "C")) }),
+  )
+
+  // Common ancestor
+  ignore(
+    bench("Tree::common_ancestor", iters_find, fn() {
+      ignore(tree.common_ancestor(["B", "C"]))
+    }),
+  )
+
+  // Is bifurcating
+  ignore(
+    bench("Tree::is_bifurcating", iters_find, fn() {
+      ignore(tree.is_bifurcating())
+    }),
+  )
+
+  // Draw ASCII
+  ignore(
+    bench("Tree::draw_ascii", iters_small, fn() { ignore(tree.draw_ascii()) }),
+  )
+
+  // Generate a larger tree for more meaningful benchmarks
+  let large_newick_buf = StringBuilder::new()
+  large_newick_buf.write_char('(')
+  for i = 0; i < 50; i = i + 1 {
+    if i > 0 {
+      large_newick_buf.write_char(',')
+    }
+    large_newick_buf.write_string("X")
+    large_newick_buf.write_string(i.to_string())
+    large_newick_buf.write_char(':')
+    large_newick_buf.write_string(0.1.to_string())
+  }
+  large_newick_buf.write_string(");")
+  let large_newick = large_newick_buf.to_string()
+  let large_tree = @lib.parse_newick(large_newick)
+
+  // Large tree operations
+  ignore(
+    bench("parse_newick (50 leaves)", iters_small, fn() {
+      ignore(@lib.parse_newick(large_newick))
+    }),
+  )
+
+  ignore(
+    bench("Tree::count_terminals (50 leaves)", iters_small, fn() {
+      ignore(large_tree.count_terminals())
+    }),
+  )
+
+  ignore(
+    bench("Tree::find_clades (50 leaves)", iters_small, fn() {
+      ignore(large_tree.find_clades(terminal=Some(true)))
+    }),
+  )
+
   println("")
   println("done.")
 }
