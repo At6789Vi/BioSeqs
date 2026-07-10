@@ -397,6 +397,22 @@ fn moonbit_test_driver_internal_catch_error(
 let moonbit_test_driver_internal_no_args_tests : MoonBitTestDriverInternalTestMap[
   () -> Unit raise,
 ] = {
+  "sequtils_test.mbt": {
+    0: (__test_7365717574696c735f746573742e6d6274_0, ["crc32_basic"]),
+    1: (__test_7365717574696c735f746573742e6d6274_1, ["gcg_basic"]),
+    2: (__test_7365717574696c735f746573742e6d6274_2, ["seguid_basic"]),
+    3: (__test_7365717574696c735f746573742e6d6274_3, ["gc_simple"]),
+    4: (__test_7365717574696c735f746573742e6d6274_4, ["gc_full"]),
+    5: (__test_7365717574696c735f746573742e6d6274_5, ["protein_molecular_weight"]),
+    6: (__test_7365717574696c735f746573742e6d6274_6, ["protein_aromaticity"]),
+    7: (__test_7365717574696c735f746573742e6d6274_7, ["protein_gravy"]),
+    8: (__test_7365717574696c735f746573742e6d6274_8, ["tm_wallace_simple"]),
+    9: (__test_7365717574696c735f746573742e6d6274_9, ["tm_wallace_gc"]),
+    10: (__test_7365717574696c735f746573742e6d6274_10, ["tm_gc_simple"]),
+    11: (__test_7365717574696c735f746573742e6d6274_11, ["tm_gc_long"]),
+  },
+  "sequtils.mbt": {
+  },
   "seqio.mbt": {
   },
   "seqfeature_test.mbt": {
