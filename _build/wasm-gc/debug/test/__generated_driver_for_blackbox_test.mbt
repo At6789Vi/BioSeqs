@@ -397,6 +397,23 @@ fn moonbit_test_driver_internal_catch_error(
 let moonbit_test_driver_internal_no_args_tests : MoonBitTestDriverInternalTestMap[
   () -> Unit raise,
 ] = {
+  "skbio_alignment_test.mbt": {
+    0: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_0, ["dna_creation"]),
+    1: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_1, ["rna_creation"]),
+    2: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_2, ["protein_creation"]),
+    3: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_3, ["tabular_msa_creation"]),
+    4: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_4, ["tabular_msa_column"]),
+    5: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_5, ["tabular_msa_consensus"]),
+    6: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_6, ["tabular_msa_conservation"]),
+    7: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_7, ["global_pairwise_align_nucleotide"]),
+    8: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_8, ["local_pairwise_align_nucleotide"]),
+    9: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_9, ["global_pairwise_align_protein"]),
+    10: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_10, ["local_pairwise_align_protein"]),
+    11: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_11, ["align_score"]),
+    12: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_12, ["global_alignment_score"]),
+  },
+  "skbio_alignment.mbt": {
+  },
   "sequtils_test.mbt": {
     0: (__test_7365717574696c735f746573742e6d6274_0, ["crc32_basic"]),
     1: (__test_7365717574696c735f746573742e6d6274_1, ["crc32_simple"]),
