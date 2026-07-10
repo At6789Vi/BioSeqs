@@ -466,6 +466,31 @@ let moonbit_test_driver_internal_no_args_tests : MoonBitTestDriverInternalTestMa
   },
   "phylip_io.mbt": {
   },
+  "pdb_test.mbt": {
+    0: (__test_7064625f746573742e6d6274_0, ["vector3_distance"]),
+    1: (__test_7064625f746573742e6d6274_1, ["atom_creation"]),
+    2: (__test_7064625f746573742e6d6274_2, ["atom_distance"]),
+    3: (__test_7064625f746573742e6d6274_3, ["residue_creation"]),
+    4: (__test_7064625f746573742e6d6274_4, ["residue_find_atom"]),
+    5: (__test_7064625f746573742e6d6274_5, ["residue_get_ca"]),
+    6: (__test_7064625f746573742e6d6274_6, ["residue_center_of_mass"]),
+    7: (__test_7064625f746573742e6d6274_7, ["chain_creation"]),
+    8: (__test_7064625f746573742e6d6274_8, ["chain_find_residue"]),
+    9: (__test_7064625f746573742e6d6274_9, ["model_creation"]),
+    10: (__test_7064625f746573742e6d6274_10, ["model_find_chain"]),
+    11: (__test_7064625f746573742e6d6274_11, ["structure_creation"]),
+    12: (__test_7064625f746573742e6d6274_12, ["pdb_parse_simple"]),
+    13: (__test_7064625f746573742e6d6274_13, ["pdb_parse_multiple_residues"]),
+    14: (__test_7064625f746573742e6d6274_14, ["pdb_parse_multiple_chains"]),
+    15: (__test_7064625f746573742e6d6274_15, ["pdb_parse_with_model"]),
+    16: (__test_7064625f746573742e6d6274_16, ["pdb_write"]),
+    17: (__test_7064625f746573742e6d6274_17, ["pdb_roundtrip"]),
+    18: (__test_7064625f746573742e6d6274_18, ["structure_distance"]),
+  },
+  "pdb_io.mbt": {
+  },
+  "pdb.mbt": {
+  },
   "newick_io.mbt": {
   },
   "genbank_io.mbt": {
