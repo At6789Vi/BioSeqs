@@ -24,6 +24,8 @@ pub fn parse_fastq(String) -> Array[SeqRecord] raise SeqIOError
 
 pub fn parse_genbank(String) -> Array[SeqRecord]
 
+pub fn parse_newick(String) -> Tree
+
 pub fn parse_phylip(String) -> MultipleSeqAlignment raise AlignIOError
 
 pub fn parse_phylip_sequential(String) -> MultipleSeqAlignment raise AlignIOError
@@ -54,6 +56,8 @@ pub fn write_fasta(Array[SeqRecord]) -> String
 
 pub fn write_fastq(Array[SeqRecord]) -> String raise SeqIOError
 
+pub fn write_newick(Tree) -> String
+
 pub fn write_phylip(MultipleSeqAlignment) -> String
 
 pub fn write_phylip_sequential(MultipleSeqAlignment) -> String
@@ -76,6 +80,23 @@ pub suberror SeqIOError {
 }
 
 // Types and methods
+pub struct Clade {
+  branch_length : Double?
+  name : String?
+  confidence : Double?
+  clades : Array[Clade]
+}
+pub fn Clade::count_terminals(Self) -> Int
+pub fn Clade::depths(Self, current_depth? : Double?) -> Array[(String, Double)]
+pub fn Clade::find_any(Self, name? : String?, terminal? : Bool?) -> Self?
+pub fn Clade::find_clades(Self, name? : String?, terminal? : Bool?) -> Array[Self]
+pub fn Clade::get_nonterminals(Self) -> Array[Self]
+pub fn Clade::get_path(Self, String) -> Array[Self]?
+pub fn Clade::get_terminals(Self) -> Array[Self]
+pub fn Clade::is_bifurcating(Self) -> Bool
+pub fn Clade::is_terminal(Self) -> Bool
+pub fn Clade::new(branch_length? : Double?, name? : String?, confidence? : Double?, clades? : Array[Self]) -> Self
+
 pub struct CompoundLocation {
   parts : Array[FeatureLocation]
   operator : String
@@ -236,6 +257,28 @@ pub fn SeqRecord::new(Seq, id? : String, name? : String, description? : String) 
 pub fn SeqRecord::phred_quality(Self) -> Array[Int]?
 pub fn SeqRecord::repr(Self) -> String
 pub fn SeqRecord::set_phred_quality(Self, Array[Int]) -> Self
+
+pub struct Tree {
+  root : Clade
+  rooted : Bool
+  name : String?
+  weight : Double
+}
+pub fn Tree::common_ancestor(Self, Array[String]) -> Clade?
+pub fn Tree::count_terminals(Self) -> Int
+pub fn Tree::depths(Self) -> Array[(String, Double)]
+pub fn Tree::distance(Self, String, String) -> Double?
+pub fn Tree::draw_ascii(Self) -> String
+pub fn Tree::find_any(Self, name? : String?, terminal? : Bool?) -> Clade?
+pub fn Tree::find_clades(Self, name? : String?, terminal? : Bool?) -> Array[Clade]
+pub fn Tree::get_nonterminals(Self) -> Array[Clade]
+pub fn Tree::get_path(Self, String) -> Array[Clade]?
+pub fn Tree::get_root(Self) -> Clade
+pub fn Tree::get_terminals(Self) -> Array[Clade]
+pub fn Tree::is_bifurcating(Self) -> Bool
+pub fn Tree::is_rooted(Self) -> Bool
+pub fn Tree::new(Clade, rooted? : Bool, name? : String?, weight? : Double) -> Self
+pub fn Tree::repr(Self) -> String
 
 // Type aliases
 

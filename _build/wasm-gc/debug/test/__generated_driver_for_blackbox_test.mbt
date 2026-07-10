@@ -438,7 +438,35 @@ let moonbit_test_driver_internal_no_args_tests : MoonBitTestDriverInternalTestMa
   },
   "seq.mbt": {
   },
+  "phylo_test.mbt": {
+    0: (__test_7068796c6f5f746573742e6d6274_0, ["clade_is_terminal"]),
+    1: (__test_7068796c6f5f746573742e6d6274_1, ["clade_count_terminals"]),
+    2: (__test_7068796c6f5f746573742e6d6274_2, ["clade_get_terminals"]),
+    3: (__test_7068796c6f5f746573742e6d6274_3, ["clade_get_nonterminals"]),
+    4: (__test_7068796c6f5f746573742e6d6274_4, ["clade_find_clades"]),
+    5: (__test_7068796c6f5f746573742e6d6274_5, ["clade_find_any"]),
+    6: (__test_7068796c6f5f746573742e6d6274_6, ["clade_get_path"]),
+    7: (__test_7068796c6f5f746573742e6d6274_7, ["clade_depths"]),
+    8: (__test_7068796c6f5f746573742e6d6274_8, ["clade_is_bifurcating"]),
+    9: (__test_7068796c6f5f746573742e6d6274_9, ["tree_basic"]),
+    10: (__test_7068796c6f5f746573742e6d6274_10, ["tree_get_terminals"]),
+    11: (__test_7068796c6f5f746573742e6d6274_11, ["tree_find_clades"]),
+    12: (__test_7068796c6f5f746573742e6d6274_12, ["tree_find_any"]),
+    13: (__test_7068796c6f5f746573742e6d6274_13, ["tree_distance"]),
+    14: (__test_7068796c6f5f746573742e6d6274_14, ["tree_common_ancestor"]),
+    15: (__test_7068796c6f5f746573742e6d6274_15, ["newick_parse_simple"]),
+    16: (__test_7068796c6f5f746573742e6d6274_16, ["newick_parse_nested"]),
+    17: (__test_7068796c6f5f746573742e6d6274_17, ["newick_parse_with_branch_lengths"]),
+    18: (__test_7068796c6f5f746573742e6d6274_18, ["newick_parse_no_semicolon"]),
+    19: (__test_7068796c6f5f746573742e6d6274_19, ["newick_roundtrip"]),
+    20: (__test_7068796c6f5f746573742e6d6274_20, ["tree_draw_ascii"]),
+    21: (__test_7068796c6f5f746573742e6d6274_21, ["tree_repr"]),
+  },
+  "phylo.mbt": {
+  },
   "phylip_io.mbt": {
+  },
+  "newick_io.mbt": {
   },
   "genbank_io.mbt": {
   },
