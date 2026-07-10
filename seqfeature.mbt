@@ -107,6 +107,16 @@ pub fn FeatureLocation::new(
   FeatureLocation::{ start, end, strand, ref_seq, ref_db }
 }
 
+pub fn FeatureLocation::new_safe(
+  start : Position,
+  end : Position,
+  strand? : Int? = None,
+  ref_seq? : String? = None,
+  ref_db? : String? = None,
+) -> FeatureLocation {
+  FeatureLocation::{ start, end, strand, ref_seq, ref_db }
+}
+
 pub fn FeatureLocation::new_exact(
   start : Int,
   end : Int,
