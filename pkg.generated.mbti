@@ -2,6 +2,8 @@
 package "biolab/bio_seq"
 
 // Values
+pub fn align_score(TabularMSA) -> Double
+
 pub fn alignio_parse(String, String) -> Array[MultipleSeqAlignment] raise AlignIOError
 
 pub fn alignio_read(String, String) -> MultipleSeqAlignment raise AlignIOError
@@ -16,6 +18,14 @@ pub fn gc(String) -> Double
 
 pub fn gcg(String) -> Int
 
+pub fn global_pairwise_align_nucleotide(DNA, DNA, gap_open_penalty? : Double, gap_extend_penalty? : Double, match_score? : Double, mismatch_score? : Double) -> (TabularMSA, Double, (Int, Int), (Int, Int)) raise AlignError
+
+pub fn global_pairwise_align_protein(Protein, Protein, gap_open_penalty? : Double, gap_extend_penalty? : Double) -> (TabularMSA, Double, (Int, Int), (Int, Int)) raise AlignError
+
+pub fn local_pairwise_align_nucleotide(DNA, DNA, gap_open_penalty? : Double, gap_extend_penalty? : Double, match_score? : Double, mismatch_score? : Double) -> (TabularMSA, Double, (Int, Int), (Int, Int)) raise AlignError
+
+pub fn local_pairwise_align_protein(Protein, Protein, gap_open_penalty? : Double, gap_extend_penalty? : Double) -> (TabularMSA, Double, (Int, Int), (Int, Int)) raise AlignError
+
 pub fn parse_clustal(String) -> MultipleSeqAlignment raise AlignIOError
 
 pub fn parse_fasta(String) -> Array[SeqRecord]
@@ -25,6 +35,8 @@ pub fn parse_fastq(String) -> Array[SeqRecord] raise SeqIOError
 pub fn parse_genbank(String) -> Array[SeqRecord]
 
 pub fn parse_newick(String) -> Tree
+
+pub fn parse_pdb(String) -> Structure
 
 pub fn parse_phylip(String) -> MultipleSeqAlignment raise AlignIOError
 
@@ -58,17 +70,30 @@ pub fn write_fastq(Array[SeqRecord]) -> String raise SeqIOError
 
 pub fn write_newick(Tree) -> String
 
+pub fn write_pdb(Structure) -> String
+
 pub fn write_phylip(MultipleSeqAlignment) -> String
 
 pub fn write_phylip_sequential(MultipleSeqAlignment) -> String
 
 // Errors
+pub suberror AlignError {
+  AlignError(String)
+}
+
 pub suberror AlignIOError {
   AlignIOError(String)
 }
 
 pub suberror LocationParserError {
   LocationParserError(String)
+}
+
+pub suberror ParseError {
+  InvalidFormat(String)
+  MissingSemicolon
+  UnbalancedParentheses
+  InvalidNumber(String)
 }
 
 pub suberror SeqError {
@@ -80,6 +105,53 @@ pub suberror SeqIOError {
 }
 
 // Types and methods
+pub enum AlignOp {
+  Match
+  Insert
+  Delete
+  Gap
+}
+
+pub struct AlignPath {
+  operations : Array[AlignOp]
+  score : Double
+  start1 : Int
+  end1 : Int
+  start2 : Int
+  end2 : Int
+}
+pub fn AlignPath::get_operations(Self) -> Array[AlignOp]
+pub fn AlignPath::get_score(Self) -> Double
+pub fn AlignPath::new(Array[AlignOp], Double, Int, Int, Int, Int) -> Self
+
+pub struct Atom {
+  name : String
+  altloc : Char
+  resname : String
+  chainid : Char
+  resseq : Int
+  icode : Char
+  coord : Vector3
+  occupancy : Double
+  bfactor : Double
+  element : String
+  charge : Int
+}
+pub fn Atom::distance(Self, Self) -> Double
+pub fn Atom::get_coord(Self) -> Vector3
+pub fn Atom::new(name~ : String, coord~ : Vector3, resname? : String, chainid? : Char, resseq? : Int, occupancy? : Double, bfactor? : Double, element? : String, charge? : Int) -> Self
+
+pub struct Chain {
+  id : Char
+  residues : Array[Residue]
+}
+pub fn Chain::find_residue(Self, Int) -> Residue?
+pub fn Chain::get_atoms(Self) -> Array[Atom]
+pub fn Chain::get_id(Self) -> Char
+pub fn Chain::get_num_residues(Self) -> Int
+pub fn Chain::get_residues(Self) -> Array[Residue]
+pub fn Chain::new(id~ : Char, residues? : Array[Residue]) -> Self
+
 pub struct Clade {
   branch_length : Double?
   name : String?
@@ -110,6 +182,15 @@ pub fn CompoundLocation::parts(Self) -> Array[FeatureLocation]
 pub fn CompoundLocation::repr(Self) -> String
 pub fn CompoundLocation::str(Self) -> String
 
+pub struct DNA {
+  seq : Seq
+} derive(Eq)
+pub fn DNA::get_char(Self, Int) -> Char?
+pub fn DNA::length(Self) -> Int
+pub fn DNA::new(String) -> Self
+pub fn DNA::to_seq(Self) -> Seq
+pub fn DNA::to_string(Self) -> String
+
 pub struct FeatureLocation {
   start : Position
   end : Position
@@ -130,6 +211,18 @@ pub fn FeatureLocation::start(Self) -> Position
 pub fn FeatureLocation::start_int(Self) -> Int
 pub fn FeatureLocation::str(Self) -> String
 pub fn FeatureLocation::strand(Self) -> Int?
+
+pub struct Model {
+  id : Int
+  chains : Array[Chain]
+}
+pub fn Model::find_chain(Self, Char) -> Chain?
+pub fn Model::get_atoms(Self) -> Array[Atom]
+pub fn Model::get_chains(Self) -> Array[Chain]
+pub fn Model::get_id(Self) -> Int
+pub fn Model::get_num_chains(Self) -> Int
+pub fn Model::get_residues(Self) -> Array[Residue]
+pub fn Model::new(id~ : Int, chains? : Array[Chain]) -> Self
 
 pub struct MultipleSeqAlignment {
   records : Array[SeqRecord]
@@ -164,6 +257,15 @@ pub fn Position::repr(Self) -> String
 pub fn Position::str(Self) -> String
 pub fn Position::to_int(Self) -> Int
 
+pub struct Protein {
+  seq : Seq
+} derive(Eq)
+pub fn Protein::get_char(Self, Int) -> Char?
+pub fn Protein::length(Self) -> Int
+pub fn Protein::new(String) -> Self
+pub fn Protein::to_seq(Self) -> Seq
+pub fn Protein::to_string(Self) -> String
+
 pub struct ProteinAnalysis {
   sequence : String
 } derive(Eq)
@@ -174,6 +276,15 @@ pub fn ProteinAnalysis::gravy(Self) -> Double
 pub fn ProteinAnalysis::molecular_weight(Self) -> Double
 pub fn ProteinAnalysis::new(String) -> Self
 
+pub struct RNA {
+  seq : Seq
+} derive(Eq)
+pub fn RNA::get_char(Self, Int) -> Char?
+pub fn RNA::length(Self) -> Int
+pub fn RNA::new(String) -> Self
+pub fn RNA::to_seq(Self) -> Seq
+pub fn RNA::to_string(Self) -> String
+
 pub struct Reference {
   authors : String
   title : String
@@ -183,6 +294,22 @@ pub struct Reference {
 } derive(Eq)
 pub fn Reference::new(authors? : String, title? : String, journal? : String, pubmed_id? : String, comment? : String) -> Self
 pub fn Reference::repr(Self) -> String
+
+pub struct Residue {
+  resname : String
+  chainid : Char
+  resseq : Int
+  icode : Char
+  atoms : Array[Atom]
+  hetfield : String
+}
+pub fn Residue::center_of_mass(Self) -> Vector3?
+pub fn Residue::find_atom(Self, String) -> Atom?
+pub fn Residue::get_atoms(Self) -> Array[Atom]
+pub fn Residue::get_ca(Self) -> Atom?
+pub fn Residue::get_num_atoms(Self) -> Int
+pub fn Residue::is_het(Self) -> Bool
+pub fn Residue::new(resname~ : String, chainid~ : Char, resseq~ : Int, atoms? : Array[Atom], hetfield? : String) -> Self
 
 pub struct Seq {
   data : String
@@ -259,6 +386,39 @@ pub fn SeqRecord::phred_quality(Self) -> Array[Int]?
 pub fn SeqRecord::repr(Self) -> String
 pub fn SeqRecord::set_phred_quality(Self, Array[Int]) -> Self
 
+pub struct Structure {
+  id : String
+  models : Array[Model]
+}
+pub fn Structure::distance(Self, String, String) -> Double?
+pub fn Structure::find_model(Self, Int) -> Model?
+pub fn Structure::get_atoms(Self) -> Array[Atom]
+pub fn Structure::get_chains(Self) -> Array[Chain]
+pub fn Structure::get_id(Self) -> String
+pub fn Structure::get_models(Self) -> Array[Model]
+pub fn Structure::get_num_atoms(Self) -> Int
+pub fn Structure::get_num_chains(Self) -> Int
+pub fn Structure::get_num_models(Self) -> Int
+pub fn Structure::get_num_residues(Self) -> Int
+pub fn Structure::get_residues(Self) -> Array[Residue]
+pub fn Structure::new(id~ : String, models? : Array[Model]) -> Self
+
+pub struct TabularMSA {
+  records : Array[SeqRecord]
+  dtype : String
+} derive(Eq)
+pub fn TabularMSA::column(Self, Int) -> String?
+pub fn TabularMSA::consensus(Self) -> Seq
+pub fn TabularMSA::conservation(Self) -> Array[Double]
+pub fn TabularMSA::from_dna(Array[DNA]) -> Self
+pub fn TabularMSA::from_protein(Array[Protein]) -> Self
+pub fn TabularMSA::from_rna(Array[RNA]) -> Self
+pub fn TabularMSA::get(Self, Int) -> SeqRecord?
+pub fn TabularMSA::get_alignment_length(Self) -> Int
+pub fn TabularMSA::new(Array[SeqRecord], dtype? : String) -> Self raise AlignError
+pub fn TabularMSA::num_records(Self) -> Int
+pub fn TabularMSA::shape(Self) -> (Int, Int)
+
 pub struct Tree {
   root : Clade
   rooted : Bool
@@ -280,6 +440,40 @@ pub fn Tree::is_bifurcating(Self) -> Bool
 pub fn Tree::is_rooted(Self) -> Bool
 pub fn Tree::new(Clade, rooted? : Bool, name? : String?, weight? : Double) -> Self
 pub fn Tree::repr(Self) -> String
+
+pub struct TreeNode {
+  name : String?
+  length : Double?
+  support : Double?
+  children : Array[TreeNode]
+}
+pub fn TreeNode::count(Self) -> Int
+pub fn TreeNode::count_tips(Self) -> Int
+pub fn TreeNode::distance(Self, String, String) -> Double?
+pub fn TreeNode::find(Self, String) -> Self?
+pub fn TreeNode::find_by_name(Self, String) -> Array[Self]
+pub fn TreeNode::find_path(Self, String) -> Array[Self]?
+pub fn TreeNode::from_newick(String) -> Self raise ParseError
+pub fn TreeNode::has_children(Self) -> Bool
+pub fn TreeNode::is_tip(Self) -> Bool
+pub fn TreeNode::lca(Self, Array[String]) -> Self?
+pub fn TreeNode::levelorder(Self) -> Array[Self]
+pub fn TreeNode::new(name? : String?, length? : Double?, support? : Double?, children? : Array[Self]) -> Self
+pub fn TreeNode::non_tips(Self) -> Array[Self]
+pub fn TreeNode::num_children(Self) -> Int
+pub fn TreeNode::postorder(Self) -> Array[Self]
+pub fn TreeNode::preorder(Self) -> Array[Self]
+pub fn TreeNode::tips(Self) -> Array[Self]
+pub fn TreeNode::to_newick(Self) -> String
+pub fn TreeNode::total_length(Self) -> Double
+
+pub struct Vector3 {
+  x : Double
+  y : Double
+  z : Double
+}
+pub fn Vector3::distance(Self, Self) -> Double
+pub fn Vector3::new(Double, Double, Double) -> Self
 
 // Type aliases
 

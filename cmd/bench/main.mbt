@@ -474,13 +474,19 @@ fn main {
   for i = 0; i < 100; i = i + 1 {
     pdb_buf.write_string("ATOM      1  N   ALA A   ")
     pdb_buf.write_string((i + 1).to_string())
-    pdb_buf.write_string("      0.000   0.000   0.000  1.00  0.00           N\n")
+    pdb_buf.write_string(
+      "      0.000   0.000   0.000  1.00  0.00           N\n",
+    )
     pdb_buf.write_string("ATOM      2  CA  ALA A   ")
     pdb_buf.write_string((i + 1).to_string())
-    pdb_buf.write_string("      1.500   0.000   0.000  1.00  0.00           C\n")
+    pdb_buf.write_string(
+      "      1.500   0.000   0.000  1.00  0.00           C\n",
+    )
     pdb_buf.write_string("ATOM      3  C   ALA A   ")
     pdb_buf.write_string((i + 1).to_string())
-    pdb_buf.write_string("      3.000   0.000   0.000  1.00  0.00           C\n")
+    pdb_buf.write_string(
+      "      3.000   0.000   0.000  1.00  0.00           C\n",
+    )
   }
   pdb_buf.write_string("ENDMDL\n")
   pdb_buf.write_string("END\n")
@@ -526,9 +532,7 @@ fn main {
     let atom1 = atoms[0]
     let atom2 = atoms[1]
     ignore(
-      bench("Atom::distance", iters_find, fn() {
-        ignore(atom1.distance(atom2))
-      }),
+      bench("Atom::distance", iters_find, fn() { ignore(atom1.distance(atom2)) }),
     )
   }
 

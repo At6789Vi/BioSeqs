@@ -416,6 +416,20 @@ let moonbit_test_driver_internal_no_args_tests : MoonBitTestDriverInternalTestMa
     15: (__test_736b62696f5f747265655f746573742e6d6274_15, ["lca"]),
     16: (__test_736b62696f5f747265655f746573742e6d6274_16, ["distance"]),
   },
+  "skbio_tree_perf_test.mbt": {
+    0: (__test_736b62696f5f747265655f706572665f746573742e6d6274_0, ["perf_lca_balanced_1024"]),
+    1: (__test_736b62696f5f747265655f706572665f746573742e6d6274_1, ["perf_lca_balanced_4096_deep"]),
+    2: (__test_736b62696f5f747265655f706572665f746573742e6d6274_2, ["perf_distance_balanced_1024"]),
+    3: (__test_736b62696f5f747265655f706572665f746573742e6d6274_3, ["perf_distance_balanced_4096"]),
+    4: (__test_736b62696f5f747265655f706572665f746573742e6d6274_4, ["perf_levelorder_4096"]),
+    5: (__test_736b62696f5f747265655f706572665f746573742e6d6274_5, ["perf_find_4096"]),
+    6: (__test_736b62696f5f747265655f706572665f746573742e6d6274_6, ["perf_parse_4096"]),
+    7: (__test_736b62696f5f747265655f706572665f746573742e6d6274_7, ["perf_to_newick_4096"]),
+    8: (__test_736b62696f5f747265655f706572665f746573742e6d6274_8, ["perf_lca_caterpillar_500"]),
+    9: (__test_736b62696f5f747265655f706572665f746573742e6d6274_9, ["perf_distance_caterpillar_500"]),
+  },
+  "skbio_tree_bench.mbt": {
+  },
   "skbio_tree.mbt": {
   },
   "skbio_alignment_test.mbt": {
