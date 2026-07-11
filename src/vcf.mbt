@@ -45,8 +45,6 @@ pub struct VcfFile {
   records : Array[VcfRecord]
 }
 
-
-
 ///|
 /// Parse INFO field into HashMap.
 fn parse_info(info_str : String) -> @hashmap.HashMap[String, String] {

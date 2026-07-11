@@ -210,7 +210,9 @@ pub fn TabularMSA::conservation(self : TabularMSA) -> Array[Double] {
     let values = counts.values().to_array()
     let mut max_count = 0
     for v in values {
-      if v > max_count { max_count = v }
+      if v > max_count {
+        max_count = v
+      }
     }
     result.push(max_count.to_double() / n)
   }
@@ -247,12 +249,7 @@ pub fn local_pairwise_align_nucleotide(
   let (msa_str, score, pos1, pos2) = local_align(s1, s2, 1, -1, -1)
   let rec1 = SeqRecord::new(Seq::new(msa_str.0), id="seq1")
   let rec2 = SeqRecord::new(Seq::new(msa_str.1), id="seq2")
-  (
-    TabularMSA::new([rec1, rec2], "DNA"),
-    score,
-    pos1,
-    pos2,
-  )
+  (TabularMSA::new([rec1, rec2], "DNA"), score, pos1, pos2)
 }
 
 ///|
@@ -285,12 +282,7 @@ pub fn local_pairwise_align_protein(
   let (msa_str, score, pos1, pos2) = local_align(s1, s2, 1, -1, -1)
   let rec1 = SeqRecord::new(Seq::new(msa_str.0), id="seq1")
   let rec2 = SeqRecord::new(Seq::new(msa_str.1), id="seq2")
-  (
-    TabularMSA::new([rec1, rec2], "Protein"),
-    score,
-    pos1,
-    pos2,
-  )
+  (TabularMSA::new([rec1, rec2], "Protein"), score, pos1, pos2)
 }
 
 ///|
@@ -309,7 +301,9 @@ pub fn align_score(msa : TabularMSA) -> Double {
     let values = counts.values().to_array()
     let mut max_count = 0
     for v in values {
-      if v > max_count { max_count = v }
+      if v > max_count {
+        max_count = v
+      }
     }
     if max_count == n {
       score = score + 1.0
@@ -346,14 +340,14 @@ fn global_align(
   for i = 0; i <= n; i = i + 1 {
     dp.push(FixedArray::make(m + 1, 0.0))
   }
-  
+
   for i = 0; i <= n; i = i + 1 {
     dp[i][0] = i.to_double() * gap_score
   }
   for j = 0; j <= m; j = j + 1 {
     dp[0][j] = j.to_double() * gap_score
   }
-  
+
   for i = 1; i <= n; i = i + 1 {
     for j = 1; j <= m; j = j + 1 {
       let c1 = s1.unsafe_get(i - 1).unsafe_to_char()
@@ -362,15 +356,21 @@ fn global_align(
         (if c1 == c2 { match_score } else { mismatch_score })
       let delete = dp[i - 1][j] + gap_score
       let insert = dp[i][j - 1] + gap_score
-      dp[i][j] = if match_mismatch > delete && match_mismatch > insert { match_mismatch } else if delete > insert { delete } else { insert }
+      dp[i][j] = if match_mismatch > delete && match_mismatch > insert {
+        match_mismatch
+      } else if delete > insert {
+        delete
+      } else {
+        insert
+      }
     }
   }
-  
+
   let mut i = n
   let mut j = m
   let r1 = StringBuilder::new()
   let r2 = StringBuilder::new()
-  
+
   while i > 0 || j > 0 {
     if i > 0 && j > 0 {
       let c1 = s1.unsafe_get(i - 1).unsafe_to_char()
@@ -395,7 +395,7 @@ fn global_align(
       j = j - 1
     }
   }
-  
+
   ((reverse_string(r1.to_string()), reverse_string(r2.to_string())), dp[n][m])
 }
 
@@ -417,7 +417,7 @@ fn local_align(
   let mut max_score = 0.0
   let mut max_i = 0
   let mut max_j = 0
-  
+
   for i = 1; i <= n; i = i + 1 {
     for j = 1; j <= m; j = j + 1 {
       let c1 = s1.unsafe_get(i - 1).unsafe_to_char()
@@ -426,7 +426,17 @@ fn local_align(
         (if c1 == c2 { match_score } else { mismatch_score })
       let delete = dp[i - 1][j] + gap_score
       let insert = dp[i][j - 1] + gap_score
-      let val = if match_mismatch > delete && match_mismatch > insert && match_mismatch > 0.0 { match_mismatch } else if delete > insert && delete > 0.0 { delete } else if insert > 0.0 { insert } else { 0.0 }
+      let val = if match_mismatch > delete &&
+        match_mismatch > insert &&
+        match_mismatch > 0.0 {
+        match_mismatch
+      } else if delete > insert && delete > 0.0 {
+        delete
+      } else if insert > 0.0 {
+        insert
+      } else {
+        0.0
+      }
       dp[i][j] = val
       if val > max_score {
         max_score = val
@@ -435,12 +445,12 @@ fn local_align(
       }
     }
   }
-  
+
   let mut i = max_i
   let mut j = max_j
   let r1 = StringBuilder::new()
   let r2 = StringBuilder::new()
-  
+
   while i > 0 && j > 0 && dp[i][j] > 0.0 {
     let c1 = s1.unsafe_get(i - 1).unsafe_to_char()
     let c2 = s2.unsafe_get(j - 1).unsafe_to_char()
@@ -461,6 +471,11 @@ fn local_align(
       j = j - 1
     }
   }
-  
-  ((reverse_string(r1.to_string()), reverse_string(r2.to_string())), max_score, (i, max_i), (j, max_j))
+
+  (
+    (reverse_string(r1.to_string()), reverse_string(r2.to_string())),
+    max_score,
+    (i, max_i),
+    (j, max_j),
+  )
 }

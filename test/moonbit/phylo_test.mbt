@@ -1,4 +1,3 @@
-
 ///|
 test "phylo_clade_is_terminal" {
   let leaf = @src.Clade::new(name=Some("A"))
@@ -12,7 +11,10 @@ test "phylo_clade_count_terminals" {
   let tree = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
-    @src.Clade::new(clades=[@src.Clade::new(name=Some("C")), @src.Clade::new(name=Some("D"))]),
+    @src.Clade::new(clades=[
+      @src.Clade::new(name=Some("C")),
+      @src.Clade::new(name=Some("D")),
+    ]),
   ])
   assert_eq(tree.count_terminals(), 4)
 }
@@ -22,7 +24,10 @@ test "phylo_clade_get_terminals" {
   let tree = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
-    @src.Clade::new(clades=[@src.Clade::new(name=Some("C")), @src.Clade::new(name=Some("D"))]),
+    @src.Clade::new(clades=[
+      @src.Clade::new(name=Some("C")),
+      @src.Clade::new(name=Some("D")),
+    ]),
   ])
   let terminals = tree.get_terminals()
   assert_eq(terminals.length(), 4)
@@ -35,7 +40,10 @@ test "phylo_clade_get_nonterminals" {
   let tree = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
-    @src.Clade::new(clades=[@src.Clade::new(name=Some("C")), @src.Clade::new(name=Some("D"))]),
+    @src.Clade::new(clades=[
+      @src.Clade::new(name=Some("C")),
+      @src.Clade::new(name=Some("D")),
+    ]),
   ])
   let nonterminals = tree.get_nonterminals()
   assert_eq(nonterminals.length(), 2)
@@ -108,7 +116,10 @@ test "phylo_clade_depths" {
 test "phylo_clade_is_bifurcating" {
   let bifurcating = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
-    @src.Clade::new(clades=[@src.Clade::new(name=Some("B")), @src.Clade::new(name=Some("C"))]),
+    @src.Clade::new(clades=[
+      @src.Clade::new(name=Some("B")),
+      @src.Clade::new(name=Some("C")),
+    ]),
   ])
 
   let non_bifurcating = @src.Clade::new(clades=[
@@ -127,7 +138,12 @@ test "phylo_tree_basic" {
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
   ])
-  let tree = @src.Tree::new(root, rooted=true, name=Some("TestTree"), weight=2.0)
+  let tree = @src.Tree::new(
+    root,
+    rooted=true,
+    name=Some("TestTree"),
+    weight=2.0,
+  )
 
   assert_eq(tree.is_rooted(), true)
   assert_eq(tree.count_terminals(), 2)
@@ -140,7 +156,10 @@ test "phylo_tree_get_terminals" {
   let root = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
-    @src.Clade::new(clades=[@src.Clade::new(name=Some("C")), @src.Clade::new(name=Some("D"))]),
+    @src.Clade::new(clades=[
+      @src.Clade::new(name=Some("C")),
+      @src.Clade::new(name=Some("D")),
+    ]),
   ])
   let tree = @src.Tree::new(root)
 

@@ -63,8 +63,6 @@ pub struct SamFile {
   records : Array[SamRecord]
 }
 
-
-
 ///|
 /// Parse SAM header type from string.
 fn parse_header_type(s : String) -> SamHeaderType {

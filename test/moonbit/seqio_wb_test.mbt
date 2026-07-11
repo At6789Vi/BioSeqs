@@ -1,4 +1,3 @@
-
 // Whitebox tests for SeqIO functionality.
 // These tests run within the package scope, so they can access internal
 // functions (@src.parse_fasta, @src.parse_fastq, @src.write_fasta, @src.write_fastq, etc.)
@@ -57,7 +56,9 @@ test "parse_fastq_basic" {
 
 ///|
 test "parse_fastq_multiple" {
-  let records = @src.parse_fastq("@s1 Desc\nACGT\n+\nIIII\n@s2 Other\nTTTT\n+\nJJJJ")
+  let records = @src.parse_fastq(
+    "@s1 Desc\nACGT\n+\nIIII\n@s2 Other\nTTTT\n+\nJJJJ",
+  )
   assert_eq(records.length(), 2)
   assert_eq(records[0].id, "s1")
   assert_eq(records[0].seq.to_string(), "ACGT")
@@ -76,7 +77,11 @@ test "parse_fastq_multiple" {
 ///|
 test "write_fasta_basic" {
   let records = [
-    @src.SeqRecord::new(@src.Seq::new("ACGT"), id="r1", description="r1 First record"),
+    @src.SeqRecord::new(
+      @src.Seq::new("ACGT"),
+      id="r1",
+      description="r1 First record",
+    ),
     @src.SeqRecord::new(@src.Seq::new("TTTT"), id="r2", description="r2"),
   ]
   let out = @src.write_fasta(records)
@@ -91,7 +96,11 @@ test "write_fasta_wrapping" {
   // A 70-character sequence should wrap at 60 chars per line, producing
   // two sequence lines of 60 and 10 characters.
   let long_seq = "A".repeat(70)
-  let rec = @src.SeqRecord::new(@src.Seq::new(long_seq), id="long1", description="long1")
+  let rec = @src.SeqRecord::new(
+    @src.Seq::new(long_seq),
+    id="long1",
+    description="long1",
+  )
   let out = @src.write_fasta([rec])
   let expected = ">long1\n" + "A".repeat(60) + "\n" + "A".repeat(10) + "\n"
   assert_eq(out, expected)
@@ -100,10 +109,11 @@ test "write_fasta_wrapping" {
 
 ///|
 test "write_fastq_basic" {
-  let rec = @src.SeqRecord::new(@src.Seq::new("ACGT"), id="fq1", description="fq1 record").set_phred_quality([
-      40, 30, 20, 10,
-    ],
-  )
+  let rec = @src.SeqRecord::new(
+    @src.Seq::new("ACGT"),
+    id="fq1",
+    description="fq1 record",
+  ).set_phred_quality([40, 30, 20, 10])
   let out = @src.write_fastq([rec])
   // Q40 -> 'I', Q30 -> '?', Q20 -> '5', Q10 -> '+'
   assert_eq(out, "@fq1 record\nACGT\n+\nI?5+\n")

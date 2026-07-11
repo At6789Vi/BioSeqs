@@ -41,14 +41,26 @@ fn parse_newick_helper(s : String, pos : Int) -> (Clade, Int) {
     let (branch_length, new_pos2) = parse_branch_length(s, p)
     p = new_pos2
 
-    (Clade::new(branch_length~, name~, confidence=None, clades~, parent=None), p)
+    (
+      Clade::new(branch_length~, name~, confidence=None, clades~, parent=None),
+      p,
+    )
   } else {
     let (name, new_pos1) = parse_name(s, p)
     p = new_pos1
     let (branch_length, new_pos2) = parse_branch_length(s, p)
     p = new_pos2
     let empty_clades = Array::new()
-    (Clade::new(branch_length~, name~, confidence=None, clades=empty_clades, parent=None), p)
+    (
+      Clade::new(
+        branch_length~,
+        name~,
+        confidence=None,
+        clades=empty_clades,
+        parent=None,
+      ),
+      p,
+    )
   }
 }
 
@@ -115,8 +127,6 @@ fn parse_name(s : String, pos : Int) -> (String?, Int) {
     None => (None, p)
   }
 }
-
-
 
 ///|
 fn parse_branch_length(s : String, pos : Int) -> (Double?, Int) {

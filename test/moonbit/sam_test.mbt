@@ -1,4 +1,3 @@
-
 ///|
 /// Test data: a simple SAM file for testing.
 /// Each sequence is exactly 80 bases (20 repeats of "ACGT").

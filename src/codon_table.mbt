@@ -15,7 +15,10 @@ fn nuc_to_2bit(c : Int) -> Int? {
     Some(1)
   } else if c == 'G'.to_int() || c == 'g'.to_int() {
     Some(2)
-  } else if c == 'T'.to_int() || c == 't'.to_int() || c == 'U'.to_int() || c == 'u'.to_int() {
+  } else if c == 'T'.to_int() ||
+    c == 't'.to_int() ||
+    c == 'U'.to_int() ||
+    c == 'u'.to_int() {
     Some(3)
   } else {
     None

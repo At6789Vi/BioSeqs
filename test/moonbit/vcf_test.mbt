@@ -1,4 +1,3 @@
-
 ///|
 /// Test data: a simple VCF file for testing.
 let test_vcf_content = "##fileformat=VCFv4.2\n##fileDate=20240101\n##source=TestVCF\n##reference=GRCh38\n##contig=<ID=chr1,length=248956422>\n##contig=<ID=chr2,length=242193529>\n##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">\n##FORMAT=<ID=AD,Number=R,Type=Integer,Description=\"Allelic depths\">\n##INFO=<ID=AC,Number=A,Type=Integer,Description=\"Allele count\">\n##INFO=<ID=AF,Number=A,Type=Float,Description=\"Allele frequency\">\n##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total depth\">\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tsample1\tsample2\tsample3\nchr1\t100\trs123\tA\tT\t60.5\tPASS\tAC=1;AF=0.333;DP=12\tGT:AD\t0/1:3,5\t1/1:0,8\t0/0:6,0\nchr1\t200\t.\tC\tG,A\t45.0\t.\tAC=2,1;AF=0.5,0.25;DP=8\tGT:AD\t0/1:2,3\t1/2:1,2,1\t0/0:4,0\nchr2\t500\trs456\tAT\tA\t30.0\tLowQual\tDP=5\tGT\t0/1\t0/0\t1/1\nchr2\t600\t.\tG\t.\t.\tFAIL\t.\tGT\t./.\t0/0\t./.\n"

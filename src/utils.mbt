@@ -13,7 +13,7 @@ pub fn split_by_char(s : String, delim : Int) -> Array[String] {
     }
     i = i + 1
   }
-  
+
   let result = Array::make(count, "")
   let mut idx = 0
   let mut start = 0
@@ -65,12 +65,12 @@ pub fn parse_double(s : String) -> Double? {
   let mut sign = 1.0
   let mut i = 0
   let zero = '0'.to_int()
-  
+
   if s.unsafe_get(0).to_int() == '-'.to_int() {
     sign = -1.0
     i = 1
   }
-  
+
   while i < n {
     let c = s.unsafe_get(i).to_int()
     if c == '.'.to_int() {
@@ -90,7 +90,7 @@ pub fn parse_double(s : String) -> Double? {
     }
     i = i + 1
   }
-  
+
   if i > 0 || (sign < 0.0 && i > 1) {
     Some(sign * result)
   } else {

@@ -1,4 +1,3 @@
-
 ///|
 test "seqfeature_location_basic" {
   let loc = @src.FeatureLocation::new(

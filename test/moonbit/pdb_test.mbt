@@ -1,4 +1,3 @@
-
 ///|
 /// Tests for Bio.PDB module.
 
@@ -12,7 +11,13 @@ test "pdb_vector3_distance" {
 ///|
 test "pdb_atom_creation" {
   let coord = @src.Vector3::new(1.0, 2.0, 3.0)
-  let atom = @src.Atom::new(name="CA", coord~, resname="ALA", chainid='A', resseq=1)
+  let atom = @src.Atom::new(
+    name="CA",
+    coord~,
+    resname="ALA",
+    chainid='A',
+    resseq=1,
+  )
 
   assert_eq(atom.name, "CA")
   assert_eq(atom.resname, "ALA")
@@ -181,7 +186,9 @@ test "pdb_write" {
     chainid='A',
     resseq=1,
   )
-  let residue = @src.Residue::new(resname="ALA", chainid='A', resseq=1, atoms=[atom])
+  let residue = @src.Residue::new(resname="ALA", chainid='A', resseq=1, atoms=[
+    atom,
+  ])
   let chain = @src.Chain::new(id='A', residues=[residue])
   let model = @src.Model::new(id=1, chains=[chain])
   let structure = @src.Structure::new(id="test", models=[model])

@@ -21,7 +21,13 @@ pub fn Clade::new(
   clades? : Array[Clade] = [],
   parent? : Clade? = None,
 ) -> Clade {
-  let mut result = Clade::{ branch_length, name, confidence, clades: [], parent }
+  let mut result = Clade::{
+    branch_length,
+    name,
+    confidence,
+    clades: [],
+    parent,
+  }
   for clade in clades {
     result = result.add_child(clade)
   }

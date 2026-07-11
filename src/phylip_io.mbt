@@ -19,7 +19,6 @@
 ///|
 /// Parse an integer from a string.
 
-
 ///|
 /// Parse PHYLIP format text (interlaced) and return a MultipleSeqAlignment.
 pub fn parse_phylip(

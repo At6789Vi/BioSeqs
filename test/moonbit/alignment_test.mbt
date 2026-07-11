@@ -1,4 +1,3 @@
-
 ///|
 /// Tests for scikit-bio alignment module.
 
@@ -93,7 +92,9 @@ test "alignment_global_pairwise_nucleotide" {
   let seq1 = @src.DNA::new("ACGT")
   let seq2 = @src.DNA::new("AGT")
 
-  let (msa, score, pos1, pos2) = @src.global_pairwise_align_nucleotide(seq1, seq2)
+  let (msa, score, pos1, pos2) = @src.global_pairwise_align_nucleotide(
+    seq1, seq2,
+  )
 
   assert_eq(msa.num_records(), 2)
   assert_eq(pos1.0, 0)
@@ -107,7 +108,9 @@ test "alignment_local_pairwise_nucleotide" {
   let seq1 = @src.DNA::new("ACGTACGT")
   let seq2 = @src.DNA::new("CGT")
 
-  let (msa, score, pos1, pos2) = @src.local_pairwise_align_nucleotide(seq1, seq2)
+  let (msa, score, pos1, pos2) = @src.local_pairwise_align_nucleotide(
+    seq1, seq2,
+  )
 
   assert_eq(msa.num_records(), 2)
 

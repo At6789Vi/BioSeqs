@@ -1,4 +1,3 @@
-
 // Blackbox tests for the MoonBit Seq reimplementation, cross-checked against
 // BioPython 1.87's Bio.Seq.Seq. Each assertion's expected value was produced
 // by running the equivalent BioPython code (see tests/python_reference.py).
@@ -186,10 +185,7 @@ test "contains" {
 
 ///|
 test "seq_add_and_mul" {
-  assert_eq(
-    (@src.Seq::new("AC") + @src.Seq::new("GT")).to_string(),
-    "ACGT",
-  )
+  assert_eq((@src.Seq::new("AC") + @src.Seq::new("GT")).to_string(), "ACGT")
   assert_eq(@src.Seq::new("AC").add_str("GT").to_string(), "ACGT")
   assert_eq(@src.Seq::new("AC").mul(3).to_string(), "ACACAC")
   assert_eq(@src.Seq::new("AC").mul(0).to_string(), "")
@@ -217,10 +213,7 @@ test "get_char" {
 
 ///|
 test "seq_strip_lstrip_rstrip" {
-  assert_eq(
-    @src.Seq::new("---ACGT---").strip(chars="-").to_string(),
-    "ACGT",
-  )
+  assert_eq(@src.Seq::new("---ACGT---").strip(chars="-").to_string(), "ACGT")
   assert_eq(
     @src.Seq::new("---ACGT---").lstrip(chars="-").to_string(),
     "ACGT---",
@@ -255,11 +248,7 @@ test "split" {
 ///|
 test "join" {
   let spacer = @src.Seq::new("-")
-  let parts = [
-    @src.Seq::new("AC"),
-    @src.Seq::new("GT"),
-    @src.Seq::new("TT"),
-  ]
+  let parts = [@src.Seq::new("AC"), @src.Seq::new("GT"), @src.Seq::new("TT")]
   // "-".join(["AC", "GT", "TT"]) -> 'AC-GT-TT'
   assert_eq(spacer.join(parts).to_string(), "AC-GT-TT")
 }
