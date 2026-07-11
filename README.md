@@ -3,7 +3,9 @@
 > https://github.com/paipai-Studio/BioSeqs
 >
 > https://gitlink.org.cn/IvanAXu/BioSeqs
->
+> 
+> https://mooncakes.io/docs/IvanAXu/BioSeqs
+> 
 
 ## 项目概述
 
