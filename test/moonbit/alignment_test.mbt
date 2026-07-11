@@ -24,7 +24,7 @@ test "protein_creation" {
 }
 
 ///|
-test "tabular_msa_creation" {
+test "alignment_tabular_msa_creation" {
   let dna1 = @src.DNA::new("ACGT")
   let dna2 = @src.DNA::new("ACCT")
   let seqs : Array[@src.DNA] = Array::new()
@@ -37,7 +37,7 @@ test "tabular_msa_creation" {
 }
 
 ///|
-test "tabular_msa_column" {
+test "alignment_tabular_msa_column" {
   let dna1 = @src.DNA::new("ACGT")
   let dna2 = @src.DNA::new("ACCT")
   let seqs : Array[@src.DNA] = Array::new()
@@ -52,7 +52,7 @@ test "tabular_msa_column" {
 }
 
 ///|
-test "tabular_msa_consensus" {
+test "alignment_tabular_msa_consensus" {
   let dna1 = @src.DNA::new("ACGT")
   let dna2 = @src.DNA::new("ACCT")
   let dna3 = @src.DNA::new("AGGT")
@@ -67,7 +67,7 @@ test "tabular_msa_consensus" {
 }
 
 ///|
-test "tabular_msa_conservation" {
+test "alignment_tabular_msa_conservation" {
   let dna1 = @src.DNA::new("ACGT")
   let dna2 = @src.DNA::new("ACCT")
   let dna3 = @src.DNA::new("AGGT")
@@ -89,7 +89,7 @@ test "tabular_msa_conservation" {
 }
 
 ///|
-test "global_pairwise_align_nucleotide" {
+test "alignment_global_pairwise_nucleotide" {
   let seq1 = @src.DNA::new("ACGT")
   let seq2 = @src.DNA::new("AGT")
 
@@ -103,7 +103,7 @@ test "global_pairwise_align_nucleotide" {
 }
 
 ///|
-test "local_pairwise_align_nucleotide" {
+test "alignment_local_pairwise_nucleotide" {
   let seq1 = @src.DNA::new("ACGTACGT")
   let seq2 = @src.DNA::new("CGT")
 
@@ -120,7 +120,7 @@ test "local_pairwise_align_nucleotide" {
 }
 
 ///|
-test "global_pairwise_align_protein" {
+test "alignment_global_pairwise_protein" {
   let seq1 = @src.Protein::new("ACDE")
   let seq2 = @src.Protein::new("ACE")
 
@@ -130,7 +130,7 @@ test "global_pairwise_align_protein" {
 }
 
 ///|
-test "local_pairwise_align_protein" {
+test "alignment_local_pairwise_protein" {
   let seq1 = @src.Protein::new("ACDEFGHI")
   let seq2 = @src.Protein::new("EFG")
 
@@ -140,7 +140,7 @@ test "local_pairwise_align_protein" {
 }
 
 ///|
-test "align_score" {
+test "alignment_score" {
   let dna1 = @src.DNA::new("ACGT")
   let dna2 = @src.DNA::new("ACGT")
   let seqs : Array[@src.DNA] = Array::new()
@@ -153,7 +153,7 @@ test "align_score" {
 }
 
 ///|
-test "global_alignment_score" {
+test "alignment_global_score" {
   let seq1 = @src.DNA::new("ATCG")
   let seq2 = @src.DNA::new("ATAG")
 

@@ -5,7 +5,7 @@
 // Run `moon test` to execute.
 
 ///|
-test "construction and to_string" {
+test "seq_construction_and_to_string" {
   let s = @src.Seq::new("ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG")
   assert_eq(s.to_string(), "ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG")
   assert_eq(s.repr(), "Seq('ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG')")
@@ -13,7 +13,7 @@ test "construction and to_string" {
 }
 
 ///|
-test "complement and complement_rna" {
+test "seq_complement_and_complement_rna" {
   // Seq("CGA").complement() -> Seq('GCT')
   assert_eq(@src.Seq::new("CGA").complement().to_string(), "GCT")
   // Seq("CGAUT").complement() -> Seq('GCTAA')  (U treated as T)
@@ -44,7 +44,7 @@ test "reverse_complement" {
 }
 
 ///|
-test "transcribe and back_transcribe" {
+test "seq_transcribe_and_back_transcribe" {
   let dna = @src.Seq::new("ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG")
   // dna.transcribe() -> 'AUGGCCAUUGUAAUGGGCCGCUGAAAGGGUGCCCGAUAG'
   assert_eq(
@@ -68,14 +68,14 @@ test "translate default" {
 }
 
 ///|
-test "translate to_stop" {
+test "seq_translate_to_stop" {
   let s = @src.Seq::new("ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG")
   // BioPython: s.translate(to_stop=True) -> 'MAIVMGR'
   assert_eq(s.translate(to_stop=true).to_string(), "MAIVMGR")
 }
 
 ///|
-test "translate cds valid" {
+test "seq_translate_cds_valid" {
   // A valid CDS: ATG ... TAG with no in-frame internal stop codons.
   // Codons: ATG GCC ATT GGC CTG AAA GGG TGC CCC CCG TAG (33 bp)
   // Translation (cds=True): M A I G L K G C P P
@@ -84,7 +84,7 @@ test "translate cds valid" {
 }
 
 ///|
-test "translate cds invalid start" {
+test "seq_translate_cds_invalid_start" {
   // First codon is AAA (not a start codon).
   let bad = @src.Seq::new("AAACCCTAG")
   try {
@@ -96,7 +96,7 @@ test "translate cds invalid start" {
 }
 
 ///|
-test "translate cds internal stop" {
+test "seq_translate_cds_internal_stop" {
   // Has an internal TGA stop codon.
   let bad = @src.Seq::new("ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG")
   try {
@@ -108,14 +108,14 @@ test "translate cds internal stop" {
 }
 
 ///|
-test "translate partial codon" {
+test "seq_translate_partial_codon" {
   // Length not a multiple of 3; trailing bases are dropped (BioPython warns).
   // BioPython: Seq("ATGGCCAT").translate() -> 'MA'
   assert_eq(@src.Seq::new("ATGGCCAT").translate().to_string(), "MA")
 }
 
 ///|
-test "translate ambiguous codon" {
+test "seq_translate_ambiguous_codon" {
   // TAN -> X (possible stop, all valid letters)
   assert_eq(@src.Seq::new("TAN").translate().to_string(), "X")
   // NNN -> X
@@ -123,7 +123,7 @@ test "translate ambiguous codon" {
 }
 
 ///|
-test "translate invalid codon raises" {
+test "seq_translate_invalid_codon_raises" {
   // TA? contains ? which is not a valid nucleotide letter.
   try {
     ignore(@src.Seq::new("TA?").translate())
@@ -134,7 +134,7 @@ test "translate invalid codon raises" {
 }
 
 ///|
-test "translate stop_symbol" {
+test "seq_translate_stop_symbol" {
   let s = @src.Seq::new("ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG")
   // BioPython: s.translate(stop_symbol="@") -> 'MAIVMGR@KGAR@'
   assert_eq(s.translate(stop_symbol='@').to_string(), "MAIVMGR@KGAR@")
@@ -159,7 +159,7 @@ test "count" {
 }
 
 ///|
-test "find and rfind" {
+test "seq_find_and_rfind" {
   let s = @src.Seq::new("ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG")
   // BioPython: s.find("GCC") -> 3, s.rfind("GCC") -> 30
   assert_eq(s.find("GCC"), 3)
@@ -169,7 +169,7 @@ test "find and rfind" {
 }
 
 ///|
-test "startswith and endswith" {
+test "seq_startswith_and_endswith" {
   let s = @src.Seq::new("ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG")
   assert_true(s.startswith("ATG"))
   assert_true(s.endswith("TAG"))
@@ -185,7 +185,7 @@ test "contains" {
 }
 
 ///|
-test "add and mul" {
+test "seq_add_and_mul" {
   assert_eq(
     (@src.Seq::new("AC") + @src.Seq::new("GT")).to_string(),
     "ACGT",
@@ -216,7 +216,7 @@ test "get_char" {
 }
 
 ///|
-test "strip lstrip rstrip" {
+test "seq_strip_lstrip_rstrip" {
   assert_eq(
     @src.Seq::new("---ACGT---").strip(chars="-").to_string(),
     "ACGT",
@@ -279,7 +279,7 @@ test "reverse" {
 }
 
 ///|
-test "complement_rna round trip" {
+test "seq_complement_rna_round_trip" {
   let dna = @src.Seq::new("ATCG")
   // reverse_complement of DNA, then back should equal complement of reverse
   let rc = dna.reverse_complement()

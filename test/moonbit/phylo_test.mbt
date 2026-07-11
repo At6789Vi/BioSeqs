@@ -1,6 +1,6 @@
 
 ///|
-test "clade_is_terminal" {
+test "phylo_clade_is_terminal" {
   let leaf = @src.Clade::new(name=Some("A"))
   let internal = @src.Clade::new(clades=[@src.Clade::new(name=Some("A"))])
   assert_eq(leaf.is_terminal(), true)
@@ -8,7 +8,7 @@ test "clade_is_terminal" {
 }
 
 ///|
-test "clade_count_terminals" {
+test "phylo_clade_count_terminals" {
   let tree = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
@@ -18,7 +18,7 @@ test "clade_count_terminals" {
 }
 
 ///|
-test "clade_get_terminals" {
+test "phylo_clade_get_terminals" {
   let tree = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
@@ -31,7 +31,7 @@ test "clade_get_terminals" {
 }
 
 ///|
-test "clade_get_nonterminals" {
+test "phylo_clade_get_nonterminals" {
   let tree = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
@@ -42,7 +42,7 @@ test "clade_get_nonterminals" {
 }
 
 ///|
-test "clade_find_clades" {
+test "phylo_clade_find_clades" {
   let tree = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
@@ -61,7 +61,7 @@ test "clade_find_clades" {
 }
 
 ///|
-test "clade_find_any" {
+test "phylo_clade_find_any" {
   let tree = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
@@ -76,7 +76,7 @@ test "clade_find_any" {
 }
 
 ///|
-test "clade_get_path" {
+test "phylo_clade_get_path" {
   let tree = @src.Clade::new(name=Some("Root"), clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("Internal"), clades=[
@@ -92,7 +92,7 @@ test "clade_get_path" {
 }
 
 ///|
-test "clade_depths" {
+test "phylo_clade_depths" {
   let tree = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A"), branch_length=Some(0.5)),
     @src.Clade::new(name=Some("B"), branch_length=Some(0.3), clades=[
@@ -105,7 +105,7 @@ test "clade_depths" {
 }
 
 ///|
-test "clade_is_bifurcating" {
+test "phylo_clade_is_bifurcating" {
   let bifurcating = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(clades=[@src.Clade::new(name=Some("B")), @src.Clade::new(name=Some("C"))]),
@@ -122,7 +122,7 @@ test "clade_is_bifurcating" {
 }
 
 ///|
-test "tree_basic" {
+test "phylo_tree_basic" {
   let root = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
@@ -136,7 +136,7 @@ test "tree_basic" {
 }
 
 ///|
-test "tree_get_terminals" {
+test "phylo_tree_get_terminals" {
   let root = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
@@ -149,7 +149,7 @@ test "tree_get_terminals" {
 }
 
 ///|
-test "tree_find_clades" {
+test "phylo_tree_find_clades" {
   let root = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
@@ -161,7 +161,7 @@ test "tree_find_clades" {
 }
 
 ///|
-test "tree_find_any" {
+test "phylo_tree_find_any" {
   let root = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A")),
     @src.Clade::new(name=Some("B")),
@@ -173,7 +173,7 @@ test "tree_find_any" {
 }
 
 ///|
-test "tree_distance" {
+test "phylo_tree_distance" {
   let root = @src.Clade::new(clades=[
     @src.Clade::new(name=Some("A"), branch_length=Some(0.5)),
     @src.Clade::new(branch_length=Some(0.5), clades=[
@@ -189,7 +189,7 @@ test "tree_distance" {
 }
 
 ///|
-test "tree_common_ancestor" {
+test "phylo_tree_common_ancestor" {
   let root = @src.Clade::new(name=Some("Root"), clades=[
     @src.Clade::new(name=Some("A"), branch_length=Some(0.5)),
     @src.Clade::new(name=Some("Internal"), branch_length=Some(0.5), clades=[
@@ -209,7 +209,7 @@ test "tree_common_ancestor" {
 }
 
 ///|
-test "newick_parse_simple" {
+test "phylo_newick_parse_simple" {
   let newick = "(A,B);"
   let tree = @src.parse_newick(newick)
 
@@ -220,7 +220,7 @@ test "newick_parse_simple" {
 }
 
 ///|
-test "newick_parse_nested" {
+test "phylo_newick_parse_nested" {
   let newick = "(((A,B),(C,D)),(E,F,G));"
   let tree = @src.parse_newick(newick)
 
@@ -228,7 +228,7 @@ test "newick_parse_nested" {
 }
 
 ///|
-test "newick_parse_with_branch_lengths" {
+test "phylo_newick_parse_with_branch_lengths" {
   let newick = "(A:0.1,B:0.2,(C:0.3,D:0.4):0.5);"
   let tree = @src.parse_newick(newick)
 
@@ -244,7 +244,7 @@ test "newick_parse_with_branch_lengths" {
 }
 
 ///|
-test "newick_parse_no_semicolon" {
+test "phylo_newick_parse_no_semicolon" {
   let newick = "(A,B)"
   let tree = @src.parse_newick(newick)
 
@@ -252,7 +252,7 @@ test "newick_parse_no_semicolon" {
 }
 
 ///|
-test "newick_roundtrip" {
+test "phylo_newick_roundtrip" {
   let original = "(A:0.1,B:0.2,(C:0.3,D:0.4):0.5);"
   let tree = @src.parse_newick(original)
   let result = @src.write_newick(tree)
@@ -262,7 +262,7 @@ test "newick_roundtrip" {
 }
 
 ///|
-test "tree_draw_ascii" {
+test "phylo_tree_draw_ascii" {
   let newick = "(A,B,(C,D));"
   let tree = @src.parse_newick(newick)
   let ascii = tree.draw_ascii()
@@ -274,7 +274,7 @@ test "tree_draw_ascii" {
 }
 
 ///|
-test "tree_repr" {
+test "phylo_tree_repr" {
   let root = @src.Clade::new(clades=[@src.Clade::new(name=Some("A"))])
   let tree = @src.Tree::new(root, rooted=true, weight=2.5)
 

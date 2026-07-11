@@ -1,6 +1,6 @@
 
 ///|
-test "feature_location_basic" {
+test "seqfeature_location_basic" {
   let loc = @src.FeatureLocation::new(
     @src.Position::new_exact(5),
     @src.Position::new_exact(10),
@@ -11,7 +11,7 @@ test "feature_location_basic" {
 }
 
 ///|
-test "feature_location_strand" {
+test "seqfeature_location_strand" {
   let loc_plus = @src.FeatureLocation::new_exact(7, 110, strand=Some(1))
   assert_eq(loc_plus.strand(), Some(1))
   let loc_minus = @src.FeatureLocation::new_exact(9, 108, strand=Some(-1))
@@ -63,7 +63,7 @@ test "seqfeature_qualifiers" {
 }
 
 ///|
-test "compound_location" {
+test "seqfeature_compound_location" {
   let loc1 = @src.FeatureLocation::new_exact(0, 10, strand=Some(1))
   let loc2 = @src.FeatureLocation::new_exact(20, 30, strand=Some(1))
   let compound = @src.CompoundLocation::new([loc1, loc2], operator="join")
@@ -72,7 +72,7 @@ test "compound_location" {
 }
 
 ///|
-test "position_types" {
+test "seqfeature_position_types" {
   let exact = @src.Position::new_exact(10)
   assert_eq(exact.to_int(), 10)
   let within = @src.Position::new_within(5, 5, 15)

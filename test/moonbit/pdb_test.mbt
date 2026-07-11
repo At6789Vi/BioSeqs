@@ -3,14 +3,14 @@
 /// Tests for Bio.PDB module.
 
 ///|
-test "vector3_distance" {
+test "pdb_vector3_distance" {
   let v1 = @src.Vector3::new(0.0, 0.0, 0.0)
   let v2 = @src.Vector3::new(3.0, 4.0, 0.0)
   assert_eq(v1.distance(v2), 5.0)
 }
 
 ///|
-test "atom_creation" {
+test "pdb_atom_creation" {
   let coord = @src.Vector3::new(1.0, 2.0, 3.0)
   let atom = @src.Atom::new(name="CA", coord~, resname="ALA", chainid='A', resseq=1)
 
@@ -22,7 +22,7 @@ test "atom_creation" {
 }
 
 ///|
-test "atom_distance" {
+test "pdb_atom_distance" {
   let atom1 = @src.Atom::new(name="CA", coord=@src.Vector3::new(0.0, 0.0, 0.0))
   let atom2 = @src.Atom::new(name="CB", coord=@src.Vector3::new(1.5, 0.0, 0.0))
 
@@ -30,7 +30,7 @@ test "atom_distance" {
 }
 
 ///|
-test "residue_creation" {
+test "pdb_residue_creation" {
   let atoms = [
     @src.Atom::new(name="N", coord=@src.Vector3::new(0.0, 0.0, 0.0)),
     @src.Atom::new(name="CA", coord=@src.Vector3::new(1.5, 0.0, 0.0)),
@@ -43,7 +43,7 @@ test "residue_creation" {
 }
 
 ///|
-test "residue_find_atom" {
+test "pdb_residue_find_atom" {
   let atoms = [
     @src.Atom::new(name="N", coord=@src.Vector3::new(0.0, 0.0, 0.0)),
     @src.Atom::new(name="CA", coord=@src.Vector3::new(1.5, 0.0, 0.0)),
@@ -59,7 +59,7 @@ test "residue_find_atom" {
 }
 
 ///|
-test "residue_get_ca" {
+test "pdb_residue_get_ca" {
   let atoms = [
     @src.Atom::new(name="N", coord=@src.Vector3::new(0.0, 0.0, 0.0)),
     @src.Atom::new(name="CA", coord=@src.Vector3::new(1.5, 0.0, 0.0)),
@@ -71,7 +71,7 @@ test "residue_get_ca" {
 }
 
 ///|
-test "residue_center_of_mass" {
+test "pdb_residue_center_of_mass" {
   let atoms = [
     @src.Atom::new(name="N", coord=@src.Vector3::new(0.0, 0.0, 0.0)),
     @src.Atom::new(name="CA", coord=@src.Vector3::new(2.0, 0.0, 0.0)),
@@ -85,7 +85,7 @@ test "residue_center_of_mass" {
 }
 
 ///|
-test "chain_creation" {
+test "pdb_chain_creation" {
   let residue = @src.Residue::new(resname="ALA", chainid='A', resseq=1)
   let chain = @src.Chain::new(id='A', residues=[residue])
 
@@ -94,7 +94,7 @@ test "chain_creation" {
 }
 
 ///|
-test "chain_find_residue" {
+test "pdb_chain_find_residue" {
   let r1 = @src.Residue::new(resname="ALA", chainid='A', resseq=1)
   let r2 = @src.Residue::new(resname="SER", chainid='A', resseq=2)
   let chain = @src.Chain::new(id='A', residues=[r1, r2])
@@ -105,7 +105,7 @@ test "chain_find_residue" {
 }
 
 ///|
-test "model_creation" {
+test "pdb_model_creation" {
   let chain = @src.Chain::new(id='A')
   let model = @src.Model::new(id=1, chains=[chain])
 
@@ -114,7 +114,7 @@ test "model_creation" {
 }
 
 ///|
-test "model_find_chain" {
+test "pdb_model_find_chain" {
   let chain_a = @src.Chain::new(id='A')
   let chain_b = @src.Chain::new(id='B')
   let model = @src.Model::new(id=1, chains=[chain_a, chain_b])
@@ -124,7 +124,7 @@ test "model_find_chain" {
 }
 
 ///|
-test "structure_creation" {
+test "pdb_structure_creation" {
   let model = @src.Model::new(id=1)
   let structure = @src.Structure::new(id="test", models=[model])
 
@@ -204,7 +204,7 @@ test "pdb_roundtrip" {
 }
 
 ///|
-test "structure_distance" {
+test "pdb_structure_distance" {
   let atom1 = @src.Atom::new(
     name="CA",
     coord=@src.Vector3::new(0.0, 0.0, 0.0),
