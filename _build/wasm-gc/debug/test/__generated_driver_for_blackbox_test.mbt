@@ -504,6 +504,8 @@ let moonbit_test_driver_internal_no_args_tests : MoonBitTestDriverInternalTestMa
   },
   "skbio_diversity.mbt": {
   },
+  "skbio_common.mbt": {
+  },
   "skbio_alignment_test.mbt": {
     0: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_0, ["dna_creation"]),
     1: (__test_736b62696f5f616c69676e6d656e745f746573742e6d6274_1, ["rna_creation"]),

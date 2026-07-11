@@ -2,50 +2,66 @@
 /// scikit-bio Diversity module - Alpha and beta diversity metrics.
 
 ///|
-/// Helper: sum of all counts.
-fn sum_counts(counts : Array[Double]) -> Double {
-  let mut total = 0.0
-  for c in counts {
-    total = total + c
+/// Helper: iterate over two arrays of possibly different lengths, calling
+/// `f(a, b)` for each index pair. Missing elements (when one array is
+/// shorter) are passed as 0.0.
+fn pairwise_iter(
+  a : Array[Double],
+  b : Array[Double],
+  f : (Double, Double) -> Unit,
+) -> Unit {
+  let la = a.length()
+  let lb = b.length()
+  let len = if la < lb { la } else { lb }
+  for i in 0..<len {
+    f(a[i], b[i])
   }
-  total
+  if la > len {
+    for i in len..<la {
+      f(a[i], 0.0)
+    }
+  }
+  if lb > len {
+    for i in len..<lb {
+      f(0.0, b[i])
+    }
+  }
 }
 
 ///|
-/// Helper: number of observed features (non-zero counts).
-fn observed_count(counts : Array[Double]) -> Int {
-  let mut n = 0
+/// Helper: sum of squared relative proportions, sum((c/total)^2).
+fn sum_p2(counts : Array[Double], total : Double) -> Double {
+  let mut s = 0.0
   for c in counts {
-    if c > 0.0 {
-      n = n + 1
-    }
+    let p = c / total
+    s = s + p * p
   }
-  n
+  s
 }
 
 ///|
 /// Number of species observed (richness).
 pub fn observed_otus(counts : Array[Double]) -> Int {
-  observed_count(counts)
+  count_if(counts, fn(c) { c > 0.0 })
 }
 
 ///|
 /// Alias for observed_otus.
 pub fn sobs(counts : Array[Double]) -> Int {
-  observed_count(counts)
+  count_if(counts, fn(c) { c > 0.0 })
 }
 
 ///|
 /// Alias for observed_otus.
 pub fn observed_features(counts : Array[Double]) -> Int {
-  observed_count(counts)
+  count_if(counts, fn(c) { c > 0.0 })
 }
 
 ///|
 /// Shannon-Wiener diversity index.
 /// H = -sum(p_i * @math.ln(p_i))
 pub fn shannon(counts : Array[Double]) -> Double {
-  let total = sum_counts(counts)
+  let total = sum_double(counts)
   if total == 0.0 {
     return 0.0
   }
@@ -74,51 +90,37 @@ pub fn shannon_base(counts : Array[Double], base : Double) -> Double {
 /// Simpson's diversity index.
 /// D = 1 - sum(p_i^2)
 pub fn simpson(counts : Array[Double]) -> Double {
-  let total = sum_counts(counts)
+  let total = sum_double(counts)
   if total == 0.0 {
     return 0.0
   }
-  let mut sum_p2 = 0.0
-  for c in counts {
-    let p = c / total
-    sum_p2 = sum_p2 + p * p
-  }
-  1.0 - sum_p2
+  1.0 - sum_p2(counts, total)
 }
 
 ///|
 /// Simpson's dominance index.
 /// D = sum(p_i^2)
 pub fn simpson_d(counts : Array[Double]) -> Double {
-  let total = sum_counts(counts)
+  let total = sum_double(counts)
   if total == 0.0 {
     return 0.0
   }
-  let mut sum_p2 = 0.0
-  for c in counts {
-    let p = c / total
-    sum_p2 = sum_p2 + p * p
-  }
-  sum_p2
+  sum_p2(counts, total)
 }
 
 ///|
 /// Inverse Simpson index.
 /// D = 1 / sum(p_i^2)
 pub fn inv_simpson(counts : Array[Double]) -> Double {
-  let total = sum_counts(counts)
+  let total = sum_double(counts)
   if total == 0.0 {
     return 0.0
   }
-  let mut sum_p2 = 0.0
-  for c in counts {
-    let p = c / total
-    sum_p2 = sum_p2 + p * p
-  }
-  if sum_p2 == 0.0 {
+  let s = sum_p2(counts, total)
+  if s == 0.0 {
     0.0
   } else {
-    1.0 / sum_p2
+    1.0 / s
   }
 }
 
@@ -138,7 +140,7 @@ pub fn gini_simpson(counts : Array[Double]) -> Double {
 /// Berger-Parker dominance index.
 /// d = N_max / N_total
 pub fn berger_parker_d(counts : Array[Double]) -> Double {
-  let total = sum_counts(counts)
+  let total = sum_double(counts)
   if total == 0.0 {
     return 0.0
   }
@@ -161,7 +163,7 @@ pub fn berger_parker(counts : Array[Double]) -> Double {
 /// Pielou's evenness index.
 /// J = H' / @math.ln(S)
 pub fn pielou_e(counts : Array[Double]) -> Double {
-  let s = observed_count(counts).to_double()
+  let s = observed_otus(counts).to_double()
   if s <= 1.0 {
     return 0.0
   }
@@ -173,7 +175,7 @@ pub fn pielou_e(counts : Array[Double]) -> Double {
 /// Simpson's evenness index.
 /// E_D = (1/D) / S
 pub fn simpson_e(counts : Array[Double]) -> Double {
-  let s = observed_count(counts).to_double()
+  let s = observed_otus(counts).to_double()
   if s == 0.0 {
     return 0.0
   }
@@ -185,7 +187,7 @@ pub fn simpson_e(counts : Array[Double]) -> Double {
 /// Heip's evenness index.
 /// E_Heip = (e^H' - 1) / (S - 1)
 pub fn heip_e(counts : Array[Double]) -> Double {
-  let s = observed_count(counts).to_double()
+  let s = observed_otus(counts).to_double()
   if s <= 1.0 {
     return 1.0
   }
@@ -197,16 +199,9 @@ pub fn heip_e(counts : Array[Double]) -> Double {
 /// Chao1 richness estimator (bias-corrected, matches scikit-bio default).
 /// S_chao1 = S_obs + F1*(F1-1) / (2*(F2+1))
 pub fn chao1(counts : Array[Double]) -> Double {
-  let s_obs = observed_count(counts).to_double()
-  let mut f1 = 0.0
-  let mut f2 = 0.0
-  for c in counts {
-    if c == 1.0 {
-      f1 = f1 + 1.0
-    } else if c == 2.0 {
-      f2 = f2 + 1.0
-    }
-  }
+  let s_obs = observed_otus(counts).to_double()
+  let f1 = count_if(counts, fn(c) { c == 1.0 }).to_double()
+  let f2 = count_if(counts, fn(c) { c == 2.0 }).to_double()
   // Bias-corrected Chao1 (matches scikit-bio default)
   s_obs + f1 * (f1 - 1.0) / (2.0 * (f2 + 1.0))
 }
@@ -215,16 +210,9 @@ pub fn chao1(counts : Array[Double]) -> Double {
 /// Classic Chao1 richness estimator.
 /// S_chao1 = S_obs + F1^2 / (2*F2)
 pub fn chao1_classic(counts : Array[Double]) -> Double {
-  let s_obs = observed_count(counts).to_double()
-  let mut f1 = 0.0
-  let mut f2 = 0.0
-  for c in counts {
-    if c == 1.0 {
-      f1 = f1 + 1.0
-    } else if c == 2.0 {
-      f2 = f2 + 1.0
-    }
-  }
+  let s_obs = observed_otus(counts).to_double()
+  let f1 = count_if(counts, fn(c) { c == 1.0 }).to_double()
+  let f2 = count_if(counts, fn(c) { c == 2.0 }).to_double()
   if f2 > 0.0 {
     s_obs + f1 * f1 / (2.0 * f2)
   } else {
@@ -240,7 +228,6 @@ pub fn ace(counts : Array[Double], rare_threshold : Int) -> Double {
   let mut s_rare = 0.0
   let mut s_abund = 0.0
   let mut n_rare = 0.0
-  let mut f1 = 0.0
   let mut sum_c2 = 0.0
   let threshold = rare_threshold.to_double()
 
@@ -250,14 +237,12 @@ pub fn ace(counts : Array[Double], rare_threshold : Int) -> Double {
         s_rare = s_rare + 1.0
         n_rare = n_rare + c
         sum_c2 = sum_c2 + c * c
-        if c == 1.0 {
-          f1 = f1 + 1.0
-        }
       } else {
         s_abund = s_abund + 1.0
       }
     }
   }
+  let f1 = count_if(counts, fn(c) { c == 1.0 }).to_double()
 
   if n_rare == 0.0 {
     return s_abund
@@ -292,8 +277,8 @@ pub fn ace_default(counts : Array[Double]) -> Double {
 /// Fisher's alpha diversity index.
 /// Solves S = alpha * @math.ln(1 + N/alpha) iteratively.
 pub fn fisher_alpha(counts : Array[Double]) -> Double {
-  let s = observed_count(counts).to_double()
-  let n = sum_counts(counts)
+  let s = observed_otus(counts).to_double()
+  let n = sum_double(counts)
   if n == 0.0 || s == 0.0 {
     return 0.0
   }
@@ -324,16 +309,11 @@ pub fn fisher_alpha(counts : Array[Double]) -> Double {
 /// Good's coverage index.
 /// C = 1 - (F1 / N)
 pub fn goods_coverage(counts : Array[Double]) -> Double {
-  let n = sum_counts(counts)
+  let n = sum_double(counts)
   if n == 0.0 {
     return 0.0
   }
-  let mut f1 = 0.0
-  for c in counts {
-    if c == 1.0 {
-      f1 = f1 + 1.0
-    }
-  }
+  let f1 = count_if(counts, fn(c) { c == 1.0 }).to_double()
   1.0 - f1 / n
 }
 
@@ -341,8 +321,8 @@ pub fn goods_coverage(counts : Array[Double]) -> Double {
 /// Margalef's richness index.
 /// D_Mg = (S - 1) / @math.ln(N)
 pub fn margalef(counts : Array[Double]) -> Double {
-  let s = observed_count(counts).to_double()
-  let n = sum_counts(counts)
+  let s = observed_otus(counts).to_double()
+  let n = sum_double(counts)
   if n <= 1.0 {
     return 0.0
   }
@@ -353,8 +333,8 @@ pub fn margalef(counts : Array[Double]) -> Double {
 /// Menhinick's richness index.
 /// D_Mn = S / sqrt(N)
 pub fn menhinick(counts : Array[Double]) -> Double {
-  let s = observed_count(counts).to_double()
-  let n = sum_counts(counts)
+  let s = observed_otus(counts).to_double()
+  let n = sum_double(counts)
   if n == 0.0 {
     return 0.0
   }
@@ -364,8 +344,8 @@ pub fn menhinick(counts : Array[Double]) -> Double {
 ///|
 /// McIntosh diversity index.
 pub fn mcintosh_d(counts : Array[Double]) -> Double {
-  let n = sum_counts(counts)
-  let s = observed_count(counts).to_double()
+  let n = sum_double(counts)
+  let s = observed_otus(counts).to_double()
   if n == 0.0 || s <= 1.0 {
     return 0.0
   }
@@ -380,8 +360,8 @@ pub fn mcintosh_d(counts : Array[Double]) -> Double {
 ///|
 /// McIntosh evenness index.
 pub fn mcintosh_e(counts : Array[Double]) -> Double {
-  let n = sum_counts(counts)
-  let s = observed_count(counts).to_double()
+  let n = sum_double(counts)
+  let s = observed_otus(counts).to_double()
   if n == 0.0 || s <= 1.0 {
     return 1.0
   }
@@ -397,7 +377,7 @@ pub fn mcintosh_e(counts : Array[Double]) -> Double {
 /// Brillouin diversity index.
 /// HB = (1/N) * @math.ln(N! / prod(n_i!))
 pub fn brillouin_d(counts : Array[Double]) -> Double {
-  let n = sum_counts(counts)
+  let n = sum_double(counts)
   if n == 0.0 {
     return 0.0
   }
@@ -423,7 +403,7 @@ fn log_factorial(n : Double) -> Double {
 ///|
 /// Robbins estimator.
 pub fn robbins(counts : Array[Double]) -> Double {
-  let n = sum_counts(counts)
+  let n = sum_double(counts)
   if n == 0.0 {
     return 1.0
   }
@@ -439,58 +419,24 @@ pub fn robbins(counts : Array[Double]) -> Double {
 ///|
 /// Number of singletons (species with count == 1).
 pub fn singles(counts : Array[Double]) -> Int {
-  let mut n = 0
-  for c in counts {
-    if c == 1.0 {
-      n = n + 1
-    }
-  }
-  n
+  count_if(counts, fn(c) { c == 1.0 })
 }
 
 ///|
 /// Number of doubletons (species with count == 2).
 pub fn doubles(counts : Array[Double]) -> Int {
-  let mut n = 0
-  for c in counts {
-    if c == 2.0 {
-      n = n + 1
-    }
-  }
-  n
+  count_if(counts, fn(c) { c == 2.0 })
 }
-
-// ============================================================
-// Beta diversity
-// ============================================================
 
 ///|
 /// Bray-Curtis dissimilarity.
 pub fn braycurtis(counts1 : Array[Double], counts2 : Array[Double]) -> Double {
-  let len = if counts1.length() < counts2.length() {
-    counts1.length()
-  } else {
-    counts2.length()
-  }
   let mut sum_diff = 0.0
   let mut sum_total = 0.0
-  for i in 0..<len {
-    let diff = (counts1[i] - counts2[i]).abs()
-    sum_diff = sum_diff + diff
-    sum_total = sum_total + counts1[i] + counts2[i]
-  }
-  if counts1.length() > len {
-    for i in len..<counts1.length() {
-      sum_diff = sum_diff + counts1[i].abs()
-      sum_total = sum_total + counts1[i]
-    }
-  }
-  if counts2.length() > len {
-    for i in len..<counts2.length() {
-      sum_diff = sum_diff + counts2[i].abs()
-      sum_total = sum_total + counts2[i]
-    }
-  }
+  pairwise_iter(counts1, counts2, fn(a, b) {
+    sum_diff = sum_diff + (a - b).abs()
+    sum_total = sum_total + a + b
+  })
   if sum_total == 0.0 {
     0.0
   } else {
@@ -501,37 +447,18 @@ pub fn braycurtis(counts1 : Array[Double], counts2 : Array[Double]) -> Double {
 ///|
 /// Jaccard dissimilarity (presence/absence).
 pub fn jaccard(counts1 : Array[Double], counts2 : Array[Double]) -> Double {
-  let len = if counts1.length() < counts2.length() {
-    counts1.length()
-  } else {
-    counts2.length()
-  }
   let mut intersection = 0.0
   let mut union = 0.0
-  for i in 0..<len {
-    let p1 = counts1[i] > 0.0
-    let p2 = counts2[i] > 0.0
+  pairwise_iter(counts1, counts2, fn(a, b) {
+    let p1 = a > 0.0
+    let p2 = b > 0.0
     if p1 && p2 {
       intersection = intersection + 1.0
       union = union + 1.0
     } else if p1 || p2 {
       union = union + 1.0
     }
-  }
-  if counts1.length() > len {
-    for i in len..<counts1.length() {
-      if counts1[i] > 0.0 {
-        union = union + 1.0
-      }
-    }
-  }
-  if counts2.length() > len {
-    for i in len..<counts2.length() {
-      if counts2[i] > 0.0 {
-        union = union + 1.0
-      }
-    }
-  }
+  })
   if union == 0.0 {
     0.0
   } else {
@@ -542,112 +469,46 @@ pub fn jaccard(counts1 : Array[Double], counts2 : Array[Double]) -> Double {
 ///|
 /// Euclidean distance.
 pub fn euclidean(counts1 : Array[Double], counts2 : Array[Double]) -> Double {
-  let len = if counts1.length() < counts2.length() {
-    counts1.length()
-  } else {
-    counts2.length()
-  }
   let mut sum_sq = 0.0
-  for i in 0..<len {
-    let diff = counts1[i] - counts2[i]
+  pairwise_iter(counts1, counts2, fn(a, b) {
+    let diff = a - b
     sum_sq = sum_sq + diff * diff
-  }
-  if counts1.length() > len {
-    for i in len..<counts1.length() {
-      sum_sq = sum_sq + counts1[i] * counts1[i]
-    }
-  }
-  if counts2.length() > len {
-    for i in len..<counts2.length() {
-      sum_sq = sum_sq + counts2[i] * counts2[i]
-    }
-  }
+  })
   sum_sq.sqrt()
 }
 
 ///|
 /// Manhattan / cityblock distance.
 pub fn manhattan(counts1 : Array[Double], counts2 : Array[Double]) -> Double {
-  let len = if counts1.length() < counts2.length() {
-    counts1.length()
-  } else {
-    counts2.length()
-  }
   let mut sum = 0.0
-  for i in 0..<len {
-    sum = sum + (counts1[i] - counts2[i]).abs()
-  }
-  if counts1.length() > len {
-    for i in len..<counts1.length() {
-      sum = sum + counts1[i].abs()
-    }
-  }
-  if counts2.length() > len {
-    for i in len..<counts2.length() {
-      sum = sum + counts2[i].abs()
-    }
-  }
+  pairwise_iter(counts1, counts2, fn(a, b) { sum = sum + (a - b).abs() })
   sum
 }
 
 ///|
 /// Chebyshev distance.
 pub fn chebyshev(counts1 : Array[Double], counts2 : Array[Double]) -> Double {
-  let len = if counts1.length() < counts2.length() {
-    counts1.length()
-  } else {
-    counts2.length()
-  }
   let mut max_diff = 0.0
-  for i in 0..<len {
-    let diff = (counts1[i] - counts2[i]).abs()
+  pairwise_iter(counts1, counts2, fn(a, b) {
+    let diff = (a - b).abs()
     if diff > max_diff {
       max_diff = diff
     }
-  }
-  if counts1.length() > len {
-    for i in len..<counts1.length() {
-      if counts1[i].abs() > max_diff {
-        max_diff = counts1[i].abs()
-      }
-    }
-  }
-  if counts2.length() > len {
-    for i in len..<counts2.length() {
-      if counts2[i].abs() > max_diff {
-        max_diff = counts2[i].abs()
-      }
-    }
-  }
+  })
   max_diff
 }
 
 ///|
 /// Cosine dissimilarity = 1 - cosine_similarity.
 pub fn cosine(counts1 : Array[Double], counts2 : Array[Double]) -> Double {
-  let len = if counts1.length() < counts2.length() {
-    counts1.length()
-  } else {
-    counts2.length()
-  }
   let mut dot = 0.0
   let mut norm1 = 0.0
   let mut norm2 = 0.0
-  for i in 0..<len {
-    dot = dot + counts1[i] * counts2[i]
-    norm1 = norm1 + counts1[i] * counts1[i]
-    norm2 = norm2 + counts2[i] * counts2[i]
-  }
-  if counts1.length() > len {
-    for i in len..<counts1.length() {
-      norm1 = norm1 + counts1[i] * counts1[i]
-    }
-  }
-  if counts2.length() > len {
-    for i in len..<counts2.length() {
-      norm2 = norm2 + counts2[i] * counts2[i]
-    }
-  }
+  pairwise_iter(counts1, counts2, fn(a, b) {
+    dot = dot + a * b
+    norm1 = norm1 + a * a
+    norm2 = norm2 + b * b
+  })
   let n1 = norm1.sqrt()
   let n2 = norm2.sqrt()
   if n1 == 0.0 || n2 == 0.0 {
@@ -669,39 +530,16 @@ pub fn cosine_distance(
 ///|
 /// Canberra distance.
 pub fn canberra(counts1 : Array[Double], counts2 : Array[Double]) -> Double {
-  let len = if counts1.length() < counts2.length() {
-    counts1.length()
-  } else {
-    counts2.length()
-  }
   let mut sum = 0.0
-  for i in 0..<len {
-    let abs_diff = (counts1[i] - counts2[i]).abs()
-    let abs_sum = counts1[i].abs() + counts2[i].abs()
+  pairwise_iter(counts1, counts2, fn(a, b) {
+    let abs_diff = (a - b).abs()
+    let abs_sum = a.abs() + b.abs()
     if abs_sum > 0.0 {
       sum = sum + abs_diff / abs_sum
     }
-  }
-  if counts1.length() > len {
-    for i in len..<counts1.length() {
-      if counts1[i].abs() > 0.0 {
-        sum = sum + 1.0
-      }
-    }
-  }
-  if counts2.length() > len {
-    for i in len..<counts2.length() {
-      if counts2[i].abs() > 0.0 {
-        sum = sum + 1.0
-      }
-    }
-  }
+  })
   sum
 }
-
-// ============================================================
-// Phylogenetic diversity
-// ============================================================
 
 ///|
 /// Faith's Phylogenetic Diversity (PD).
@@ -761,14 +599,10 @@ fn pd_helper(
   }
 }
 
-// ============================================================
-// Diversity profile (Hill numbers)
-// ============================================================
-
 ///|
 /// Hill number of order q.
 pub fn hill(counts : Array[Double], q : Double) -> Double {
-  let total = sum_counts(counts)
+  let total = sum_double(counts)
   if total == 0.0 {
     return 0.0
   }
@@ -776,7 +610,7 @@ pub fn hill(counts : Array[Double], q : Double) -> Double {
   if q == 1.0 {
     @math.exp(shannon(counts))
   } else if q == 0.0 {
-    observed_count(counts).to_double()
+    observed_otus(counts).to_double()
   } else {
     let mut sum_pq = 0.0
     for c in counts {
@@ -792,7 +626,7 @@ pub fn hill(counts : Array[Double], q : Double) -> Double {
 ///|
 /// Renyi entropy of order q.
 pub fn renyi(counts : Array[Double], q : Double) -> Double {
-  let total = sum_counts(counts)
+  let total = sum_double(counts)
   if total == 0.0 {
     return 0.0
   }
@@ -800,7 +634,7 @@ pub fn renyi(counts : Array[Double], q : Double) -> Double {
   if q == 1.0 {
     shannon(counts)
   } else if q == 0.0 {
-    @math.ln(observed_count(counts).to_double())
+    @math.ln(observed_otus(counts).to_double())
   } else {
     let mut sum_pq = 0.0
     for c in counts {
@@ -816,7 +650,7 @@ pub fn renyi(counts : Array[Double], q : Double) -> Double {
 ///|
 /// Tsallis entropy of order q.
 pub fn tsallis(counts : Array[Double], q : Double) -> Double {
-  let total = sum_counts(counts)
+  let total = sum_double(counts)
   if total == 0.0 {
     return 0.0
   }

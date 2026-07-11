@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "biolab/bio_seq"
 
+import {
+  "moonbitlang/core/random",
+}
+
 // Values
 pub fn ace(Array[Double], Int) -> Double
 
@@ -40,6 +44,8 @@ pub fn cosine(Array[Double], Array[Double]) -> Double
 
 pub fn cosine_distance(Array[Double], Array[Double]) -> Double
 
+pub fn count_if(Array[Double], (Double) -> Bool) -> Int
+
 pub fn crc32(String) -> Int
 
 pub fn diff_of_means(Array[Double], Array[Double]) -> Double
@@ -53,6 +59,8 @@ pub fn euclidean(Array[Double], Array[Double]) -> Double
 pub fn faith_pd(Array[Double], Array[String], TreeNode) -> Double
 
 pub fn fisher_alpha(Array[Double]) -> Double
+
+pub fn fisher_yates_shuffle(Array[Int], @random.Rand) -> Unit
 
 pub fn gc(String) -> Double
 
@@ -78,6 +86,8 @@ pub fn local_pairwise_align_nucleotide(DNA, DNA, gap_open_penalty? : Double, gap
 
 pub fn local_pairwise_align_protein(Protein, Protein, gap_open_penalty? : Double, gap_extend_penalty? : Double) -> (TabularMSA, Double, (Int, Int), (Int, Int)) raise AlignError
 
+pub fn make_rng(Int) -> @random.Rand
+
 pub fn manhattan(Array[Double], Array[Double]) -> Double
 
 pub fn margalef(Array[Double]) -> Double
@@ -85,6 +95,8 @@ pub fn margalef(Array[Double]) -> Double
 pub fn mcintosh_d(Array[Double]) -> Double
 
 pub fn mcintosh_e(Array[Double]) -> Double
+
+pub fn mean_double(Array[Double]) -> Double
 
 pub fn menhinick(Array[Double]) -> Double
 
@@ -156,11 +168,15 @@ pub fn string_to_bytes(String) -> Array[Int]
 
 pub fn subsample_counts(Array[Double], Int, Bool, Int) -> Array[Double]
 
+pub fn sum_double(Array[Double]) -> Double
+
 pub fn tm_gc(String) -> Double
 
 pub fn tm_wallace(String) -> Double
 
 pub fn tsallis(Array[Double], Double) -> Double
+
+pub fn upper_triangle_iter(Int, (Int, Int) -> Unit) -> Unit
 
 pub fn write_clustal(MultipleSeqAlignment) -> String
 

@@ -1,19 +1,6 @@
 ///|
 /// scikit-bio Stats module - Statistical functions for bioinformatics.
 
-// ============================================================
-// Helper: Int seed to 32-byte Bytes for chacha8 RNG
-// ============================================================
-
-///|
-fn seed_to_bytes(seed : Int) -> Bytes {
-  Bytes::makei(32, fn(i) { ((seed >> (i % 4 * 8)) & 0xFF).to_byte() })
-}
-
-// ============================================================
-// Subsample counts
-// ============================================================
-
 ///|
 /// Randomly subsample from a vector of counts, with or without replacement.
 /// Returns a subsampled vector where the sum equals n.
@@ -25,22 +12,17 @@ pub fn subsample_counts(
 ) -> Array[Double] {
   let total = sum_double(counts)
   let total_int = total.to_int()
-
   if n < 0 {
     return Array::make(counts.length(), 0.0)
   }
   if !replace && n > total_int {
     return Array::make(counts.length(), 0.0)
   }
-
-  let rng = @random.Rand::chacha8(seed=seed_to_bytes(seed))
+  let rng = make_rng(seed)
   let result = Array::make(counts.length(), 0.0)
-
   if replace {
-    let total_d = total
-    let mut i = 0
-    while i < n {
-      let r = rng.double() * total_d
+    for _ in 0..<n {
+      let r = rng.double() * total
       let mut cumulative = 0.0
       let mut idx = 0
       while idx < counts.length() && cumulative + counts[idx] < r {
@@ -51,68 +33,74 @@ pub fn subsample_counts(
         idx = counts.length() - 1
       }
       result[idx] = result[idx] + 1.0
-      i = i + 1
     }
   } else {
     let pool : Array[Int] = Array::new()
-    let mut i = 0
-    while i < counts.length() {
+    for i in 0..<counts.length() {
       let cnt = counts[i].to_int()
-      let mut j = 0
-      while j < cnt {
+      for _ in 0..<cnt {
         pool.push(i)
-        j = j + 1
       }
-      i = i + 1
     }
-
-    // Fisher-Yates shuffle
-    let m = pool.length()
-    let mut i = 0
-    while i < m {
-      let j = i + rng.int(limit=m - i)
-      let tmp = pool[i]
-      pool[i] = pool[j]
-      pool[j] = tmp
-      i = i + 1
-    }
-
-    let take = if n < m { n } else { m }
-    let mut i = 0
-    while i < take {
-      let idx = pool[i]
+    fisher_yates_shuffle(pool, rng)
+    let take = if n < pool.length() { n } else { pool.length() }
+    for k in 0..<take {
+      let idx = pool[k]
       result[idx] = result[idx] + 1.0
-      i = i + 1
     }
   }
-
   result
 }
 
 ///|
-fn sum_double(arr : Array[Double]) -> Double {
-  let mut s = 0.0
-  for x in arr {
-    s = s + x
-  }
-  s
-}
-
-// ============================================================
-// P-value correction (multiple comparison)
-// ============================================================
-
-///|
-/// Bonferroni correction.
-/// p_adj = p * m, clipped to [0, 1]
+/// Bonferroni correction. p_adj = p * m, clipped to [0, 1].
 pub fn p_adjust_bonferroni(pvalues : Array[Double]) -> Array[Double] {
   let m = pvalues.length().to_double()
   let result = Array::make(pvalues.length(), 0.0)
-  let mut i = 0
-  while i < pvalues.length() {
+  for i in 0..<pvalues.length() {
     let adj = pvalues[i] * m
     result[i] = if adj > 1.0 { 1.0 } else { adj }
-    i = i + 1
+  }
+  result
+}
+
+///|
+/// Stepwise p-value adjustment shared by Holm and Benjamini-Hochberg.
+/// `factor_fn(i, n)` scales the sorted p-value at rank i; `descending` selects
+/// iteration direction and monotonicity (Holm: forward/max, BH: backward/min).
+fn stepwise_adjust(
+  pvalues : Array[Double],
+  factor_fn : (Int, Int) -> Double,
+  descending : Bool,
+  prev_init : Double,
+) -> Array[Double] {
+  let n = pvalues.length()
+  if n == 0 {
+    return Array::new()
+  }
+  let indexed = Array::makei(n, fn(i) { (i, pvalues[i]) })
+  sort_pairs_by_p(indexed, 0, n - 1)
+  let adjusted_sorted = Array::make(n, 0.0)
+  let mut prev = prev_init
+  for k in 0..<n {
+    let i = if descending { n - 1 - k } else { k }
+    let mut adj = indexed[i].1 * factor_fn(i, n)
+    if descending {
+      if adj > prev {
+        adj = prev
+      }
+    } else if adj < prev {
+      adj = prev
+    }
+    if adj > 1.0 {
+      adj = 1.0
+    }
+    adjusted_sorted[i] = adj
+    prev = adj
+  }
+  let result = Array::make(n, 0.0)
+  for k in 0..<n {
+    result[indexed[k].0] = adjusted_sorted[k]
   }
   result
 }
@@ -120,87 +108,18 @@ pub fn p_adjust_bonferroni(pvalues : Array[Double]) -> Array[Double] {
 ///|
 /// Holm-Bonferroni (step-down) correction.
 pub fn p_adjust_holm(pvalues : Array[Double]) -> Array[Double] {
-  let n = pvalues.length()
-  if n == 0 {
-    return Array::new()
-  }
-
-  let indexed : Array[(Int, Double)] = Array::new()
-  let mut i = 0
-  while i < n {
-    indexed.push((i, pvalues[i]))
-    i = i + 1
-  }
-
-  sort_pairs_by_p(indexed, 0, n - 1)
-
-  let adjusted_sorted = Array::make(n, 0.0)
-  let mut prev = 0.0
-  let mut i = 0
-  while i < n {
-    let factor = (n - i).to_double()
-    let mut adj = indexed[i].1 * factor
-    if adj < prev {
-      adj = prev
-    }
-    if adj > 1.0 {
-      adj = 1.0
-    }
-    adjusted_sorted[i] = adj
-    prev = adj
-    i = i + 1
-  }
-
-  let result = Array::make(n, 0.0)
-  let mut i = 0
-  while i < n {
-    result[indexed[i].0] = adjusted_sorted[i]
-    i = i + 1
-  }
-  result
+  stepwise_adjust(pvalues, fn(i, n) { (n - i).to_double() }, false, 0.0)
 }
 
 ///|
 /// Benjamini-Hochberg (FDR) correction.
 pub fn p_adjust_fdr_bh(pvalues : Array[Double]) -> Array[Double] {
-  let n = pvalues.length()
-  if n == 0 {
-    return Array::new()
-  }
-
-  let indexed : Array[(Int, Double)] = Array::new()
-  let mut i = 0
-  while i < n {
-    indexed.push((i, pvalues[i]))
-    i = i + 1
-  }
-
-  sort_pairs_by_p(indexed, 0, n - 1)
-
-  let adjusted_sorted = Array::make(n, 0.0)
-  let mut prev = 1.0
-  let mut i = n - 1
-  while i >= 0 {
-    let factor = n.to_double() / (i + 1).to_double()
-    let mut adj = indexed[i].1 * factor
-    if adj > prev {
-      adj = prev
-    }
-    if adj > 1.0 {
-      adj = 1.0
-    }
-    adjusted_sorted[i] = adj
-    prev = adj
-    i = i - 1
-  }
-
-  let result = Array::make(n, 0.0)
-  let mut i = 0
-  while i < n {
-    result[indexed[i].0] = adjusted_sorted[i]
-    i = i + 1
-  }
-  result
+  stepwise_adjust(
+    pvalues,
+    fn(i, n) { n.to_double() / (i + 1).to_double() },
+    true,
+    1.0,
+  )
 }
 
 ///|
@@ -209,15 +128,13 @@ fn sort_pairs_by_p(arr : Array[(Int, Double)], lo : Int, hi : Int) -> Unit {
   if lo < hi {
     let pivot = arr[hi].1
     let mut i = lo - 1
-    let mut j = lo
-    while j < hi {
+    for j in lo..<hi {
       if arr[j].1 <= pivot {
         i = i + 1
         let tmp = arr[i]
         arr[i] = arr[j]
         arr[j] = tmp
       }
-      j = j + 1
     }
     let tmp = arr[i + 1]
     arr[i + 1] = arr[hi]
@@ -227,10 +144,6 @@ fn sort_pairs_by_p(arr : Array[(Int, Double)], lo : Int, hi : Int) -> Unit {
     sort_pairs_by_p(arr, pi + 1, hi)
   }
 }
-
-// ============================================================
-// Permutation test
-// ============================================================
 
 ///|
 /// Result of a permutation test.
@@ -251,7 +164,6 @@ pub fn permutation_test(
   seed : Int,
 ) -> PermutationTestResult {
   let orig_stat = test_fn(sample1, sample2)
-
   if permutations <= 0 {
     return PermutationTestResult::{
       statistic: orig_stat,
@@ -259,74 +171,41 @@ pub fn permutation_test(
       permutations: 0,
     }
   }
-
   let n1 = sample1.length()
   let n2 = sample2.length()
   let n_total = n1 + n2
-
-  // Pre-allocate buffers once
   let combined = Array::make(n_total, 0.0)
-  let mut i = 0
-  while i < n1 {
+  for i in 0..<n1 {
     combined[i] = sample1[i]
-    i = i + 1
   }
-  let mut i = 0
-  while i < n2 {
+  for i in 0..<n2 {
     combined[n1 + i] = sample2[i]
-    i = i + 1
   }
-
   let s1 = Array::make(n1, 0.0)
   let s2 = Array::make(n2, 0.0)
-
-  let rng = @random.Rand::chacha8(seed=seed_to_bytes(seed))
+  let rng = make_rng(seed)
   let mut count_ge = 0
-
-  let mut i = 0
-  while i < permutations {
-    // Fisher-Yates shuffle in-place on combined
-    let mut j = 0
-    while j < n_total {
+  for _ in 0..<permutations {
+    // Fisher-Yates shuffle in-place on combined (Array[Double], kept inline).
+    for j in 0..<n_total {
       let k = j + rng.int(limit=n_total - j)
       let tmp = combined[j]
       combined[j] = combined[k]
       combined[k] = tmp
-      j = j + 1
     }
-
-    // Split into pre-allocated s1/s2
-    let mut j = 0
-    while j < n1 {
+    for j in 0..<n1 {
       s1[j] = combined[j]
-      j = j + 1
     }
-    let mut j = 0
-    while j < n2 {
+    for j in 0..<n2 {
       s2[j] = combined[n1 + j]
-      j = j + 1
     }
-
     let perm_stat = test_fn(s1, s2)
     if perm_stat >= orig_stat {
       count_ge = count_ge + 1
     }
-    i = i + 1
   }
-
   let p_value = count_ge.to_double() / permutations.to_double()
-
   PermutationTestResult::{ statistic: orig_stat, p_value, permutations }
-}
-
-///|
-/// Mean of a double array.
-fn mean_double(arr : Array[Double]) -> Double {
-  if arr.length() == 0 {
-    0.0
-  } else {
-    sum_double(arr) / arr.length().to_double()
-  }
 }
 
 ///|
@@ -334,10 +213,6 @@ fn mean_double(arr : Array[Double]) -> Double {
 pub fn diff_of_means(s1 : Array[Double], s2 : Array[Double]) -> Double {
   mean_double(s1) - mean_double(s2)
 }
-
-// ============================================================
-// Distance matrix utilities (for ANOSIM / PERMANOVA)
-// ============================================================
 
 ///|
 /// A distance matrix (square, symmetric, zero diagonal).
@@ -365,14 +240,10 @@ pub fn DistanceMatrix::from_2d(
 ) -> DistanceMatrix {
   let n = matrix.length()
   let data = Array::make(n * n, 0.0)
-  let mut i = 0
-  while i < n {
-    let mut j = 0
-    while j < n {
+  for i in 0..<n {
+    for j in 0..<n {
       data[i * n + j] = matrix[i][j]
-      j = j + 1
     }
-    i = i + 1
   }
   DistanceMatrix::{ data, size: n, ids }
 }
@@ -382,10 +253,6 @@ pub fn DistanceMatrix::from_2d(
 pub fn DistanceMatrix::get(self : DistanceMatrix, i : Int, j : Int) -> Double {
   self.data[i * self.size + j]
 }
-
-// ============================================================
-// ANOSIM (Analysis of Similarities)
-// ============================================================
 
 ///|
 /// Result of an ANOSIM test.
@@ -407,15 +274,11 @@ pub fn anosim(
   seed : Int,
 ) -> ANOSIMResult {
   let n = dm.size
-  let num_groups = count_unique_int(groups)
-
-  // Precompute distances and ranks (constant across permutations)
+  let num_groups = get_unique_groups(groups).length()
   let (distances, pair_indices) = anosim_precompute(dm)
   let ranks = rank_data(distances)
   let num_pairs = distances.length()
-
   let orig_r = anosim_r_from_ranks(ranks, pair_indices, groups, n, num_pairs)
-
   if permutations <= 0 {
     return ANOSIMResult::{
       r_statistic: orig_r,
@@ -425,33 +288,19 @@ pub fn anosim(
       sample_size: n,
     }
   }
-
-  let rng = @random.Rand::chacha8(seed=seed_to_bytes(seed))
+  let rng = make_rng(seed)
   let mut count_ge = 0
-
-  let mut i = 0
-  while i < permutations {
+  for _ in 0..<permutations {
     let perm_groups = groups.copy()
-    let mut j = 0
-    while j < n {
-      let k = j + rng.int(limit=n - j)
-      let tmp = perm_groups[j]
-      perm_groups[j] = perm_groups[k]
-      perm_groups[k] = tmp
-      j = j + 1
-    }
-
+    fisher_yates_shuffle(perm_groups, rng)
     let perm_r = anosim_r_from_ranks(
       ranks, pair_indices, perm_groups, n, num_pairs,
     )
     if perm_r >= orig_r {
       count_ge = count_ge + 1
     }
-    i = i + 1
   }
-
   let p_value = count_ge.to_double() / permutations.to_double()
-
   ANOSIMResult::{
     r_statistic: orig_r,
     p_value,
@@ -469,17 +318,11 @@ fn anosim_precompute(dm : DistanceMatrix) -> (Array[Double], Array[(Int, Int)]) 
   let distances = Array::make(num_pairs, 0.0)
   let pair_indices = Array::make(num_pairs, (0, 0))
   let mut idx = 0
-  let mut i = 0
-  while i < n {
-    let mut j = i + 1
-    while j < n {
-      distances[idx] = dm.get(i, j)
-      pair_indices[idx] = (i, j)
-      idx = idx + 1
-      j = j + 1
-    }
-    i = i + 1
-  }
+  upper_triangle_iter(n, fn(i, j) {
+    distances[idx] = dm.get(i, j)
+    pair_indices[idx] = (i, j)
+    idx = idx + 1
+  })
   (distances, pair_indices)
 }
 
@@ -496,9 +339,7 @@ fn anosim_r_from_ranks(
   let mut count_within = 0.0
   let mut sum_between = 0.0
   let mut count_between = 0.0
-
-  let mut i = 0
-  while i < num_pairs {
+  for i in 0..<num_pairs {
     let (a, b) = pair_indices[i]
     if groups[a] != groups[b] {
       sum_between = sum_between + ranks[i]
@@ -507,12 +348,9 @@ fn anosim_r_from_ranks(
       sum_within = sum_within + ranks[i]
       count_within = count_within + 1.0
     }
-    i = i + 1
   }
-
   let r_b = if count_between > 0.0 { sum_between / count_between } else { 0.0 }
   let r_w = if count_within > 0.0 { sum_within / count_within } else { 0.0 }
-
   let denom = n.to_double() * (n.to_double() - 1.0) / 4.0
   if denom == 0.0 {
     0.0
@@ -526,16 +364,8 @@ fn anosim_r_from_ranks(
 fn rank_data(data : Array[Double]) -> Array[Double] {
   let n = data.length()
   let result = Array::make(n, 0.0)
-
-  let indexed : Array[(Int, Double)] = Array::new()
-  let mut i = 0
-  while i < n {
-    indexed.push((i, data[i]))
-    i = i + 1
-  }
-
+  let indexed = Array::makei(n, fn(i) { (i, data[i]) })
   sort_pairs_by_p(indexed, 0, n - 1)
-
   let mut i = 0
   while i < n {
     let mut j = i
@@ -543,32 +373,13 @@ fn rank_data(data : Array[Double]) -> Array[Double] {
       j = j + 1
     }
     let avg_rank = (i.to_double() + j.to_double()) / 2.0 + 1.0
-    let mut k = i
-    while k <= j {
+    for k in i..<(j + 1) {
       result[indexed[k].0] = avg_rank
-      k = k + 1
     }
     i = j + 1
   }
-
   result
 }
-
-///|
-/// Count unique integer values.
-fn count_unique_int(arr : Array[Int]) -> Int {
-  let seen : @hashmap.HashMap[Int, Bool] = @hashmap.HashMap([])
-  for x in arr {
-    if !seen.contains(x) {
-      seen.set(x, true)
-    }
-  }
-  seen.length()
-}
-
-// ============================================================
-// PERMANOVA (Permutational Multivariate Analysis of Variance)
-// ============================================================
 
 ///|
 /// Result of a PERMANOVA test.
@@ -594,16 +405,12 @@ pub fn permanova(
   seed : Int,
 ) -> PERMANOVAResult {
   let n = dm.size
-  let num_groups = count_unique_int(groups)
-
-  // Precompute ss_total (constant across permutations)
   let ss_total = permanova_ss_total(dm)
-  let group_ids = get_unique_groups(groups, num_groups)
-
+  let group_ids = get_unique_groups(groups)
+  let num_groups = group_ids.length()
   let (f_stat, ss_bet, ss_with, df_bet, df_with) = permanova_f_from_ss(
     dm, groups, group_ids, n, ss_total,
   )
-
   if permutations <= 0 {
     return PERMANOVAResult::{
       f_statistic: f_stat,
@@ -618,33 +425,19 @@ pub fn permanova(
       ss_total,
     }
   }
-
-  let rng = @random.Rand::chacha8(seed=seed_to_bytes(seed))
+  let rng = make_rng(seed)
   let mut count_ge = 0
-
-  let mut i = 0
-  while i < permutations {
+  for _ in 0..<permutations {
     let perm_groups = groups.copy()
-    let mut j = 0
-    while j < n {
-      let k = j + rng.int(limit=n - j)
-      let tmp = perm_groups[j]
-      perm_groups[j] = perm_groups[k]
-      perm_groups[k] = tmp
-      j = j + 1
-    }
-
+    fisher_yates_shuffle(perm_groups, rng)
     let (perm_f, _, _, _, _) = permanova_f_from_ss(
       dm, perm_groups, group_ids, n, ss_total,
     )
     if perm_f >= f_stat {
       count_ge = count_ge + 1
     }
-    i = i + 1
   }
-
   let p_value = count_ge.to_double() / permutations.to_double()
-
   PERMANOVAResult::{
     f_statistic: f_stat,
     p_value,
@@ -664,22 +457,16 @@ pub fn permanova(
 fn permanova_ss_total(dm : DistanceMatrix) -> Double {
   let n = dm.size
   let mut ss_total = 0.0
-  let mut i = 0
-  while i < n {
-    let mut j = i + 1
-    while j < n {
-      let d = dm.get(i, j)
-      ss_total = ss_total + d * d
-      j = j + 1
-    }
-    i = i + 1
-  }
+  upper_triangle_iter(n, fn(i, j) {
+    let d = dm.get(i, j)
+    ss_total = ss_total + d * d
+  })
   ss_total / n.to_double()
 }
 
 ///|
 /// Extract unique group IDs without HashMap (faster for small group counts).
-fn get_unique_groups(groups : Array[Int], num_groups : Int) -> Array[Int] {
+fn get_unique_groups(groups : Array[Int]) -> Array[Int] {
   let group_ids : Array[Int] = Array::new()
   for g in groups {
     let mut found = false
@@ -706,48 +493,35 @@ fn permanova_f_from_ss(
   ss_total : Double,
 ) -> (Double, Double, Double, Int, Int) {
   let num_groups = group_ids.length()
-
   let mut ss_within = 0.0
   for g in group_ids {
     let mut ss_g = 0.0
     let mut n_g = 0
-    let mut i = 0
-    while i < n {
+    for i in 0..<n {
       if groups[i] == g {
-        let mut j = i + 1
-        while j < n {
+        for j in (i + 1)..<n {
           if groups[j] == g {
             let d = dm.get(i, j)
             ss_g = ss_g + d * d
           }
-          j = j + 1
         }
         n_g = n_g + 1
       }
-      i = i + 1
     }
     if n_g > 0 {
       ss_within = ss_within + ss_g / n_g.to_double()
     }
   }
-
   let ss_between = ss_total - ss_within
-
   let df_between = num_groups - 1
   let df_within = n - num_groups
-
   let f_stat = if df_within > 0 && ss_within > 0.0 {
     ss_between / df_between.to_double() / (ss_within / df_within.to_double())
   } else {
     0.0
   }
-
   (f_stat, ss_between, ss_within, df_between, df_within)
 }
-
-// ============================================================
-// Confidence bound (normal approximation)
-// ============================================================
 
 ///|
 /// Calculate a confidence bound assuming a normal distribution.
@@ -768,6 +542,16 @@ pub fn confidence_bound(
 }
 
 ///|
+/// Evaluate a polynomial sum(coeffs[i] * x^i) via Horner's method.
+fn poly_eval(coeffs : Array[Double], x : Double) -> Double {
+  let mut r = 0.0
+  for c in coeffs {
+    r = r * x + c
+  }
+  r
+}
+
+///|
 /// Approximate inverse normal CDF (probit function).
 /// Uses Beasley-Springer-Moro algorithm.
 fn normal_ppf(p : Double) -> Double {
@@ -777,45 +561,32 @@ fn normal_ppf(p : Double) -> Double {
   if p >= 1.0 {
     return 1000000000000000000000000000000.0
   }
-
-  let a0 = -39.69683028665376
-  let a1 = 220.9460984245205
-  let a2 = -275.9285104469687
-  let a3 = 138.3577518672690
-  let a4 = -30.66479806614716
-  let a5 = 2.506628277459239
-  let b0 = -54.47609879822406
-  let b1 = 161.5858368580409
-  let b2 = -155.6989798598866
-  let b3 = 66.80131188771972
-  let b4 = -13.28068155288572
-  let c0 = -0.007784894002430293
-  let c1 = -0.3223964580411365
-  let c2 = -2.400758277161838
-  let c3 = -2.549732539343734
-  let c4 = 4.374664141464968
-  let c5 = 2.938163982698783
-  let d0 = 0.007784695709041462
-  let d1 = 0.3224671290700398
-  let d2 = 2.445134137142996
-  let d3 = 3.754408661907416
-
+  let a = [
+    -39.69683028665376, 220.9460984245205, -275.9285104469687, 138.3577518672690,
+    -30.66479806614716, 2.506628277459239,
+  ]
+  let b = [
+    -54.47609879822406, 161.5858368580409, -155.6989798598866, 66.80131188771972,
+    -13.28068155288572,
+  ]
+  let c = [
+    -0.007784894002430293, -0.3223964580411365, -2.400758277161838, -2.549732539343734,
+    4.374664141464968, 2.938163982698783,
+  ]
+  let d = [
+    0.007784695709041462, 0.3224671290700398, 2.445134137142996, 3.754408661907416,
+  ]
   let p_low = 0.02425
   let p_high = 1.0 - p_low
-
   if p < p_low {
     let q = (-2.0 * @math.ln(p)).sqrt()
-    (((((c0 * q + c1) * q + c2) * q + c3) * q + c4) * q + c5) /
-    ((((d0 * q + d1) * q + d2) * q + d3) * q + 1.0)
+    poly_eval(c, q) / (poly_eval(d, q) * q + 1.0)
   } else if p <= p_high {
     let q = p - 0.5
     let r = q * q
-    (((((a0 * r + a1) * r + a2) * r + a3) * r + a4) * r + a5) *
-    q /
-    (((((b0 * r + b1) * r + b2) * r + b3) * r + b4) * r + 1.0)
+    poly_eval(a, r) * q / (poly_eval(b, r) * r + 1.0)
   } else {
     let q = (-2.0 * @math.ln(1.0 - p)).sqrt()
-    -(((((c0 * q + c1) * q + c2) * q + c3) * q + c4) * q + c5) /
-    ((((d0 * q + d1) * q + d2) * q + d3) * q + 1.0)
+    -poly_eval(c, q) / (poly_eval(d, q) * q + 1.0)
   }
 }

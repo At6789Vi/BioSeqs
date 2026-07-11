@@ -1,7 +1,4 @@
 ///|
-/// scikit-bio Tree module - Phylogenetic tree data structures.
-
-///|
 /// A node within a phylogenetic tree.
 /// Stores links to parent and child nodes, branch length, and support value.
 pub struct TreeNode {
@@ -47,8 +44,6 @@ pub fn TreeNode::lca(self : TreeNode, names : Array[String]) -> TreeNode? {
   if names.length() == 0 {
     return None
   }
-
-  // Find paths from root to each target node using backtracking
   let paths : Array[Array[TreeNode]] = Array::new()
   for name in names {
     let path = Array::new()
@@ -58,36 +53,7 @@ pub fn TreeNode::lca(self : TreeNode, names : Array[String]) -> TreeNode? {
       return None
     }
   }
-
-  // Find the last common node across all paths
-  let min_len = {
-    let mut m = paths[0].length()
-    for i in 1..<paths.length() {
-      if paths[i].length() < m {
-        m = paths[i].length()
-      }
-    }
-    m
-  }
-
-  let mut lca_idx = 0
-  for i in 0..<min_len {
-    let candidate = paths[0][i]
-    let mut all_match = true
-    for j in 1..<paths.length() {
-      if paths[j][i].name != candidate.name {
-        all_match = false
-        break
-      }
-    }
-    if all_match {
-      lca_idx = i
-    } else {
-      break
-    }
-  }
-
-  Some(paths[0][lca_idx])
+  Some(paths[0][find_lca_index(paths)])
 }
 
 ///|
@@ -109,6 +75,34 @@ fn find_path_backtrack(
   }
   ignore(path.remove(path.length() - 1))
   false
+}
+
+///|
+/// Find the last index at which all paths share a node with the same name.
+fn find_lca_index(paths : Array[Array[TreeNode]]) -> Int {
+  let mut min_len = paths[0].length()
+  for i in 1..<paths.length() {
+    if paths[i].length() < min_len {
+      min_len = paths[i].length()
+    }
+  }
+  let mut idx = 0
+  for i in 0..<min_len {
+    let cand = paths[0][i].name
+    let mut all_match = true
+    for j in 1..<paths.length() {
+      if paths[j][i].name != cand {
+        all_match = false
+        break
+      }
+    }
+    if all_match {
+      idx = i
+    } else {
+      break
+    }
+  }
+  idx
 }
 
 ///|
@@ -228,21 +222,7 @@ pub fn TreeNode::distance(
 ) -> Double? {
   match (self.find_path(name1), self.find_path(name2)) {
     (Some(path1), Some(path2)) => {
-      // Find LCA index (last common node on both paths)
-      let mut lca_idx = 0
-      let min_len = if path1.length() < path2.length() {
-        path1.length()
-      } else {
-        path2.length()
-      }
-      for i in 0..<min_len {
-        if path1[i].name == path2[i].name {
-          lca_idx = i
-        } else {
-          break
-        }
-      }
-      // Sum distances from LCA to each node
+      let lca_idx = find_lca_index([path1, path2])
       let mut dist = 0.0
       for i in (lca_idx + 1)..<path1.length() {
         dist = dist + path1[i].length.unwrap_or(0.0)
@@ -360,12 +340,10 @@ fn TreeNode::to_newick_helper(self : TreeNode, buf : StringBuilder) -> Unit {
     }
     buf.write_char(')')
   }
-
   match self.name {
     Some(n) => buf.write_string(n)
     None => ()
   }
-
   match self.length {
     Some(l) => {
       buf.write_char(':')
@@ -388,19 +366,15 @@ pub suberror ParseError {
 /// Parse Newick format string into TreeNode.
 fn parse_tree_node_from_newick(input : String) -> TreeNode raise ParseError {
   let trimmed = input.trim().to_owned()
-
   if !trimmed.has_suffix(";") {
     raise ParseError::MissingSemicolon
   }
-
   let s = trimmed[0:trimmed.length() - 1].to_owned()
   let n = s.length()
   let (root, pos) = parse_node_rec(s, 0, n)
-
   if pos < n {
     raise ParseError::InvalidFormat("Extra characters after root".to_string())
   }
-
   root
 }
 
@@ -411,20 +385,16 @@ fn parse_node_rec(
   len : Int,
 ) -> (TreeNode, Int) raise ParseError {
   let mut pos = skip_ws(s, pos, len)
-
   let children : Array[TreeNode] = Array::new()
   let mut name : String? = None
   let mut length : Double? = None
-
   if pos < len && s.unsafe_get(pos).unsafe_to_char() == '(' {
     pos = pos + 1
     pos = skip_ws(s, pos, len)
-
     if pos < len && s.unsafe_get(pos).unsafe_to_char() != ')' {
       let (child, new_pos) = parse_node_rec(s, pos, len)
       pos = new_pos
       children.push(child)
-
       while pos < len && s.unsafe_get(pos).unsafe_to_char() == ',' {
         pos = pos + 1
         pos = skip_ws(s, pos, len)
@@ -434,14 +404,12 @@ fn parse_node_rec(
         pos = skip_ws(s, pos, len)
       }
     }
-
     if pos >= len || s.unsafe_get(pos).unsafe_to_char() != ')' {
       raise ParseError::UnbalancedParentheses
     }
     pos = pos + 1
     pos = skip_ws(s, pos, len)
   }
-
   if pos < len {
     let c = s.unsafe_get(pos).unsafe_to_char()
     if c != ':' && c != ',' && c != ')' && c != ';' {
@@ -451,7 +419,6 @@ fn parse_node_rec(
       pos = skip_ws(s, pos, len)
     }
   }
-
   if pos < len && s.unsafe_get(pos).unsafe_to_char() == ':' {
     pos = pos + 1
     pos = skip_ws(s, pos, len)
@@ -460,17 +427,13 @@ fn parse_node_rec(
     pos = new_pos
     pos = skip_ws(s, pos, len)
   }
-
-  let node = TreeNode::new(name~, length~, children~)
-
-  (node, pos)
+  (TreeNode::new(name~, length~, children~), pos)
 }
 
 ///|
 fn parse_label_rec(s : String, pos : Int, len : Int) -> (String, Int) {
   let buf = StringBuilder::new()
   let mut pos = pos
-
   if pos < len && s.unsafe_get(pos).unsafe_to_char() == '\'' {
     pos = pos + 1
     while pos < len && s.unsafe_get(pos).unsafe_to_char() != '\'' {
@@ -498,7 +461,6 @@ fn parse_label_rec(s : String, pos : Int, len : Int) -> (String, Int) {
       pos = pos + 1
     }
   }
-
   (buf.to_string(), pos)
 }
 
@@ -509,23 +471,19 @@ fn parse_number_rec(
   len : Int,
 ) -> (Double, Int) raise ParseError {
   let mut pos = pos
-
-  let mut result = 0.0
-  let mut decimal = 0.0
-  let mut decimal_places = 0
-  let mut is_negative = false
-  let mut is_scientific = false
-  let mut sci_sign = 1
-  let mut sci_value = 0
+  let mut int_part = 0.0
+  let mut frac = 0.0
+  let mut frac_digits = 0
+  let mut neg = false
+  let mut has_exp = false
+  let mut exp_sign = 1
+  let mut exp_val = 0
   let zero = '0'.to_int()
-
   if pos < len && s.unsafe_get(pos).to_int() == 45 {
-    is_negative = true
+    neg = true
     pos = pos + 1
   }
-
   let mut has_digit = false
-
   while pos < len {
     let c = s.unsafe_get(pos).to_int()
     if c == 46 {
@@ -535,20 +493,20 @@ fn parse_number_rec(
         if dc < zero || dc > zero + 9 {
           break
         }
-        decimal = decimal * 10.0 + (dc - zero).to_double()
-        decimal_places = decimal_places + 1
+        frac = frac * 10.0 + (dc - zero).to_double()
+        frac_digits = frac_digits + 1
         has_digit = true
         pos = pos + 1
       }
       break
     }
     if c == 101 || c == 69 {
-      is_scientific = true
+      has_exp = true
       pos = pos + 1
       if pos < len {
         let sc = s.unsafe_get(pos).to_int()
         if sc == 45 {
-          sci_sign = -1
+          exp_sign = -1
           pos = pos + 1
         } else if sc == 43 {
           pos = pos + 1
@@ -559,7 +517,7 @@ fn parse_number_rec(
         if dc < zero || dc > zero + 9 {
           break
         }
-        sci_value = sci_value * 10 + (dc - zero)
+        exp_val = exp_val * 10 + (dc - zero)
         pos = pos + 1
       }
       break
@@ -567,44 +525,32 @@ fn parse_number_rec(
     if c < zero || c > zero + 9 {
       break
     }
-    result = result * 10.0 + (c - zero).to_double()
+    int_part = int_part * 10.0 + (c - zero).to_double()
     has_digit = true
     pos = pos + 1
   }
-
   if !has_digit {
     raise ParseError::InvalidNumber("".to_string())
   }
-
-  // Apply decimal places using a single division
-  if decimal_places > 0 {
+  if frac_digits > 0 {
     let mut divisor = 1.0
-    for i = 0; i < decimal_places; i = i + 1 {
+    for _ in 0..<frac_digits {
       divisor = divisor * 10.0
     }
-    decimal = decimal / divisor
+    frac = frac / divisor
   }
-
-  let mut final_result = result + decimal
-  if is_scientific {
+  let mut out = int_part + frac
+  if has_exp {
     let mut pow10 = 1.0
-    let mut j = 0
-    while j < sci_value {
+    for _ in 0..<exp_val {
       pow10 = pow10 * 10.0
-      j = j + 1
     }
-    if sci_sign == 1 {
-      final_result = final_result * pow10
-    } else {
-      final_result = final_result / pow10
-    }
+    out = if exp_sign == 1 { out * pow10 } else { out / pow10 }
   }
-
-  if is_negative {
-    final_result = -final_result
+  if neg {
+    out = -out
   }
-
-  (final_result, pos)
+  (out, pos)
 }
 
 ///|
