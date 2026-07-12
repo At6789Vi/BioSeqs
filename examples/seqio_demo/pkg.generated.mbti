@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "IvanAXu/BioSeqs/cmd/seqio_main"
+package "IvanAXu/BioSeqs/examples/seqio_demo"
 
 // Values
 
