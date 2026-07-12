@@ -35,6 +35,22 @@ fn bench(label : String, iters : Int, f : () -> Unit) -> Double {
 }
 
 ///|
+/// Measure how long `f` takes when called `iters` times; returns total us.
+/// Supports functions that may raise errors.
+fn bench_err(label : String, iters : Int, f : () -> Unit) -> Double {
+  let ts = @mb.monotonic_clock_start()
+  for i = 0; i < iters; i = i + 1 {
+    f()
+  }
+  let elapsed_us = @mb.monotonic_clock_end(ts)
+  let per_iter = elapsed_us / iters.to_double()
+  println(
+    "\{label}: \{elapsed_us} us total, \{per_iter} us/iter (\{iters} iters)",
+  )
+  elapsed_us
+}
+
+///|
 
 ///|
 /// Generate a FASTA string with `n_records` records, each of length `seq_len`.
@@ -559,6 +575,98 @@ fn main {
     bench("Structure::distance", iters_find, fn() {
       ignore(pdb_struct.distance("CA", "N"))
     }),
+  )
+
+  // ---------------------------------------------------------------------------
+  // BAM benchmarks
+  // ---------------------------------------------------------------------------
+  println("")
+  println("=== MoonBit BAM benchmark ===")
+  println("")
+
+  let test_bam_base64 = "QkFNAS0AAABASEQJVk46MS42CVNPOmNvb3JkaW5hdGUKQFNRCVNOOmNocjEJTE46MTAwMAoBAAAABQAAAGNocjEA6AMAADkAAAAAAAAAZAAAAAAAAAA8AAAGAAEACAAAAP////8AAAAAAAAAAHJlYWQxAIAAAAAAAAAAAAAAAAAAAAA="
+  
+  // BAM parse from base64
+  ignore(
+    bench_err("parse_bam_base64 (1 record)", iters_find, () => {
+      ignore(@lib.parse_bam_base64(test_bam_base64)) catch { _ => () }
+    }),
+  )
+
+  // BAM to_sam
+  let bam_file_opt = @lib.try_parse_bam_base64(test_bam_base64)
+  if bam_file_opt.is_some() {
+    let bam_file = bam_file_opt.unwrap()
+    ignore(
+      bench("BamFile::to_sam", iters_find, fn() { ignore(bam_file.to_sam()) }),
+    )
+
+    // BAM get_reference_names
+    ignore(
+      bench("BamFile::get_reference_names", iters_find, fn() {
+        ignore(bam_file.get_reference_names())
+      }),
+    )
+
+    // BAM num_references
+    ignore(
+      bench("BamFile::num_references", iters_find, fn() {
+        ignore(bam_file.num_references())
+      }),
+    )
+
+    // BAM len
+    ignore(bench("BamFile::len", iters_find, fn() { ignore(bam_file.len()) }))
+  }
+
+  // ---------------------------------------------------------------------------
+  // CRAM benchmarks
+  // ---------------------------------------------------------------------------
+  println("")
+  println("=== MoonBit CRAM benchmark ===")
+  println("")
+
+  // Generate CRAM test data
+  let cram_buf = StringBuilder::new()
+  cram_buf.write_string("CRAM")
+  cram_buf.write_char('\u{0001}')
+  cram_buf.write_char('\u{0003}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0001}')
+  cram_buf.write_char('\u{0004}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_char('\u{0000}')
+  cram_buf.write_string("@HD\tVN:1.6\tSO:coordinate\n@SQ\tSN:chr1\tLN:1000\n")
+  let cram_content = cram_buf.to_string()
+
+  // CRAM magic check
+  ignore(
+    bench("is_cram_magic", iters_find, fn() { ignore(@lib.is_cram_magic(cram_content)) }),
+  )
+
+  // CRAM magic check (negative)
+  ignore(
+    bench("is_cram_magic (negative)", iters_find, fn() { ignore(@lib.is_cram_magic("BAMtest")) }),
   )
 
   println("")

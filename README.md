@@ -402,6 +402,23 @@ let prot_names = protein_feature_names()
 | write_pdb | 300 atoms | **1804 us** |
 | Atom::distance | 2 atoms | **0.30 us** |
 
+### 性能基准测试 (BAM)
+
+| 操作 | 规模 | 单次耗时 |
+|------|------|----------|
+| parse_bam_base64 | 1 record | **7.19 us** |
+| BamFile::to_sam | 1 record | **4.23 us** |
+| BamFile::get_reference_names | 1 reference | **1.37 us** |
+| BamFile::num_references | 1 reference | **0.19 us** |
+| BamFile::len | 1 record | **0.28 us** |
+
+### 性能基准测试 (CRAM)
+
+| 操作 | 规模 | 单次耗时 |
+|------|------|----------|
+| is_cram_magic (positive) | 8 bytes | **0.26 us** |
+| is_cram_magic (negative) | 8 bytes | **0.12 us** |
+
 ### Python 参考基准测试
 
 > **注意**: BioPython 的 `complement`、`count`、`replace` 等操作使用 C 扩展实现，因此 MoonBit 在这些操作上较慢是预期的。

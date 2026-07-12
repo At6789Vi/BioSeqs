@@ -7,21 +7,21 @@
 fn main {
   println("=== BAM Format Parsing Demo ===")
   println("")
-  
+
   let test_bam_base64 = "QkFNAS0AAABASEQJVk46MS42CVNPOmNvb3JkaW5hdGUKQFNRCVNOOmNocjEJTE46MTAwMAoBAAAABQAAAGNocjEA6AMAADkAAAAAAAAAZAAAAAAAAAA8AAAGAAEACAAAAP////8AAAAAAAAAAHJlYWQxAIAAAAAAAAAAAAAAAAAAAAA="
-  
+
   println("Parsing base64-encoded BAM data...")
-  
+
   let bam_opt = @bio.try_parse_bam_base64(test_bam_base64)
   if bam_opt is None {
     println("Error parsing BAM data")
     return
   }
   let bam = bam_opt.unwrap()
-  
+
   println("Parsing successful!")
   println("")
-  
+
   println("=== Header Information ===")
   println("References: \{bam.num_references()}")
   let ref_names = bam.get_reference_names()
@@ -29,12 +29,12 @@ fn main {
     let len = bam.get_reference_length(name)
     println("  - \{name}: length = \{len}")
   }
-  
+
   println("")
   println("=== Records ===")
   println("Total records: \{bam.len()}")
   println("")
-  
+
   for i = 0; i < bam.len(); i = i + 1 {
     let record = bam.records[i]
     println("Record \{i + 1}:")
@@ -67,10 +67,10 @@ fn main {
     println("  Is unmapped: \{record.is_unmapped()}")
     println("")
   }
-  
+
   println("=== SAM Output ===")
   let sam_str = bam.to_sam()
   println(sam_str)
-  
+
   println("=== Done ===")
 }

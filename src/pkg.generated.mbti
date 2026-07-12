@@ -29,9 +29,13 @@ pub fn avg_hydrophobicity(String) -> Double
 
 pub fn avg_polarity(String) -> Double
 
+pub fn base64_decode(String) -> String
+
 pub fn build_fai(String) -> FastaIndex
 
 pub fn bytes_to_base64(Array[Int]) -> String
+
+pub let codon_fixed_table : FixedArray[UInt16]
 
 pub fn crc32(String) -> Int
 
@@ -51,6 +55,12 @@ pub fn global_pairwise_align_nucleotide(DNA, DNA) -> (TabularMSA, Double, (Int, 
 
 pub fn global_pairwise_align_protein(Protein, Protein) -> (TabularMSA, Double, (Int, Int), (Int, Int))
 
+pub fn is_bam_magic(String) -> Bool
+
+pub fn is_bgzf(String) -> Bool
+
+pub fn is_cram_magic(String) -> Bool
+
 pub fn kmer_frequency(String, Int, Bool) -> Map[String, Double]
 
 pub fn local_pairwise_align_nucleotide(DNA, DNA) -> (TabularMSA, Double, (Int, Int), (Int, Int))
@@ -59,13 +69,23 @@ pub fn local_pairwise_align_protein(Protein, Protein) -> (TabularMSA, Double, (I
 
 pub fn molecular_weight(String) -> Double
 
+pub fn nuc_to_2bit(UInt16) -> Int
+
+pub let nuc_to_2bit_table : FixedArray[Int]
+
 pub fn nucleotide_composition(String) -> NucleotideComposition
+
+pub fn parse_bam(String) -> BamFile raise BamError
+
+pub fn parse_bam_base64(String) -> BamFile raise BamError
 
 pub fn parse_cigar(String) -> Array[CigarElement]
 
 pub fn parse_clustal(String) -> MultipleSeqAlignment raise AlignIOError
 
 pub fn parse_comma_list(String) -> Array[String]
+
+pub fn parse_cram(String) -> CramFile raise CramError
 
 pub fn parse_double(String) -> Double?
 
@@ -127,6 +147,8 @@ pub fn tm_wallace(String) -> Double
 
 pub fn tripeptide_composition(String) -> Map[String, Double]
 
+pub fn try_parse_bam_base64(String) -> BamFile?
+
 pub fn write_clustal(MultipleSeqAlignment) -> String
 
 pub fn write_fai(FastaIndex) -> String
@@ -150,6 +172,14 @@ pub suberror AlignError {
 
 pub suberror AlignIOError {
   AlignIOError(String)
+}
+
+pub suberror BamError {
+  BamError(String)
+}
+
+pub suberror CramError {
+  CramError(String)
 }
 
 pub suberror FastaIndexError {
@@ -185,6 +215,75 @@ pub struct Atom {
 pub fn Atom::distance(Self, Self) -> Double
 pub fn Atom::get_coord(Self) -> Vector3
 pub fn Atom::new(name~ : String, coord~ : Vector3, resname? : String, chainid? : Char, resseq? : Int, occupancy? : Double, bfactor? : Double, element? : String, charge? : Int) -> Self
+
+pub struct BamCigarElement {
+  op : BamCigarOp
+  length : Int
+} derive(Eq)
+
+pub enum BamCigarOp {
+  Match
+  Insert
+  Delete
+  Skip
+  SoftClip
+  HardClip
+  Pad
+  Equal
+  Diff
+} derive(Eq)
+
+pub struct BamFile {
+  header : BamHeader
+  records : Array[BamRecord]
+}
+pub fn BamFile::get_reference_length(Self, String) -> Int?
+pub fn BamFile::get_reference_names(Self) -> Array[String]
+pub fn BamFile::len(Self) -> Int
+pub fn BamFile::num_references(Self) -> Int
+pub fn BamFile::to_sam(Self) -> String
+
+pub struct BamHeader {
+  text : String
+  references : FixedArray[BamReference]
+}
+
+pub struct BamRecord {
+  ref_id : Int
+  pos : Int
+  bin : Int
+  mapq : Int
+  flag : Int
+  l_read_name : Int
+  cigar_len : Int
+  l_seq : Int
+  next_ref_id : Int
+  next_pos : Int
+  tlen : Int
+  qname : String
+  cigar : FixedArray[BamCigarElement]
+  seq : String
+  qual : String
+}
+pub fn BamRecord::get_alignment_length(Self) -> Int
+pub fn BamRecord::get_end(Self) -> Int
+pub fn BamRecord::get_reference_name(Self, BamHeader) -> String
+pub fn BamRecord::is_mate_reverse(Self) -> Bool
+pub fn BamRecord::is_mate_unmapped(Self) -> Bool
+pub fn BamRecord::is_paired(Self) -> Bool
+pub fn BamRecord::is_proper_pair(Self) -> Bool
+pub fn BamRecord::is_read1(Self) -> Bool
+pub fn BamRecord::is_read2(Self) -> Bool
+pub fn BamRecord::is_reverse(Self) -> Bool
+pub fn BamRecord::is_secondary(Self) -> Bool
+pub fn BamRecord::is_supplementary(Self) -> Bool
+pub fn BamRecord::is_unmapped(Self) -> Bool
+pub fn BamRecord::to_sam_string(Self, BamHeader) -> String
+
+pub struct BamReference {
+  name : String
+  length : Int
+} derive(Eq)
 
 pub struct Chain {
   id : Char
@@ -246,6 +345,117 @@ pub fn CompoundLocation::operator(Self) -> String
 pub fn CompoundLocation::parts(Self) -> Array[FeatureLocation]
 pub fn CompoundLocation::repr(Self) -> String
 pub fn CompoundLocation::str(Self) -> String
+
+pub struct CramBlock {
+  content_type : CramContentType
+  compression_method : CramCompressionMethod
+  compressed_size : Int
+  raw_size : Int
+  data : String
+}
+
+pub struct CramCompressionHeader {
+  version : Int
+  reference_id : Int
+  num_ref_bases : Int
+  ref_seq_id : Int
+  ref_start : Int
+  ref_end : Int
+  num_slices : Int
+}
+
+pub enum CramCompressionMethod {
+  NoCompression
+  Gzip
+  Bzip2
+  Lzma
+  Rans
+  Bgzf
+}
+
+pub enum CramContentType {
+  CompressionHeader
+  SliceHeader
+  CoreData
+  ExternalData
+  FileHeader
+  ReferenceSequence
+  Mapping
+  Info
+  QualityScore
+  TagData
+  ReadFeatures
+  InsertSize
+  SubstitutionMatrix
+  DeletionMatrix
+  InsertionMatrix
+  Padding
+  Unknown(Int)
+}
+
+pub struct CramFile {
+  header : BamHeader
+  records : Array[CramRecord]
+}
+pub fn CramFile::get_reference_names(Self) -> Array[String]
+pub fn CramFile::num_references(Self) -> Int
+pub fn CramFile::to_sam(Self) -> String
+
+pub struct CramFileDefinition {
+  major_version : Int
+  minor_version : Int
+  flags : Int
+}
+
+pub enum CramReadFeature {
+  Substitution(Int, Int)
+  Insertion(Int, String)
+  Deletion(Int, Int)
+  SkippedBases(Int, Int)
+  HardClip(Int, Int)
+  SoftClip(Int, String)
+  Padding(Int, Int)
+  QualityScore(Int, String)
+  ModifiedBase(Int, String)
+  ModifiedQuality(Int, String)
+  UnknownFeature(Int)
+}
+
+pub struct CramRecord {
+  seq_id : Int
+  alignment_start : Int
+  read_length : Int
+  read_group : Int
+  flags : Int
+  mapping_quality : Int
+  mate_seq_id : Int
+  mate_alignment_start : Int
+  template_size : Int
+  num_reads : Int
+  read_number : Int
+  fragment_length : Int
+  qname : String
+  cigar : FixedArray[BamCigarElement]
+  seq : String
+  qual : String
+  tags : Array[(String, String)]
+  read_features : FixedArray[CramReadFeature]
+}
+pub fn CramRecord::get_end(Self) -> Int
+pub fn CramRecord::get_reference_name(Self, BamHeader) -> String
+pub fn CramRecord::is_mapped(Self) -> Bool
+pub fn CramRecord::is_paired(Self) -> Bool
+pub fn CramRecord::is_reverse(Self) -> Bool
+pub fn CramRecord::to_sam_string(Self, BamHeader) -> String
+
+pub struct CramSliceHeader {
+  alignment_start : Int
+  alignment_span : Int
+  num_records : Int
+  num_blocks : Int
+  reference_id : Int
+  landmark : Int
+}
 
 pub struct DNA {
   seq : Seq

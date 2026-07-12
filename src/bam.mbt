@@ -181,7 +181,7 @@ fn decode_bam_seq(encoded : String, length : Int) -> String {
   while i < length {
     let byte_pos = i / 2
     let byte = encoded.unsafe_get(byte_pos).to_int()
-    let offset = (i % 2) * 4
+    let offset = i % 2 * 4
     let code = (byte >> offset) & 0xF
     let c = match code {
       0 => 'A'.to_int().to_uint16()
@@ -212,42 +212,51 @@ fn decode_bam_qual(encoded : String, length : Int) -> String {
 
 ///|
 /// Parse the BAM header section.
-fn parse_bam_header(data : String, pos : Int) -> (BamHeader, Int) raise BamError {
+fn parse_bam_header(
+  data : String,
+  pos : Int,
+) -> (BamHeader, Int) raise BamError {
   let (l_text, pos1) = read_int32_le(data, pos)
-  
+
   if pos1 + l_text > data.length() {
     raise BamError("Truncated BAM header text")
   }
   let text = data[pos1:pos1 + l_text].to_owned()
   let pos2 = pos1 + l_text
-  
+
   let (n_ref, pos3) = read_int32_le(data, pos2)
-  
-  let references : FixedArray[BamReference] = FixedArray::make(n_ref, BamReference::{ name: "", length: 0 })
+
+  let references : FixedArray[BamReference] = FixedArray::make(n_ref, BamReference::{
+    name: "",
+    length: 0,
+  })
   let mut ref_idx = 0
   let mut current_pos = pos3
   while ref_idx < n_ref {
     let (l_name, pos4) = read_int32_le(data, current_pos)
-    
+
     if pos4 + l_name > data.length() {
       raise BamError("Truncated BAM reference name")
     }
     let name = data[pos4:pos4 + l_name - 1].to_owned()
     let pos5 = pos4 + l_name
-    
+
     let (length, pos6) = read_int32_le(data, pos5)
-    
+
     references[ref_idx] = BamReference::{ name, length }
     ref_idx = ref_idx + 1
     current_pos = pos6
   }
-  
+
   (BamHeader::{ text, references }, current_pos)
 }
 
 ///|
 /// Parse a single BAM alignment record.
-fn parse_bam_record(data : String, pos : Int) -> (BamRecord, Int) raise BamError {
+fn parse_bam_record(
+  data : String,
+  pos : Int,
+) -> (BamRecord, Int) raise BamError {
   let (ref_id, pos1) = read_int32_le(data, pos)
   let (pos_val, pos2) = read_int32_le(data, pos1)
   let (bin, pos3) = read_uint32_le(data, pos2)
@@ -259,10 +268,13 @@ fn parse_bam_record(data : String, pos : Int) -> (BamRecord, Int) raise BamError
   let (next_ref_id, pos9) = read_int32_le(data, pos8)
   let (next_pos, pos10) = read_int32_le(data, pos9)
   let (tlen, pos11) = read_int32_le(data, pos10)
-  
+
   let (qname, pos12) = read_cstring(data, pos11)
-  
-  let cigar : FixedArray[BamCigarElement] = FixedArray::make(cigar_len, BamCigarElement::{ op: BamCigarOp::Match, length: 0 })
+
+  let cigar : FixedArray[BamCigarElement] = FixedArray::make(cigar_len, BamCigarElement::{
+    op: BamCigarOp::Match,
+    length: 0,
+  })
   let mut cigar_idx = 0
   let mut current_pos = pos12
   while cigar_idx < cigar_len {
@@ -276,42 +288,45 @@ fn parse_bam_record(data : String, pos : Int) -> (BamRecord, Int) raise BamError
     cigar_idx = cigar_idx + 1
     current_pos = pos_new
   }
-  
+
   let seq_bytes = (seq_len + 1) / 2
   if current_pos + seq_bytes > data.length() {
     raise BamError("Truncated BAM sequence")
   }
   let encoded_seq = data[current_pos:current_pos + seq_bytes].to_owned()
   let pos13 = current_pos + seq_bytes
-  
+
   let seq = decode_bam_seq(encoded_seq, seq_len)
-  
+
   let qual_bytes = seq_len
   if pos13 + qual_bytes > data.length() {
     raise BamError("Truncated BAM quality")
   }
   let encoded_qual = data[pos13:pos13 + qual_bytes].to_owned()
   let pos14 = pos13 + qual_bytes
-  
+
   let qual = decode_bam_qual(encoded_qual, seq_len)
-  
-  (BamRecord::{
-    ref_id,
-    pos: pos_val,
-    bin,
-    mapq,
-    flag,
-    l_read_name,
-    cigar_len,
-    l_seq: seq_len,
-    next_ref_id,
-    next_pos,
-    tlen,
-    qname,
-    cigar,
-    seq,
-    qual,
-  }, pos14)
+
+  (
+    BamRecord::{
+      ref_id,
+      pos: pos_val,
+      bin,
+      mapq,
+      flag,
+      l_read_name,
+      cigar_len,
+      l_seq: seq_len,
+      next_ref_id,
+      next_pos,
+      tlen,
+      qname,
+      cigar,
+      seq,
+      qual,
+    },
+    pos14,
+  )
 }
 
 ///|
@@ -322,15 +337,15 @@ pub fn parse_bam(data : String) -> BamFile raise BamError {
   if n < 4 {
     raise BamError("BAM file too short")
   }
-  
+
   for i = 0; i < 4; i = i + 1 {
     if data.unsafe_get(i).to_int() != bam_magic[i] {
       raise BamError("Invalid BAM magic number")
     }
   }
-  
+
   let (header, pos) = parse_bam_header(data, 4)
-  
+
   let records = Array::new()
   let mut current_pos = pos
   while current_pos < n {
@@ -338,19 +353,22 @@ pub fn parse_bam(data : String) -> BamFile raise BamError {
     if pos_new + block_size > n {
       break
     }
-    
+
     let (record, _) = parse_bam_record(data, pos_new)
-    
+
     records.push(record)
     current_pos = pos_new + block_size + 4
   }
-  
+
   BamFile::{ header, records }
 }
 
 ///|
 /// Get the reference name for a record.
-pub fn BamRecord::get_reference_name(self : BamRecord, header : BamHeader) -> String {
+pub fn BamRecord::get_reference_name(
+  self : BamRecord,
+  header : BamHeader,
+) -> String {
   if self.ref_id >= 0 && self.ref_id < header.references.length() {
     header.references[self.ref_id].name
   } else {
@@ -484,20 +502,36 @@ pub fn base64_decode(s : String) -> String {
   let n = s.length()
   let eq_char = '='.to_int().to_uint16()
   let padding = if n >= 2 && s.unsafe_get(n - 1) == eq_char {
-    if n >= 3 && s.unsafe_get(n - 2) == eq_char { 2 } else { 1 }
+    if n >= 3 && s.unsafe_get(n - 2) == eq_char {
+      2
+    } else {
+      1
+    }
   } else {
     0
   }
-  let out_len = (n * 3) / 4 - padding
+  let out_len = n * 3 / 4 - padding
   let buf : FixedArray[UInt16] = FixedArray::make(out_len, 0)
   let mut i = 0
   let mut j = 0
   while i < n {
     let c0 = base64_table[s.unsafe_get(i).to_int()]
-    let c1 = if i + 1 < n { base64_table[s.unsafe_get(i + 1).to_int()] } else { 0 }
-    let c2 = if i + 2 < n { base64_table[s.unsafe_get(i + 2).to_int()] } else { 0 }
-    let c3 = if i + 3 < n { base64_table[s.unsafe_get(i + 3).to_int()] } else { 0 }
-    
+    let c1 = if i + 1 < n {
+      base64_table[s.unsafe_get(i + 1).to_int()]
+    } else {
+      0
+    }
+    let c2 = if i + 2 < n {
+      base64_table[s.unsafe_get(i + 2).to_int()]
+    } else {
+      0
+    }
+    let c3 = if i + 3 < n {
+      base64_table[s.unsafe_get(i + 3).to_int()]
+    } else {
+      0
+    }
+
     buf[j] = ((c0 << 2) | ((c1 >> 4) & 0x03)).to_uint16()
     if j + 1 < out_len {
       buf[j + 1] = (((c1 & 0x0F) << 4) | ((c2 >> 2) & 0x0F)).to_uint16()
@@ -505,7 +539,7 @@ pub fn base64_decode(s : String) -> String {
     if j + 2 < out_len {
       buf[j + 2] = (((c2 & 0x03) << 6) | (c3 & 0x3F)).to_uint16()
     }
-    
+
     i = i + 4
     j = j + 3
   }
@@ -518,7 +552,7 @@ pub fn BamRecord::get_end(self : BamRecord) -> Int {
   if self.pos == 0 || self.cigar.length() == 0 {
     return 0
   }
-  
+
   let mut end = self.pos - 1
   let mut i = 0
   while i < self.cigar.length() {
@@ -575,7 +609,8 @@ pub fn BamRecord::to_sam_string(self : BamRecord, header : BamHeader) -> String 
     cigar_str.write_string(elem.length.to_string())
     cigar_str.write_char(op_char)
   }
-  let rnext = if self.next_ref_id >= 0 && self.next_ref_id < header.references.length() {
+  let rnext = if self.next_ref_id >= 0 &&
+    self.next_ref_id < header.references.length() {
     header.references[self.next_ref_id].name
   } else {
     "*"
