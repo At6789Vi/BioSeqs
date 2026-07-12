@@ -7,6 +7,12 @@ import {
 }
 
 // Values
+pub let aa_charge : Map[UInt16, Double]
+
+pub let aa_hydrophobicity : Map[UInt16, Double]
+
+pub let aa_polarity : Map[UInt16, Double]
+
 pub fn align_score(TabularMSA) -> Double
 
 pub fn alignio_parse(String, String) -> Array[MultipleSeqAlignment] raise AlignIOError
@@ -15,11 +21,27 @@ pub fn alignio_read(String, String) -> MultipleSeqAlignment raise AlignIOError
 
 pub fn alignio_write(Array[MultipleSeqAlignment], String) -> String raise AlignIOError
 
+pub fn amino_acid_composition(String) -> Map[UInt16, Double]
+
+pub fn avg_charge(String) -> Double
+
+pub fn avg_hydrophobicity(String) -> Double
+
+pub fn avg_polarity(String) -> Double
+
 pub fn build_fai(String) -> FastaIndex
 
 pub fn bytes_to_base64(Array[Int]) -> String
 
 pub fn crc32(String) -> Int
+
+pub fn dipeptide_composition(String) -> Map[String, Double]
+
+pub fn dna_canonical_kmer_frequency(String, Int, Bool) -> Map[String, Double]
+
+pub fn dna_feature_names() -> Array[String]
+
+pub fn dna_feature_vector(String) -> Array[Double]
 
 pub fn gc(String) -> Double
 
@@ -29,9 +51,15 @@ pub fn global_pairwise_align_nucleotide(DNA, DNA) -> (TabularMSA, Double, (Int, 
 
 pub fn global_pairwise_align_protein(Protein, Protein) -> (TabularMSA, Double, (Int, Int), (Int, Int))
 
+pub fn kmer_frequency(String, Int, Bool) -> Map[String, Double]
+
 pub fn local_pairwise_align_nucleotide(DNA, DNA) -> (TabularMSA, Double, (Int, Int), (Int, Int))
 
 pub fn local_pairwise_align_protein(Protein, Protein) -> (TabularMSA, Double, (Int, Int), (Int, Int))
+
+pub fn molecular_weight(String) -> Double
+
+pub fn nucleotide_composition(String) -> NucleotideComposition
 
 pub fn parse_cigar(String) -> Array[CigarElement]
 
@@ -65,6 +93,14 @@ pub fn parse_semicolon_list(String) -> Array[String]
 
 pub fn parse_vcf(String) -> VcfFile
 
+pub fn position_specific_features(String, Int) -> Array[Double]
+
+pub fn protein_feature_names() -> Array[String]
+
+pub fn protein_feature_vector(String) -> Array[Double]
+
+pub fn secondary_structure_propensity(String) -> (Double, Double, Double)
+
 pub fn seguid(String) -> String
 
 pub fn seqio_parse(String, String) -> Array[SeqRecord] raise SeqIOError
@@ -88,6 +124,8 @@ pub fn string_to_bytes(String) -> Array[Int]
 pub fn tm_gc(String) -> Double
 
 pub fn tm_wallace(String) -> Double
+
+pub fn tripeptide_composition(String) -> Map[String, Double]
 
 pub fn write_clustal(MultipleSeqAlignment) -> String
 
@@ -295,6 +333,14 @@ pub fn MultipleSeqAlignment::new(Array[SeqRecord], annotations? : Map[String, St
 pub fn MultipleSeqAlignment::num_records(Self) -> Int
 pub fn MultipleSeqAlignment::repr(Self) -> String
 pub fn MultipleSeqAlignment::slice(Self, row_start? : Int, row_end? : Int, col_start? : Int, col_end? : Int) -> Self
+
+pub struct NucleotideComposition {
+  a : Double
+  t : Double
+  g : Double
+  c : Double
+  other : Double
+}
 
 pub enum Position {
   ExactPosition(Int)
