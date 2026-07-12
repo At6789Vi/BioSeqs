@@ -441,7 +441,7 @@ pub fn Seq::translate(
       
       let combined = b0 | b1 | b2
       if combined >= 0 && combined < 4 {
-        let idx = b0 * 16 + b1 * 4 + b2
+        let idx = (b0 << 4) | (b1 << 2) | b2
         let result = codon_fixed_table[idx]
         
         if result == sentinel_stop {
@@ -449,18 +449,16 @@ pub fn Seq::translate(
           raise SeqError("Extra in frame stop codon '" + codon + "' found.")
         }
         amino_buf[amino_len] = result
-        amino_len = amino_len + 1
       } else if c0 == gap_code && c1 == gap_code && c2 == gap_code {
         amino_buf[amino_len] = gap_code
-        amino_len = amino_len + 1
       } else if b0 >= 0 && b1 >= 0 && b2 >= 0 {
         amino_buf[amino_len] = x_code
-        amino_len = amino_len + 1
       } else {
         let codon = codon_to_string(seq, i)
         raise SeqError("Codon '" + codon + "' is invalid")
       }
       
+      amino_len = amino_len + 1
       i = i + 3
     }
     if amino_len == max_amino {
@@ -473,8 +471,9 @@ pub fn Seq::translate(
     return Seq::{ data: unsafe_from_uint16_fixedarray(final_buf) }
   }
   
+  let limit = n - n % 3
   let mut i = 0
-  while i < n - n % 3 {
+  while i < limit {
     let c0 = seq.unsafe_get(i)
     let c1 = seq.unsafe_get(i + 1)
     let c2 = seq.unsafe_get(i + 2)
@@ -485,7 +484,7 @@ pub fn Seq::translate(
     
     let combined = b0 | b1 | b2
     if combined >= 0 && combined < 4 {
-      let idx = b0 * 16 + b1 * 4 + b2
+      let idx = (b0 << 4) | (b1 << 2) | b2
       let result = codon_fixed_table[idx]
       
       if result == sentinel_stop {
@@ -500,18 +499,16 @@ pub fn Seq::translate(
       } else {
         amino_buf[amino_len] = result
       }
-      amino_len = amino_len + 1
     } else if c0 == gap_code && c1 == gap_code && c2 == gap_code {
       amino_buf[amino_len] = gap_code
-      amino_len = amino_len + 1
     } else if b0 >= 0 && b1 >= 0 && b2 >= 0 {
       amino_buf[amino_len] = x_code
-      amino_len = amino_len + 1
     } else {
       let codon = codon_to_string(seq, i)
       raise SeqError("Codon '" + codon + "' is invalid")
     }
     
+    amino_len = amino_len + 1
     i = i + 3
   }
   
