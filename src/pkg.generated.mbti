@@ -43,6 +43,10 @@ pub fn count_overlaps(GRanges, GRanges) -> Array[Int]
 
 pub fn crc32(String) -> Int
 
+pub fn deseq(DESeqDataSet) -> DESeqResults
+
+pub fn deseq_dataset(Array[Array[Int]], Array[String], Array[String], Array[Array[Double]]) -> DESeqDataSet
+
 pub fn dinucleotide_frequency(String, Bool) -> Map[String, Double]
 
 pub fn dipeptide_composition(String) -> Map[String, Double]
@@ -177,6 +181,8 @@ pub fn protein_feature_names() -> Array[String]
 
 pub fn protein_feature_vector(String) -> Array[Double]
 
+pub fn results(DESeqDataSet) -> DESeqResults
+
 pub fn rscu(String) -> Map[String, Double]
 
 pub fn secondary_structure_propensity(String) -> (Double, Double, Double)
@@ -197,9 +203,17 @@ pub fn sha1_string(String) -> Array[Int]
 
 pub fn shannon_entropy(String) -> Double
 
+pub fn significant_genes(DESeqResults, Double, Double) -> Array[String]
+
 pub fn split_by_char(String, Int) -> Array[String]
 
 pub fn split_by_tab(String) -> Array[String]
+
+pub fn strand_minus() -> Strand
+
+pub fn strand_plus() -> Strand
+
+pub fn strand_star() -> Strand
 
 pub fn strand_to_char(Strand) -> String
 
@@ -553,6 +567,20 @@ pub struct CramSliceHeader {
   num_blocks : Int
   reference_id : Int
   landmark : Int
+}
+
+pub struct DESeqDataSet {
+  counts : Array[Array[Int]]
+  row_names : Array[String]
+  col_names : Array[String]
+  design : Array[Array[Double]]
+}
+
+pub struct DESeqResults {
+  row_names : Array[String]
+  base_mean : Array[Double]
+  log2_fold_change : Array[Double]
+  p_value : Array[Double]
 }
 
 pub struct DNA {

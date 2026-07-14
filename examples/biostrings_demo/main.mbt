@@ -13,7 +13,9 @@ fn main {
   println("Sequence: \{seq}")
 
   let freq = @bio.letter_frequency_dna(seq)
-  println("Letter Frequency: A=\{freq.a}, C=\{freq.c}, G=\{freq.g}, T=\{freq.t}")
+  println(
+    "Letter Frequency: A=\{freq.a}, C=\{freq.c}, G=\{freq.g}, T=\{freq.t}",
+  )
 
   let di_freq = @bio.oligonucleotide_frequency(seq, 2, false)
   println("Di-nucleotide Frequency: AC=\{di_freq.get("AC").unwrap_or(0.0)}")
