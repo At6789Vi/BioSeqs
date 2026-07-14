@@ -39,9 +39,27 @@ pub fn bytes_to_base64(Array[Int]) -> String
 
 pub let codon_fixed_table : FixedArray[UInt16]
 
+pub fn column(String, DataType, Array[DataValue]) -> Column
+
 pub fn count_overlaps(GRanges, GRanges) -> Array[Int]
 
 pub fn crc32(String) -> Int
+
+pub fn data_type_bool() -> DataType
+
+pub fn data_type_double() -> DataType
+
+pub fn data_type_int() -> DataType
+
+pub fn data_type_string() -> DataType
+
+pub fn data_value_bool(Bool) -> DataValue
+
+pub fn data_value_double(Double) -> DataValue
+
+pub fn data_value_int(Int) -> DataValue
+
+pub fn data_value_string(String) -> DataValue
 
 pub fn dataframe(Array[Column]) -> DataFrame
 
@@ -232,6 +250,12 @@ pub fn sha1_string(String) -> Array[Int]
 pub fn shannon_entropy(String) -> Double
 
 pub fn significant_genes(DESeqResults, Double, Double) -> Array[String]
+
+pub fn smith_waterman(String, String, Scoring) -> SWResult
+
+pub fn smith_waterman_dna(String, String) -> SWResult
+
+pub fn smith_waterman_protein(String, String) -> SWResult
 
 pub fn split_by_char(String, Int) -> Array[String]
 
@@ -823,6 +847,30 @@ pub fn Residue::get_num_atoms(Self) -> Int
 pub fn Residue::is_het(Self) -> Bool
 pub fn Residue::new(resname~ : String, chainid~ : Char, resseq~ : Int, atoms? : Array[Atom], hetfield? : String) -> Self
 
+pub struct SWResult {
+  aligned_seq1 : String
+  aligned_seq2 : String
+  match_line : String
+  score : Double
+  start_pos1 : (Int, Int)
+  start_pos2 : (Int, Int)
+  score_matrix : Array[Array[Double]]
+  trace_matrix : Array[Array[TraceDirection]]
+}
+pub fn SWResult::aligned1(Self) -> String
+pub fn SWResult::aligned2(Self) -> String
+pub fn SWResult::alignment_length(Self) -> Int
+pub fn SWResult::format(Self) -> String
+pub fn SWResult::format_wrapped(Self, Int) -> String
+pub fn SWResult::match_line(Self) -> String
+pub fn SWResult::num_matches(Self) -> Int
+pub fn SWResult::percent_identity(Self) -> Double
+pub fn SWResult::pos1(Self) -> (Int, Int)
+pub fn SWResult::pos2(Self) -> (Int, Int)
+pub fn SWResult::score(Self) -> Double
+pub fn SWResult::score_matrix(Self) -> Array[Array[Double]]
+pub fn SWResult::trace_matrix(Self) -> Array[Array[TraceDirection]]
+
 pub struct SamFile {
   headers : Array[SamHeader]
   records : Array[SamRecord]
@@ -871,6 +919,15 @@ pub fn SamRecord::is_reverse(Self) -> Bool
 pub fn SamRecord::is_secondary(Self) -> Bool
 pub fn SamRecord::is_supplementary(Self) -> Bool
 pub fn SamRecord::is_unmapped(Self) -> Bool
+
+pub struct Scoring {
+  match_reward : Double
+  mismatch_penalty : Double
+  gap_penalty : Double
+}
+pub fn Scoring::default_dna() -> Self
+pub fn Scoring::default_protein() -> Self
+pub fn Scoring::new(Double, Double, Double) -> Self
 
 pub struct Seq {
   data : String
@@ -981,6 +1038,13 @@ pub fn TabularMSA::from_dna(Array[DNA]) -> Self
 pub fn TabularMSA::get_alignment_length(Self) -> Int
 pub fn TabularMSA::new(Array[SeqRecord], String) -> Self
 pub fn TabularMSA::num_records(Self) -> Int
+
+pub enum TraceDirection {
+  Stop
+  Diag
+  Up
+  Left
+} derive(Eq, Show)
 
 pub struct Tree {
   root : Clade

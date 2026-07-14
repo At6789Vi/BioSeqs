@@ -72,23 +72,19 @@ pub fn data_value_bool(v : Bool) -> DataValue {
 }
 
 ///|
-pub fn column(name : String, dtype : DataType, values : Array[DataValue]) -> Column {
-  Column::{
-    name: name,
-    dtype: dtype,
-    values: values
-  }
+pub fn column(
+  name : String,
+  dtype : DataType,
+  values : Array[DataValue],
+) -> Column {
+  Column::{ name, dtype, values }
 }
 
 ///|
 pub fn dataframe(columns : Array[Column]) -> DataFrame {
   let ncol = columns.length()
   let nrow = if ncol == 0 { 0 } else { columns[0].values.length() }
-  DataFrame::{
-    columns: columns,
-    nrow: nrow,
-    ncol: ncol
-  }
+  DataFrame::{ columns, nrow, ncol }
 }
 
 ///|
@@ -113,7 +109,7 @@ pub fn dataframe_colnames(df : DataFrame) -> Array[String] {
 }
 
 ///|
-pub fn dataframe_get_column(df : DataFrame, name : String) -> Option[Column] {
+pub fn dataframe_get_column(df : DataFrame, name : String) -> Column? {
   let mut i = 0
   while i < df.ncol {
     if df.columns[i].name == name {
@@ -125,7 +121,7 @@ pub fn dataframe_get_column(df : DataFrame, name : String) -> Option[Column] {
 }
 
 ///|
-pub fn dataframe_get_column_index(df : DataFrame, name : String) -> Option[Int] {
+pub fn dataframe_get_column_index(df : DataFrame, name : String) -> Int? {
   let mut i = 0
   while i < df.ncol {
     if df.columns[i].name == name {
@@ -137,7 +133,10 @@ pub fn dataframe_get_column_index(df : DataFrame, name : String) -> Option[Int] 
 }
 
 ///|
-pub fn dataframe_select(df : DataFrame, column_names : Array[String]) -> DataFrame {
+pub fn dataframe_select(
+  df : DataFrame,
+  column_names : Array[String],
+) -> DataFrame {
   let selected : Array[Column] = []
   let mut i = 0
   while i < column_names.length() {
@@ -151,7 +150,10 @@ pub fn dataframe_select(df : DataFrame, column_names : Array[String]) -> DataFra
 }
 
 ///|
-pub fn dataframe_filter(df : DataFrame, predicate : (DataFrame, Int) -> Bool) -> DataFrame {
+pub fn dataframe_filter(
+  df : DataFrame,
+  predicate : (DataFrame, Int) -> Bool,
+) -> DataFrame {
   let keep : Array[Int] = []
   let mut i = 0
   while i < df.nrow {
@@ -160,7 +162,7 @@ pub fn dataframe_filter(df : DataFrame, predicate : (DataFrame, Int) -> Bool) ->
     }
     i = i + 1
   }
-  
+
   let new_cols : Array[Column] = []
   let mut j = 0
   while j < df.ncol {
@@ -174,7 +176,7 @@ pub fn dataframe_filter(df : DataFrame, predicate : (DataFrame, Int) -> Bool) ->
     new_cols.push(Column::{
       name: col.name,
       dtype: col.dtype,
-      values: new_values
+      values: new_values,
     })
     j = j + 1
   }
@@ -182,14 +184,17 @@ pub fn dataframe_filter(df : DataFrame, predicate : (DataFrame, Int) -> Bool) ->
 }
 
 ///|
-pub fn dataframe_mutate(df : DataFrame, new_columns : Array[(String, DataType, (DataFrame, Int) -> DataValue)]) -> DataFrame {
+pub fn dataframe_mutate(
+  df : DataFrame,
+  new_columns : Array[(String, DataType, (DataFrame, Int) -> DataValue)],
+) -> DataFrame {
   let all_cols : Array[Column] = []
   let mut i = 0
   while i < df.ncol {
     all_cols.push(df.columns[i])
     i = i + 1
   }
-  
+
   let mut j = 0
   while j < new_columns.length() {
     let (name, dtype, func) = new_columns[j]
@@ -199,11 +204,7 @@ pub fn dataframe_mutate(df : DataFrame, new_columns : Array[(String, DataType, (
       values.push(func(df, k))
       k = k + 1
     }
-    all_cols.push(Column::{
-      name: name,
-      dtype: dtype,
-      values: values
-    })
+    all_cols.push(Column::{ name, dtype, values })
     j = j + 1
   }
   dataframe(all_cols)
@@ -222,62 +223,74 @@ fn data_value_to_string(v : DataValue) -> String {
 ///|
 fn data_value_less(a : DataValue, b : DataValue) -> Bool {
   match a {
-    DataValue::IntValue(av) => match b {
-      DataValue::IntValue(bv) => av < bv
-      _ => false
-    }
-    DataValue::DoubleValue(av) => match b {
-      DataValue::DoubleValue(bv) => av < bv
-      _ => false
-    }
-    DataValue::StringValue(av) => match b {
-      DataValue::StringValue(bv) => av < bv
-      _ => false
-    }
-    DataValue::BoolValue(av) => match b {
-      DataValue::BoolValue(bv) => av < bv
-      _ => false
-    }
+    DataValue::IntValue(av) =>
+      match b {
+        DataValue::IntValue(bv) => av < bv
+        _ => false
+      }
+    DataValue::DoubleValue(av) =>
+      match b {
+        DataValue::DoubleValue(bv) => av < bv
+        _ => false
+      }
+    DataValue::StringValue(av) =>
+      match b {
+        DataValue::StringValue(bv) => av < bv
+        _ => false
+      }
+    DataValue::BoolValue(av) =>
+      match b {
+        DataValue::BoolValue(bv) => av < bv
+        _ => false
+      }
   }
 }
 
 ///|
 fn data_value_eq(a : DataValue, b : DataValue) -> Bool {
   match a {
-    DataValue::IntValue(av) => match b {
-      DataValue::IntValue(bv) => av == bv
-      _ => false
-    }
-    DataValue::DoubleValue(av) => match b {
-      DataValue::DoubleValue(bv) => av == bv
-      _ => false
-    }
-    DataValue::StringValue(av) => match b {
-      DataValue::StringValue(bv) => av == bv
-      _ => false
-    }
-    DataValue::BoolValue(av) => match b {
-      DataValue::BoolValue(bv) => av == bv
-      _ => false
-    }
+    DataValue::IntValue(av) =>
+      match b {
+        DataValue::IntValue(bv) => av == bv
+        _ => false
+      }
+    DataValue::DoubleValue(av) =>
+      match b {
+        DataValue::DoubleValue(bv) => av == bv
+        _ => false
+      }
+    DataValue::StringValue(av) =>
+      match b {
+        DataValue::StringValue(bv) => av == bv
+        _ => false
+      }
+    DataValue::BoolValue(av) =>
+      match b {
+        DataValue::BoolValue(bv) => av == bv
+        _ => false
+      }
   }
 }
 
 ///|
-pub fn dataframe_arrange(df : DataFrame, column_name : String, descending : Bool) -> DataFrame {
+pub fn dataframe_arrange(
+  df : DataFrame,
+  column_name : String,
+  descending : Bool,
+) -> DataFrame {
   let col_idx_opt = dataframe_get_column_index(df, column_name)
   if col_idx_opt.is_none() {
     return df
   }
   let col_idx = col_idx_opt.unwrap()
-  
+
   let indices : Array[Int] = []
   let mut i = 0
   while i < df.nrow {
     indices.push(i)
     i = i + 1
   }
-  
+
   let mut swapped = true
   let mut n = df.nrow
   while swapped && n > 0 {
@@ -298,7 +311,7 @@ pub fn dataframe_arrange(df : DataFrame, column_name : String, descending : Bool
     }
     n = n - 1
   }
-  
+
   let new_cols : Array[Column] = []
   let mut k = 0
   while k < df.ncol {
@@ -312,7 +325,7 @@ pub fn dataframe_arrange(df : DataFrame, column_name : String, descending : Bool
     new_cols.push(Column::{
       name: col.name,
       dtype: col.dtype,
-      values: new_values
+      values: new_values,
     })
     k = k + 1
   }
@@ -320,16 +333,19 @@ pub fn dataframe_arrange(df : DataFrame, column_name : String, descending : Bool
 }
 
 ///|
-pub fn dataframe_group_by(df : DataFrame, group_column : String) -> Array[(String, DataFrame)] {
+pub fn dataframe_group_by(
+  df : DataFrame,
+  group_column : String,
+) -> Array[(String, DataFrame)] {
   let col_idx_opt = dataframe_get_column_index(df, group_column)
   if col_idx_opt.is_none() {
     return []
   }
   let col_idx = col_idx_opt.unwrap()
-  
+
   let group_names : Array[String] = []
   let group_indices : Array[Array[Int]] = []
-  
+
   let mut i = 0
   while i < df.nrow {
     let key = data_value_to_string(df.columns[col_idx].values[i])
@@ -349,7 +365,7 @@ pub fn dataframe_group_by(df : DataFrame, group_column : String) -> Array[(Strin
     }
     i = i + 1
   }
-  
+
   let result : Array[(String, DataFrame)] = []
   let mut j = 0
   while j < group_names.length() {
@@ -368,7 +384,7 @@ pub fn dataframe_group_by(df : DataFrame, group_column : String) -> Array[(Strin
       group_cols.push(Column::{
         name: col.name,
         dtype: col.dtype,
-        values: new_values
+        values: new_values,
       })
       k = k + 1
     }
@@ -379,46 +395,48 @@ pub fn dataframe_group_by(df : DataFrame, group_column : String) -> Array[(Strin
 }
 
 ///|
-pub fn dataframe_summarize(df : DataFrame, group_column : String, agg_columns : Array[(String, (Array[DataValue]) -> DataValue)]) -> DataFrame {
+pub fn dataframe_summarize(
+  df : DataFrame,
+  group_column : String,
+  agg_columns : Array[(String, (Array[DataValue]) -> DataValue)],
+) -> DataFrame {
   let groups = dataframe_group_by(df, group_column)
-  
+
   if groups.length() == 0 {
     return dataframe([])
   }
-  
+
   let result_cols : Array[Column] = []
-  
+
   let group_name_col = Column::{
     name: group_column,
     dtype: StringType,
-    values: []
+    values: [],
   }
   result_cols.push(group_name_col)
-  
+
   let mut i = 0
   while i < agg_columns.length() {
     let (name, agg_func) = agg_columns[i]
-    let agg_col = Column::{
-      name: name,
-      dtype: DoubleType,
-      values: []
-    }
+    let agg_col = Column::{ name, dtype: DoubleType, values: [] }
     result_cols.push(agg_col)
     i = i + 1
   }
-  
+
   let mut j = 0
   while j < groups.length() {
     let (key, group_df) = groups[j]
     result_cols[0].values.push(DataValue::StringValue(key))
-    
+
     let mut k = 0
     while k < agg_columns.length() {
       let (_, agg_func) = agg_columns[k]
       let col_idx_opt = dataframe_get_column_index(group_df, agg_columns[k].0)
       if col_idx_opt.is_some() {
         let col_idx = col_idx_opt.unwrap()
-        result_cols[k + 1].values.push(agg_func(group_df.columns[col_idx].values))
+        result_cols[k + 1].values.push(
+          agg_func(group_df.columns[col_idx].values),
+        )
       } else {
         result_cols[k + 1].values.push(DataValue::DoubleValue(0.0))
       }
@@ -426,12 +444,16 @@ pub fn dataframe_summarize(df : DataFrame, group_column : String, agg_columns : 
     }
     j = j + 1
   }
-  
+
   dataframe(result_cols)
 }
 
 ///|
-pub fn dataframe_inner_join(df1 : DataFrame, df2 : DataFrame, by : String) -> DataFrame {
+pub fn dataframe_inner_join(
+  df1 : DataFrame,
+  df2 : DataFrame,
+  by : String,
+) -> DataFrame {
   let col1_idx_opt = dataframe_get_column_index(df1, by)
   let col2_idx_opt = dataframe_get_column_index(df2, by)
   if col1_idx_opt.is_none() {
@@ -442,10 +464,10 @@ pub fn dataframe_inner_join(df1 : DataFrame, df2 : DataFrame, by : String) -> Da
   }
   let col1_idx = col1_idx_opt.unwrap()
   let col2_idx = col2_idx_opt.unwrap()
-  
+
   let result_rows : Array[Int] = []
   let result_rows2 : Array[Int] = []
-  
+
   let mut i = 0
   while i < df1.nrow {
     let val1 = df1.columns[col1_idx].values[i]
@@ -460,7 +482,7 @@ pub fn dataframe_inner_join(df1 : DataFrame, df2 : DataFrame, by : String) -> Da
     }
     i = i + 1
   }
-  
+
   let new_cols : Array[Column] = []
   let mut k = 0
   while k < df1.ncol {
@@ -474,11 +496,11 @@ pub fn dataframe_inner_join(df1 : DataFrame, df2 : DataFrame, by : String) -> Da
     new_cols.push(Column::{
       name: col.name,
       dtype: col.dtype,
-      values: new_values
+      values: new_values,
     })
     k = k + 1
   }
-  
+
   let mut m = 0
   while m < df2.ncol {
     if df2.columns[m].name != by {
@@ -492,7 +514,7 @@ pub fn dataframe_inner_join(df1 : DataFrame, df2 : DataFrame, by : String) -> Da
       new_cols.push(Column::{
         name: col.name,
         dtype: col.dtype,
-        values: new_values
+        values: new_values,
       })
     }
     m = m + 1
@@ -501,7 +523,11 @@ pub fn dataframe_inner_join(df1 : DataFrame, df2 : DataFrame, by : String) -> Da
 }
 
 ///|
-pub fn dataframe_left_join(df1 : DataFrame, df2 : DataFrame, by : String) -> DataFrame {
+pub fn dataframe_left_join(
+  df1 : DataFrame,
+  df2 : DataFrame,
+  by : String,
+) -> DataFrame {
   let col1_idx_opt = dataframe_get_column_index(df1, by)
   let col2_idx_opt = dataframe_get_column_index(df2, by)
   if col1_idx_opt.is_none() {
@@ -519,7 +545,7 @@ pub fn dataframe_left_join(df1 : DataFrame, df2 : DataFrame, by : String) -> Dat
       all_cols.push(Column::{
         name: df2.columns[j].name,
         dtype: df2.columns[j].dtype,
-        values: []
+        values: [],
       })
       j = j + 1
     }
@@ -527,10 +553,10 @@ pub fn dataframe_left_join(df1 : DataFrame, df2 : DataFrame, by : String) -> Dat
   }
   let col1_idx = col1_idx_opt.unwrap()
   let col2_idx = col2_idx_opt.unwrap()
-  
+
   let result_rows : Array[Int] = []
   let result_rows2 : Array[Int] = []
-  
+
   let mut i = 0
   while i < df1.nrow {
     let val1 = df1.columns[col1_idx].values[i]
@@ -551,7 +577,7 @@ pub fn dataframe_left_join(df1 : DataFrame, df2 : DataFrame, by : String) -> Dat
     }
     i = i + 1
   }
-  
+
   let new_cols : Array[Column] = []
   let mut k = 0
   while k < df1.ncol {
@@ -565,11 +591,11 @@ pub fn dataframe_left_join(df1 : DataFrame, df2 : DataFrame, by : String) -> Dat
     new_cols.push(Column::{
       name: col.name,
       dtype: col.dtype,
-      values: new_values
+      values: new_values,
     })
     k = k + 1
   }
-  
+
   let mut m = 0
   while m < df2.ncol {
     if df2.columns[m].name != by {
@@ -587,12 +613,10 @@ pub fn dataframe_left_join(df1 : DataFrame, df2 : DataFrame, by : String) -> Dat
       new_cols.push(Column::{
         name: col.name,
         dtype: col.dtype,
-        values: new_values
+        values: new_values,
       })
     }
     m = m + 1
   }
   dataframe(new_cols)
 }
-
-
