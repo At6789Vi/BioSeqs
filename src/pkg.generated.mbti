@@ -453,7 +453,40 @@ pub struct BamReference {
   length : Int
 } derive(Eq)
 
+type BitArray
+
 type BitReader
+
+pub struct BloomFilter {
+  bit_array : BitArray
+  num_hashes : Int
+  num_bits : Int
+  mut count : Int
+}
+pub fn BloomFilter::bits_set(Self) -> Int
+pub fn BloomFilter::capacity(Self) -> Int
+pub fn BloomFilter::clear(Self) -> Unit
+pub fn BloomFilter::contains(Self, String) -> Bool
+pub fn BloomFilter::estimated_fpr(Self) -> Double
+pub fn BloomFilter::hash_count(Self) -> Int
+pub fn BloomFilter::insert(Self, String) -> Unit
+pub fn BloomFilter::len(Self) -> Int
+pub fn BloomFilter::new(Int, Double) -> Self
+pub fn BloomFilter::with_params(Int, Int) -> Self
+
+pub struct BloomKmerFilter {
+  bloom : BloomFilter
+  k : Int
+}
+pub fn BloomKmerFilter::add_sequence(Self, String) -> Unit
+pub fn BloomKmerFilter::capacity(Self) -> Int
+pub fn BloomKmerFilter::contains(Self, String) -> Bool
+pub fn BloomKmerFilter::count_distinct(Self, String) -> (Int, Int)
+pub fn BloomKmerFilter::estimated_fpr(Self) -> Double
+pub fn BloomKmerFilter::hash_count(Self) -> Int
+pub fn BloomKmerFilter::k(Self) -> Int
+pub fn BloomKmerFilter::len(Self) -> Int
+pub fn BloomKmerFilter::new(Int, Int, Double) -> Self
 
 pub struct Chain {
   id : Char
@@ -736,6 +769,26 @@ pub struct GRanges {
 }
 
 type HuffmanDecoder
+
+pub struct KmerCount {
+  kmer : String
+  count : Int
+}
+pub fn KmerCount::count(Self) -> Int
+pub fn KmerCount::kmer(Self) -> String
+
+pub struct KmerCounter {
+  k : Int
+  counts : Map[String, Int]
+  mut total_kmers : Int
+}
+pub fn KmerCounter::count(Self, String) -> Unit
+pub fn KmerCounter::get(Self, String) -> Int
+pub fn KmerCounter::k(Self) -> Int
+pub fn KmerCounter::new(Int) -> Self
+pub fn KmerCounter::top_k(Self, Int) -> Array[KmerCount]
+pub fn KmerCounter::total(Self) -> Int
+pub fn KmerCounter::unique(Self) -> Int
 
 pub struct Model {
   id : Int
