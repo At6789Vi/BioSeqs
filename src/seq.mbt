@@ -391,9 +391,6 @@ pub fn Seq::back_transcribe(self : Seq) -> Seq {
   Seq::{ data: unsafe_from_uint16_fixedarray(buf) }
 }
 
-///|
-/// Translate a nucleotide sequence into a protein sequence using the
-/// Standard NCBI table (table 1). Optimized version using FixedArray lookup.
 pub fn Seq::translate(
   self : Seq,
   stop_symbol? : Char = '*',
