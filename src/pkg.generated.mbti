@@ -839,6 +839,15 @@ pub fn KmerCounter::top_k(Self, Int) -> Array[KmerCount]
 pub fn KmerCounter::total(Self) -> Int
 pub fn KmerCounter::unique(Self) -> Int
 
+pub struct LCPArray {
+  lcp : Array[Int]
+}
+pub fn LCPArray::get(Self, Int) -> Int
+pub fn LCPArray::lcp(Self) -> Array[Int]
+pub fn LCPArray::len(Self) -> Int
+pub fn LCPArray::max_lcp(Self) -> Int
+pub fn LCPArray::new(SuffixArray) -> Self
+
 pub struct Model {
   id : Int
   chains : Array[Chain]
@@ -1173,6 +1182,36 @@ pub fn Structure::get_num_models(Self) -> Int
 pub fn Structure::get_num_residues(Self) -> Int
 pub fn Structure::get_residues(Self) -> Array[Residue]
 pub fn Structure::new(id~ : String, models? : Array[Model]) -> Self
+
+pub struct SuffixArray {
+  text : String
+  sa : Array[Int]
+}
+pub fn SuffixArray::count(Self, String) -> Int
+pub fn SuffixArray::find_lower(Self, String) -> Int
+pub fn SuffixArray::find_upper(Self, String) -> Int
+pub fn SuffixArray::get_sorted_suffix(Self, Int) -> String
+pub fn SuffixArray::get_suffix(Self, Int) -> String
+pub fn SuffixArray::len(Self) -> Int
+pub fn SuffixArray::locate(Self, String) -> Array[Int]
+pub fn SuffixArray::new(String) -> Self
+pub fn SuffixArray::sa(Self) -> Array[Int]
+pub fn SuffixArray::text(Self) -> String
+
+pub struct SuffixTree {
+  text : String
+  size : Int
+}
+pub fn SuffixTree::contains(Self, String) -> Bool
+pub fn SuffixTree::count(Self, String) -> Int
+pub fn SuffixTree::locate(Self, String) -> Array[Int]
+pub fn SuffixTree::longest_repeated_substring(Self) -> String
+pub fn SuffixTree::new(String) -> Self
+pub fn SuffixTree::root(Self) -> String
+pub fn SuffixTree::size(Self) -> Int
+pub fn SuffixTree::text(Self) -> String
+pub fn SuffixTree::to_dot(Self) -> String
+pub fn SuffixTree::to_string(Self) -> String
 
 pub struct TabularMSA {
   records : Array[SeqRecord]
