@@ -35,6 +35,10 @@ pub fn bgzf_decompress(String) -> String raise BgzfError
 
 pub fn build_fai(String) -> FastaIndex
 
+pub fn bwt(String) -> String
+
+pub fn bwt_inverse(String) -> String
+
 pub fn bytes_to_base64(Array[Int]) -> String
 
 pub let codon_fixed_table : FixedArray[UInt16]
@@ -276,6 +280,8 @@ pub fn strand_star() -> Strand
 pub fn strand_to_char(Strand) -> String
 
 pub fn string_to_bytes(String) -> Array[Int]
+
+pub fn suffix_array(String) -> Array[Int]
 
 pub fn tm_gc(String) -> Double
 
@@ -708,6 +714,20 @@ pub enum DataValue {
   StringValue(String)
   BoolValue(Bool)
 }
+
+pub struct FMIndex {
+  bwt_str : String
+  c_table : Map[Char, Int]
+  occ : Map[Char, Array[Int]]
+  sa : Array[Int]
+  text_len : Int
+}
+pub fn FMIndex::bwt(Self) -> String
+pub fn FMIndex::count(Self, String) -> Int
+pub fn FMIndex::len(Self) -> Int
+pub fn FMIndex::lf(Self, Int) -> Int
+pub fn FMIndex::locate(Self, String) -> Array[Int]
+pub fn FMIndex::new(String) -> Self
 
 pub struct FaiRecord {
   name : String
