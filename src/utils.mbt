@@ -121,3 +121,82 @@ pub fn parse_semicolon_list(s : String) -> Array[String] {
   }
   split_by_char(s, ';'.to_int())
 }
+
+///|
+/// Get character at position.
+pub fn char_at(s : String, idx : Int) -> String {
+  let c = s.unsafe_get(idx).to_int()
+  if c >= 'A'.to_int() && c <= 'Z'.to_int() {
+    let mut result = ""
+    for i = 0; i < 26; i = i + 1 {
+      if c == 'A'.to_int() + i {
+        result = result + ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"][i]
+        break
+      }
+    }
+    result
+  } else if c >= 'a'.to_int() && c <= 'z'.to_int() {
+    let mut result = ""
+    for i = 0; i < 26; i = i + 1 {
+      if c == 'a'.to_int() + i {
+        result = result + ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"][i]
+        break
+      }
+    }
+    result
+  } else if c >= '0'.to_int() && c <= '9'.to_int() {
+    let mut result = ""
+    for i = 0; i < 10; i = i + 1 {
+      if c == '0'.to_int() + i {
+        result = result + ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"][i]
+        break
+      }
+    }
+    result
+  } else if c == ' '.to_int() { " " }
+  else if c == '\t'.to_int() { "\t" }
+  else if c == '\n'.to_int() { "\n" }
+  else if c == '\r'.to_int() { "\r" }
+  else if c == '>'.to_int() { ">" }
+  else if c == '#'.to_int() { "#" }
+  else if c == '/'.to_int() { "/" }
+  else if c == ':'.to_int() { ":" }
+  else if c == ';'.to_int() { ";" }
+  else if c == ','.to_int() { "," }
+  else if c == '('.to_int() { "(" }
+  else if c == ')'.to_int() { ")" }
+  else if c == '.'.to_int() { "." }
+  else if c == '-'.to_int() { "-" }
+  else if c == '_'.to_int() { "_" }
+  else if c == '['.to_int() { "[" }
+  else if c == ']'.to_int() { "]" }
+  else if c == '@'.to_int() { "@" }
+  else if c == '&'.to_int() { "&" }
+  else { c.to_string() }
+}
+
+///|
+/// Substring function.
+pub fn substring(s : String, start : Int, len : Int) -> String {
+  let mut result = ""
+  for i = 0; i < len && start + i < s.length(); i = i + 1 {
+    result = result + char_at(s, start + i)
+  }
+  result
+}
+
+///|
+/// Check if string starts with prefix at position.
+pub fn starts_with(s : String, pos : Int, prefix : String) -> Bool {
+  if pos + prefix.length() > s.length() {
+    return false
+  }
+  
+  for i = 0; i < prefix.length(); i = i + 1 {
+    if s.unsafe_get(pos + i) != prefix.unsafe_get(i) {
+      return false
+    }
+  }
+  
+  true
+}

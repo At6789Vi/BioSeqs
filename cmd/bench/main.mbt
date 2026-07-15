@@ -362,81 +362,53 @@ fn main {
 
   // Newick writing
   ignore(
-    bench("write_newick", iters_find, fn() { ignore(@lib.write_newick(tree)) }),
+    bench("write_newick", iters_find, fn() { ignore(@lib.write_newick(tree, true)) }),
   )
 
   // Count terminals
   ignore(
-    bench("Tree::count_terminals", iters_find, fn() {
-      ignore(tree.count_terminals())
+    bench("Tree::get_leaf_count", iters_find, fn() {
+      ignore(@lib.get_leaf_count(tree))
     }),
   )
 
   // Get terminals
   ignore(
-    bench("Tree::get_terminals", iters_find, fn() {
-      ignore(tree.get_terminals())
+    bench("Tree::get_leaves", iters_find, fn() {
+      ignore(@lib.get_leaves(tree))
     }),
   )
 
   // Get nonterminals
   ignore(
-    bench("Tree::get_nonterminals", iters_find, fn() {
-      ignore(tree.get_nonterminals())
+    bench("Tree::get_node_count - get_leaf_count", iters_find, fn() {
+      ignore(@lib.get_node_count(tree) - @lib.get_leaf_count(tree))
     }),
   )
 
-  // Find clades by name
+  // Find node by name
   ignore(
-    bench("Tree::find_clades by name", iters_find, fn() {
-      ignore(tree.find_clades(name=Some("A")))
+    bench("Tree::find_node by name", iters_find, fn() {
+      ignore(@lib.find_node(tree, "A"))
     }),
   )
 
-  // Find clades by terminal status
+  // Get tree depth
   ignore(
-    bench("Tree::find_clades terminal=true", iters_find, fn() {
-      ignore(tree.find_clades(terminal=Some(true)))
-    }),
+    bench("Tree::get_tree_depth", iters_find, fn() { ignore(@lib.get_tree_depth(tree)) }),
   )
 
-  // Find any clade
-  ignore(
-    bench("Tree::find_any", iters_find, fn() {
-      ignore(tree.find_any(name=Some("A")))
-    }),
-  )
+  // Total branch length
+  ignore(bench("Tree::total_branch_length", iters_find, fn() { ignore(@lib.total_branch_length(tree)) }))
 
-  // Get path
+  // Get node count
   ignore(
-    bench("Tree::get_path", iters_find, fn() { ignore(tree.get_path("C")) }),
-  )
-
-  // Depths
-  ignore(bench("Tree::depths", iters_find, fn() { ignore(tree.depths()) }))
-
-  // Distance
-  ignore(
-    bench("Tree::distance", iters_find, fn() { ignore(tree.distance("A", "C")) }),
-  )
-
-  // Common ancestor
-  ignore(
-    bench("Tree::common_ancestor", iters_find, fn() {
-      ignore(tree.common_ancestor(["B", "C"]))
-    }),
-  )
-
-  // Is bifurcating
-  ignore(
-    bench("Tree::is_bifurcating", iters_find, fn() {
-      ignore(tree.is_bifurcating())
-    }),
+    bench("Tree::get_node_count", iters_find, fn() { ignore(@lib.get_node_count(tree)) }),
   )
 
   // Draw ASCII
   ignore(
-    bench("Tree::draw_ascii", iters_small, fn() { ignore(tree.draw_ascii()) }),
+    bench("Tree::write_newick", iters_small, fn() { ignore(@lib.write_newick(tree, true)) }),
   )
 
   // Generate a larger tree for more meaningful benchmarks
@@ -463,14 +435,14 @@ fn main {
   )
 
   ignore(
-    bench("Tree::count_terminals (50 leaves)", iters_small, fn() {
-      ignore(large_tree.count_terminals())
+    bench("Tree::get_leaf_count (50 leaves)", iters_small, fn() {
+      ignore(@lib.get_leaf_count(large_tree))
     }),
   )
 
   ignore(
-    bench("Tree::find_clades (50 leaves)", iters_small, fn() {
-      ignore(large_tree.find_clades(terminal=Some(true)))
+    bench("Tree::get_leaves (50 leaves)", iters_small, fn() {
+      ignore(@lib.get_leaves(large_tree))
     }),
   )
 
