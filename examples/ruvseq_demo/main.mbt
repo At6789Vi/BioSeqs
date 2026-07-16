@@ -9,7 +9,7 @@ fn main {
   println("Genes: " + data.genes.length().to_string())
   println("Samples: " + data.samples.length().to_string())
   println("Batches: " + data.batch.length().to_string())
-  
+
   let mut i = 0
   while i < data.samples.length() {
     println("  " + data.samples[i] + " (" + data.batch[i] + ")")
@@ -34,7 +34,7 @@ fn main {
   println("==================")
   let normalized_data = data.normalize()
   println("Normalized: " + normalized_data.normalized.to_string())
-  
+
   if gene_a_idx is Some(_) {
     let counts = normalized_data.counts[gene_a_idx.unwrap()]
     let mut line = ""
@@ -51,7 +51,7 @@ fn main {
   println("\n4. Log2 Transform:")
   println("==================")
   let log_data = data.log2_transform()
-  
+
   if gene_a_idx is Some(_) {
     let counts = log_data.counts[gene_a_idx.unwrap()]
     let mut line = ""
@@ -103,7 +103,7 @@ fn main {
   let corrected = @bio.remove_batch_effect(data, ruvg_factors)
   println("Corrected data genes: " + corrected.genes.length().to_string())
   println("Corrected data samples: " + corrected.samples.length().to_string())
-  
+
   let corr_gene_a_idx = corrected.get_gene_index("GeneA")
   if corr_gene_a_idx is Some(_) {
     let corr_counts = corrected.counts[corr_gene_a_idx.unwrap()]

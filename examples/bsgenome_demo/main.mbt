@@ -19,7 +19,13 @@ fn main {
   let mut i = 0
   while i < chr_names.length() {
     let len = genome.chromosome_length(chr_names[i])
-    println("  - " + chr_names[i] + " (" + (if len is Some(_) { len.unwrap().to_string() } else { "N/A" }) + " bp)")
+    println(
+      "  - " +
+      chr_names[i] +
+      " (" +
+      (if len is Some(_) { len.unwrap().to_string() } else { "N/A" }) +
+      " bp)",
+    )
     i = i + 1
   }
 
@@ -36,7 +42,7 @@ fn main {
   if subseq is Some(_) {
     println("chr1:0-10: " + subseq.unwrap())
   }
-  
+
   let subseq2 = genome.get_subseq("chr1", 10, 8)
   if subseq2 is Some(_) {
     println("chr1:10+8: " + subseq2.unwrap())
@@ -48,7 +54,7 @@ fn main {
   if gene_plus is Some(_) {
     println("Gene (+ strand): " + gene_plus.unwrap())
   }
-  
+
   let gene_minus = genome.extract_gene("chr1", 0, 12, "-")
   if gene_minus is Some(_) {
     println("Gene (- strand): " + gene_minus.unwrap())

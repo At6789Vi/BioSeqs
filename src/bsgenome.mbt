@@ -9,19 +9,28 @@ pub struct BSGenome {
 }
 
 ///|
-pub fn BSGenome::new(name : String, organism : String, provider : String, release : String) -> BSGenome {
+pub fn BSGenome::new(
+  name : String,
+  organism : String,
+  provider : String,
+  release : String,
+) -> BSGenome {
   BSGenome::{
     name,
     organism,
     provider,
     release,
     chromosomes: Array::new(),
-    chromosome_lengths: Array::new()
+    chromosome_lengths: Array::new(),
   }
 }
 
 ///|
-pub fn BSGenome::add_chromosome(self : BSGenome, name : String, sequence : String) -> BSGenome {
+pub fn BSGenome::add_chromosome(
+  self : BSGenome,
+  name : String,
+  sequence : String,
+) -> BSGenome {
   let new_chromosomes = self.chromosomes.copy()
   new_chromosomes.push((name, sequence))
   let new_lengths = self.chromosome_lengths.copy()
@@ -32,7 +41,7 @@ pub fn BSGenome::add_chromosome(self : BSGenome, name : String, sequence : Strin
     provider: self.provider,
     release: self.release,
     chromosomes: new_chromosomes,
-    chromosome_lengths: new_lengths
+    chromosome_lengths: new_lengths,
   }
 }
 
@@ -48,7 +57,7 @@ pub fn BSGenome::chromosome_names(self : BSGenome) -> Array[String] {
 }
 
 ///|
-pub fn BSGenome::chromosome_length(self : BSGenome, chr : String) -> Option[Int] {
+pub fn BSGenome::chromosome_length(self : BSGenome, chr : String) -> Int? {
   let mut i = 0
   while i < self.chromosome_lengths.length() {
     if self.chromosome_lengths[i].0 == chr {
@@ -60,7 +69,7 @@ pub fn BSGenome::chromosome_length(self : BSGenome, chr : String) -> Option[Int]
 }
 
 ///|
-pub fn BSGenome::chromosome_sequence(self : BSGenome, chr : String) -> Option[String] {
+pub fn BSGenome::chromosome_sequence(self : BSGenome, chr : String) -> String? {
   let mut i = 0
   while i < self.chromosomes.length() {
     if self.chromosomes[i].0 == chr {
@@ -72,7 +81,12 @@ pub fn BSGenome::chromosome_sequence(self : BSGenome, chr : String) -> Option[St
 }
 
 ///|
-pub fn BSGenome::get_sequence(self : BSGenome, chr : String, start : Int, end : Int) -> Option[String] {
+pub fn BSGenome::get_sequence(
+  self : BSGenome,
+  chr : String,
+  start : Int,
+  end : Int,
+) -> String? {
   let seq = self.chromosome_sequence(chr)
   if seq is None {
     return None
@@ -86,7 +100,12 @@ pub fn BSGenome::get_sequence(self : BSGenome, chr : String, start : Int, end : 
 }
 
 ///|
-pub fn BSGenome::get_subseq(self : BSGenome, chr : String, start : Int, length : Int) -> Option[String] {
+pub fn BSGenome::get_subseq(
+  self : BSGenome,
+  chr : String,
+  start : Int,
+  length : Int,
+) -> String? {
   let seq = self.chromosome_sequence(chr)
   if seq is None {
     return None
@@ -96,7 +115,7 @@ pub fn BSGenome::get_subseq(self : BSGenome, chr : String, start : Int, length :
   if start < 0 || start + length > len {
     return None
   }
-  Some(s[start:start+length].to_owned())
+  Some(s[start:start + length].to_owned())
 }
 
 ///|
@@ -139,7 +158,13 @@ pub fn BSGenome::has_chromosome(self : BSGenome, chr : String) -> Bool {
 }
 
 ///|
-pub fn BSGenome::extract_gene(self : BSGenome, chr : String, start : Int, end : Int, strand : String) -> Option[String] {
+pub fn BSGenome::extract_gene(
+  self : BSGenome,
+  chr : String,
+  start : Int,
+  end : Int,
+  strand : String,
+) -> String? {
   let seq = self.get_sequence(chr, start, end)
   if seq is None {
     return None
@@ -178,9 +203,17 @@ fn rev_comp(s : String) -> String {
 ///|
 pub fn create_demo_genome() -> BSGenome {
   let genome = BSGenome::new("Homo sapiens", "Homo sapiens", "UCSC", "hg38")
-  let genome = genome.add_chromosome("chr1", "ACGTACGTACGTACGTACGTACGTACGTACGTACGT")
-  let genome = genome.add_chromosome("chr2", "GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTA")
-  let genome = genome.add_chromosome("chr3", "ATCGATCGATCGATCGATCGATCGATCGATCGATC")
-  let genome = genome.add_chromosome("chrX", "TGCAATGCAATGCAATGCAATGCAATGCAATGCAA")
+  let genome = genome.add_chromosome(
+    "chr1", "ACGTACGTACGTACGTACGTACGTACGTACGTACGT",
+  )
+  let genome = genome.add_chromosome(
+    "chr2", "GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTA",
+  )
+  let genome = genome.add_chromosome(
+    "chr3", "ATCGATCGATCGATCGATCGATCGATCGATCGATC",
+  )
+  let genome = genome.add_chromosome(
+    "chrX", "TGCAATGCAATGCAATGCAATGCAATGCAATGCAA",
+  )
   genome.add_chromosome("chrY", "CGATCGATCGATCGATCGATCGATCGATCGATCGA")
 }

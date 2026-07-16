@@ -288,7 +288,7 @@ IvanAXu/BioSeqs/
 ### 样例测试
 ```
 moon build                                              # ✅ 成功
-moon test --package IvanAXu/BioSeqs/test/moonbit        # ✅ 749 个测试全部通过
+moon test --package IvanAXu/BioSeqs/test/moonbit        # ✅ 788 个测试全部通过
 ```
 
 ### 模块对照表
@@ -1967,6 +1967,150 @@ if gene_idx is Some(_) {
 }
 ```
 
+### 53. PDB 高级结构分析 (Bio.PDB.Polypeptide / DSSP)
+
+```moonbit
+// 创建演示蛋白质结构
+let s = create_demo_structure()
+
+// 计算主链二面角 (phi, psi, omega)
+let model = s.find_model(0).unwrap()
+let chain = model.find_chain('A').unwrap()
+let dihedrals = calc_chain_dihedrals(chain)
+// → [(1, None, Some(psi1), None), (2, Some(phi2), Some(psi2), Some(omega2)), ...]
+
+// 计算四原子二面角
+let a = Vector3::new(0.0, 0.0, 0.0)
+let b = Vector3::new(1.0, 0.0, 0.0)
+let c = Vector3::new(1.0, 1.0, 0.0)
+let d = Vector3::new(1.0, 1.0, 1.0)
+let angle = calc_dihedral(a, b, c, d)  // → -90.0 (degrees)
+
+// CA 原子距离矩阵
+let matrix = calc_ca_distance_matrix(chain)
+matrix[0][0]  // → 0.0 (对角线)
+matrix[0][1]  // → CA-CA 距离
+
+// 接触图 (8 Å 阈值)
+let contact = calc_contact_map(chain, threshold=8.0)
+contact[0][1]  // → true/false
+
+// 氢键检测
+let hbonds = detect_hydrogen_bonds(chain, max_dist=3.5, min_angle=90.0)
+hbonds.length()  // → 检测到的氢键数量
+
+// 二级结构分配 (DSSP-style)
+let ss = assign_secondary_structure(chain)
+// → [(1, Coil), (2, Turn), (3, ExtendedStrand), (4, Coil)]
+
+// 二级结构统计
+let counts = count_secondary_structure(ss)
+counts.get("H")  // → Some(0) (AlphaHelix 数量)
+counts.get("E")  // → Some(1) (ExtendedStrand 数量)
+
+// 回转半径
+let rg = calc_radius_of_gyration(chain)
+rg.unwrap()  // → ~3.6 Å
+
+// Ramachandran 图数据
+let plot = ramachandran_plot(chain)
+// → [(2, "GLY", phi2, psi2), (3, "VAL", phi3, psi3)]
+
+// Ramachandran 区域分类
+classify_ramachandran(-60.0, -45.0)  // → Favored
+classify_ramachandran(-120.0, 130.0) // → Favored
+classify_ramachandran(60.0, 30.0)    // → Allowed
+```
+
+### 54. 系统发育树高级分析 (Bio.Phylo.TreeMetrics)
+
+```moonbit
+// 创建演示树: ((A:1, B:1):0.5, (C:1, D:1):0.5)
+let tree = create_demo_tree()
+let tree2 = create_demo_tree2()  // ((A:1, C:1):0.5, (B:1, D:1):0.5)
+
+// 总分支长度
+tree.total_branch_length()  // → 5.0
+
+// 最大深度
+tree.max_depth()  // → 1.5
+
+// 叶节点名称
+let leaves = tree.get_root().get_leaf_names()
+// → ["A", "B", "C", "D"]
+
+// Colless 平衡指数 (0 = 完全平衡)
+tree.colless_index()  // → 0
+
+// 系统发生距离 (沿路径的分支长度之和)
+let dist = tree.patristic_distance("A", "B")
+dist.unwrap()  // → 2.0
+
+let dist2 = tree.patristic_distance("A", "C")
+dist2.unwrap()  // → 3.0
+
+// 系统发生距离矩阵
+let matrix = tree.patristic_distance_matrix()
+// → [("A", "B", 2.0), ("A", "C", 3.0), ("A", "D", 3.0), ("B", "C", 3.0), ...]
+
+// 内部节点计数
+tree.count_internal()  // → 3
+
+// 二分体 (bipartitions)
+let biparts = tree.get_root().get_bipartitions()
+// → [(["A","B"], ["C","D"]), (["A"], ["B","C","D"]), ...]
+
+// Robinson-Foulds 距离 (树拓扑差异度量)
+let rf_same = robinson_foulds_distance(tree, tree)   // → 0 (相同拓扑)
+let rf_diff = robinson_foulds_distance(tree, tree2)   // → > 0 (不同拓扑)
+```
+
+### 55. 序列复杂度与组成分析 (Bio.SeqUtils.Complexity)
+
+```moonbit
+// Shannon 熵 (bits)
+shannon_entropy_bits("ATCGATCG")  // → ~2.0 (高复杂度)
+shannon_entropy_bits("AAAAAAAA")  // → 0.0 (零复杂度)
+
+// 语言学复杂度 (observed/max k-mers)
+linguistic_complexity("ATCGATCG", k=2)  // → > 0.5
+linguistic_complexity("ATATATAT", k=2)  // → < above
+
+// GC/AT 含量
+gc_content_percent("GCGCGCGC")  // → 100.0
+gc_content_percent("ATCGATCG") // → 50.0
+at_content("ATATATAT")         // → 100.0
+
+// GC/AT 偏斜
+gc_skew("GGGGCC")  // → 0.33 (G > C)
+gc_skew("CCCCGG")  // → -0.33 (C > G)
+at_skew("AAAATT")  // → 0.33 (A > T)
+
+// DUST 低复杂度评分 (越高越低复杂度)
+dust_score("ATGATGATGATG")  // → 重复序列，高 DUST 分数
+dust_score("ATCGATCGATCG") // → 多样序列，较低 DUST 分数
+
+// 序列签名 (k-mer 频率向量)
+let sig = sequence_signature("ATCG", k=2)
+sig.size()      // → 3 (AT, TC, CG)
+sig.get("AT")    // → Some(0.333...)
+
+// 核苷酸组成
+let (a, t, g, c) = nucleotide_frequencies("ATCG")
+// → (0.25, 0.25, 0.25, 0.25)
+
+// 混沌游戏表示 (CGR)
+let (x, y) = chaos_game_representation("AAAA")
+// → (0.0625, 0.0625) — 接近 A 角
+
+let (x2, y2) = chaos_game_representation("GGGG")
+// → (0.9375, 0.9375) — 接近 G 角
+
+// 序列相似度 (余弦相似度)
+sequence_similarity("ATCGATCG", "ATCGATCG", k=2)  // → ~1.0 (完全相同)
+sequence_similarity("ATCGATCG", "GCTAGCTA", k=2)  // → < 1.0 (不同)
+```
+
 ## 性能优化
 
 ### 优化策略
@@ -2070,8 +2214,8 @@ if gene_idx is Some(_) {
 ### 测试覆盖率
 
 ```
-Total tests: 736
-Passed: 736
+Total tests: 788
+Passed: 788
 Failed: 0
 ```
 
@@ -2133,6 +2277,12 @@ Failed: 0
 | SingleCell | `single_cell_test.mbt` | 9 |
 | KEGG | `kegg_test.mbt` | 9 |
 | Medline | `medline_test.mbt` | 8 |
+| BSGenome | `bsgenome_test.mbt` | 6 |
+| BioMart | `biomart_test.mbt` | 5 |
+| RUVSeq | `ruvseq_test.mbt` | 5 |
+| PDB 高级分析 | `pdb_analysis_test.mbt` | 13 |
+| Phylo 高级分析 | `phylo_metrics_test.mbt` | 11 |
+| 序列复杂度 | `seq_complexity_test.mbt` | 18 |
 
 ### Python 对比测试
 
@@ -2219,7 +2369,7 @@ moon run cmd/bench/main.mbt
 
 ### 示例程序
 
-项目提供 45 个示例程序，展示各模块的典型用法：
+项目提供 48 个示例程序，展示各模块的典型用法：
 
 | 示例 | 说明 | 运行命令 |
 |------|------|----------|
@@ -2273,6 +2423,9 @@ moon run cmd/bench/main.mbt
 | bsgenome_demo | BSgenome 基因组序列数据库（基因组创建、染色体管理、序列提取、链特异性基因提取） | `moon run examples/bsgenome_demo/main.mbt` |
 | biomart_demo | biomaRt 基因ID转换和注释查询（ID映射、基因注释、外部数据库查询、批量查询） | `moon run examples/biomart_demo/main.mbt` |
 | ruvseq_demo | RUVSeq RNA-seq批次效应去除（数据标准化、Log2转换、RUVg/RUVs方法、批次效应校正） | `moon run examples/ruvseq_demo/main.mbt` |
+| pdb_analysis_demo | PDB高级结构分析（二面角、距离矩阵、接触图、氢键检测、二级结构分配、回转半径、Ramachandran图） | `moon run examples/pdb_analysis_demo/main.mbt` |
+| phylo_metrics_demo | 系统发育树高级分析（总分支长度、最大深度、Colless指数、系统发生距离、Robinson-Foulds距离） | `moon run examples/phylo_metrics_demo/main.mbt` |
+| seq_complexity_demo | 序列复杂度与组成分析（Shannon熵、语言学复杂度、DUST评分、CGR、序列相似度） | `moon run examples/seq_complexity_demo/main.mbt` |
 
 ## 技术栈
 
@@ -2343,6 +2496,10 @@ moon run cmd/bench/main.mbt
 - ✅ 实现 BSgenome 基因组序列数据库（基因组创建、染色体管理、序列提取、链特异性基因提取）
 - ✅ 实现 biomaRt 基因ID转换和注释查询（ID映射、基因注释、外部数据库查询、批量查询）
 - ✅ 实现 RUVSeq RNA-seq批次效应去除（数据标准化、Log2转换、RUVg/RUVs方法、批次效应校正）
+- ✅ 实现 PDB高级结构分析（二面角、距离矩阵、接触图、氢键检测、二级结构分配、回转半径、Ramachandran图）
+- ✅ 实现 phylo_metrics 系统发育树高级分析（总分支长度、最大深度、Colless指数、系统发生距离、Robinson-Foulds距离）
+- ✅ 实现 seq_complexity 序列复杂度与组成分析（Shannon熵、语言学复杂度、DUST评分、CGR、序列相似度）
+
 - [ ] 实现 CRAM 格式支持
 - [ ] 添加 更多多样性指数计算
 - [ ] 添加 SIMD 加速支持
