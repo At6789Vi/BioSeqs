@@ -6,11 +6,7 @@ fn main {
   println("=== Bio.Cluster Demo ===")
 
   let sequences = [
-    "ACGTACGTACGT",
-    "ACGTACATACGT",
-    "ACATACGTACGT",
-    "TTTTTTTTTTTT",
-    "TTTTTTATTTTT",
+    "ACGTACGTACGT", "ACGTACATACGT", "ACATACGTACGT", "TTTTTTTTTTTT", "TTTTTTATTTTT",
     "AAAAAAAAAAAA",
   ]
   let names = ["Seq1", "Seq2", "Seq3", "Seq4", "Seq5", "Seq6"]

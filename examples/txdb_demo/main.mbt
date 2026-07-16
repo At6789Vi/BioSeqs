@@ -4,8 +4,7 @@ fn main {
   println("Inspired by Bioconductor GenomicFeatures package")
   println("")
 
-  let gtf_content =
-    "chr1\tensembl\tgene\t100\t500\t.\t+\t.\tgene_id \"GeneA\"; gene_name \"GeneA\";\n" +
+  let gtf_content = "chr1\tensembl\tgene\t100\t500\t.\t+\t.\tgene_id \"GeneA\"; gene_name \"GeneA\";\n" +
     "chr1\tensembl\ttranscript\t100\t500\t.\t+\t.\tgene_id \"GeneA\"; transcript_id \"Tx1\";\n" +
     "chr1\tensembl\texon\t100\t150\t.\t+\t.\tgene_id \"GeneA\"; transcript_id \"Tx1\"; exon_number \"1\";\n" +
     "chr1\tensembl\texon\t200\t300\t.\t+\t.\tgene_id \"GeneA\"; transcript_id \"Tx1\"; exon_number \"2\";\n" +

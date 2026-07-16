@@ -81,8 +81,35 @@ fn main {
   }
   println("")
 
-  // --- 6. Long sequence with wrapping ---
-  println("6. Long Sequence Alignment (wrapped at 40 chars):")
+  // --- 6. Protein alignment with BLOSUM62 matrix ---
+  println("6. Protein Alignment with BLOSUM62 Matrix:")
+  let prot3 = "MVKLSQVAPFASG"
+  let prot4 = "MVKLSEVAPFSSG"
+  let result6 = @bio.smith_waterman_blosum62(prot3, prot4, -1.0)
+  println("   Seq1: \{prot3}")
+  println("   Seq2: \{prot4}")
+  println("   Score: \{result6.score()}")
+  println("   Identity: \{result6.percent_identity()}%")
+  println("   Alignment:")
+  let lines6 = result6.format().split("\n").to_array()
+  for i = 0; i < lines6.length(); i = i + 1 {
+    println("   \{lines6[i]}")
+  }
+  println("")
+
+  // --- 7. Protein alignment with PAM250 matrix ---
+  println("7. Protein Alignment with PAM250 Matrix:")
+  let prot5 = "ACDEFGHIKLMNPQRSTVWY"
+  let prot6 = "ACDEFGHIKLMNPQRSTVWY"
+  let result7 = @bio.smith_waterman_pam250(prot5, prot6, -2.0)
+  println("   Seq1: \{prot5}")
+  println("   Seq2: \{prot6}")
+  println("   Score: \{result7.score()}")
+  println("   Identity: \{result7.percent_identity()}%")
+  println("")
+
+  // --- 8. Long sequence with wrapping ---
+  println("8. Long Sequence Alignment (wrapped at 40 chars):")
   let long1 = "ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG"
   let long2 = "GGGGATCGATCGATCGGGGGATCGATCGATCGGGGGATCGATCGATCG"
   let result6 = @bio.smith_waterman_dna(long1, long2)
@@ -93,8 +120,8 @@ fn main {
   println(result6.format_wrapped(40))
   println("")
 
-  // --- 7. Score matrix inspection ---
-  println("7. Score Matrix (first 5x5):")
+  // --- 9. Score matrix inspection ---
+  println("9. Score Matrix (first 5x5):")
   let result7 = @bio.smith_waterman_dna("ACGT", "ACGT")
   let matrix = result7.score_matrix()
   let rows = if matrix.length() > 5 { 5 } else { matrix.length() }
@@ -114,8 +141,8 @@ fn main {
   }
   println("")
 
-  // --- 8. No match case ---
-  println("8. No Match (AAAA vs TTTT):")
+  // --- 10. No match case ---
+  println("10. No Match (AAAA vs TTTT):")
   let result8 = @bio.smith_waterman_dna("AAAA", "TTTT")
   println("   Score: \{result8.score()}")
   println("   Alignment length: \{result8.alignment_length()}")

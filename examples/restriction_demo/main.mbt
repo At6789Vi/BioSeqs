@@ -10,14 +10,19 @@ fn main {
   println("   Available enzymes: \{enzymes.length()}")
   let mut first5 = ""
   for i = 0; i < 5 && i < enzymes.length(); i = i + 1 {
-    if i > 0 { first5 = first5 + ", " }
+    if i > 0 {
+      first5 = first5 + ", "
+    }
     first5 = first5 + enzymes[i]
   }
   println("   First 5: \{first5}")
 
   println("\n2. Get enzyme by name:")
   match @bio.get_enzyme_by_name("EcoRI") {
-    Some(e) => println("   EcoRI: recognition_site=\{e.recognition_site}, cutting_position=\{e.cutting_position}")
+    Some(e) =>
+      println(
+        "   EcoRI: recognition_site=\{e.recognition_site}, cutting_position=\{e.cutting_position}",
+      )
     None => println("   EcoRI not found")
   }
 
@@ -49,5 +54,7 @@ fn main {
   println("\n9. Compatible overhangs:")
   let bamHI = @bio.restriction_enzyme("BamHI", "GGATCC", 1, "GATC", "")
   let bglII = @bio.restriction_enzyme("BglII", "AGATCT", 1, "GATC", "")
-  println("   BamHI & BglII compatible: \{@bio.is_compatible_overhang(bamHI, bglII)}")
+  println(
+    "   BamHI & BglII compatible: \{@bio.is_compatible_overhang(bamHI, bglII)}",
+  )
 }

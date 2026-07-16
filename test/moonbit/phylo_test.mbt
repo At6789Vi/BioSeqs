@@ -58,7 +58,7 @@ test "phylo_get_leaves" {
 test "phylo_get_node_count" {
   let newick = "((A,B),(C,D));"
   let tree = @src.parse_newick(newick)
-  
+
   assert_eq(@src.get_node_count(tree), 5)
 }
 
@@ -66,7 +66,7 @@ test "phylo_get_node_count" {
 test "phylo_get_tree_depth" {
   let newick = "(A:0.1,B:0.2);"
   let tree = @src.parse_newick(newick)
-  
+
   let depth = @src.get_tree_depth(tree)
   assert_true(depth > 0.0)
 }
@@ -75,7 +75,7 @@ test "phylo_get_tree_depth" {
 test "phylo_total_branch_length" {
   let newick = "(A:0.1,B:0.2);"
   let tree = @src.parse_newick(newick)
-  
+
   let total = @src.total_branch_length(tree)
   assert_true(total > 0.0)
 }
@@ -84,10 +84,10 @@ test "phylo_total_branch_length" {
 test "phylo_find_node" {
   let newick = "((A,B),(C,D));"
   let tree = @src.parse_newick(newick)
-  
+
   let found = @src.find_node(tree, "A")
   assert_eq(found.is_some(), true)
-  
+
   let not_found = @src.find_node(tree, "Z")
   assert_eq(not_found.is_none(), true)
 }
@@ -96,10 +96,10 @@ test "phylo_find_node" {
 test "phylo_prune_tree" {
   let newick = "((A,B),(C,D));"
   let tree = @src.parse_newick(newick)
-  
+
   let pruned = @src.prune_tree(tree, ["A", "B"])
   assert_eq(pruned.is_some(), true)
-  
+
   match pruned {
     Some(p) => assert_eq(@src.get_leaf_count(p), 2)
     None => assert_true(false)
@@ -110,6 +110,6 @@ test "phylo_prune_tree" {
 test "phylo_parse_nhx" {
   let nhx = "(A[&&NHX:name=A],B[&&NHX:name=B]);"
   let tree = @src.parse_nhx(nhx)
-  
+
   assert_eq(@src.get_leaf_count(tree), 2)
 }

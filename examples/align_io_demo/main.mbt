@@ -6,7 +6,7 @@ fn main {
   println("=== Bio.AlignIO Demo ===")
 
   let clustalw_content = "CLUSTAL W (1.83) multiple sequence alignment\n\nSeq1        ACGTACGT\nSeq2        ACATACAT\nSeq3        AGGTAGGT\n"
-  
+
   println("\n1. Parse ClustalW alignment:")
   let align = @bio.parse_clustalw(clustalw_content)
   println("   Number of sequences: \{@bio.num_sequences(align)}")
@@ -31,7 +31,7 @@ fn main {
   println(clustalw_out)
 
   let fasta_content = ">Seq1\nACGTACGT\n>Seq2\nACATACAT\n"
-  
+
   println("\n6. Parse FASTA alignment:")
   let fasta_align = @bio.parse_fasta_alignment(fasta_content)
   println("   Number of sequences: \{@bio.num_sequences(fasta_align)}")

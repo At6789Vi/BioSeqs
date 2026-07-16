@@ -308,7 +308,10 @@ pub fn meme_to_motif(meme_content : String) -> Motif {
     let probs = sites[pos].split(" ").to_array()
     for alpha_idx = 0; alpha_idx < 4; alpha_idx = alpha_idx + 1 {
       if alpha_idx < probs.length() {
-        pwm[pos][alpha_idx] = match parse_double(probs[alpha_idx].to_owned()) { Some(v) => v; None => 0.0 }
+        pwm[pos][alpha_idx] = match parse_double(probs[alpha_idx].to_owned()) {
+          Some(v) => v
+          None => 0.0
+        }
       }
     }
   }

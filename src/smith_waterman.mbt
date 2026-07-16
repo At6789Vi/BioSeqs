@@ -304,6 +304,126 @@ pub fn smith_waterman_protein(seq1 : String, seq2 : String) -> SWResult {
 }
 
 ///|
+/// Run Smith-Waterman local alignment using a substitution matrix.
+///
+/// `seq1`, `seq2` — protein sequences (single-letter code strings).
+/// `matrix` — substitution matrix (e.g., `blosum62()`).
+/// `gap_penalty` — penalty for a gap (typically negative).
+///
+/// Returns a `SWResult` containing aligned sequences, score, positions,
+/// and the full DP matrices.
+pub fn smith_waterman_with_matrix(
+  seq1 : String,
+  seq2 : String,
+  matrix : SubstitutionMatrix,
+  gap_penalty : Double,
+) -> SWResult {
+  let n = seq1.length()
+  let m = seq2.length()
+  let dp : Array[Array[Double]] = Array::new()
+  let trace : Array[Array[TraceDirection]] = Array::new()
+  for i = 0; i <= n; i = i + 1 {
+    let row = FixedArray::make(m + 1, 0.0)
+    let trow = FixedArray::make(m + 1, TraceDirection::Stop)
+    let drow : Array[Double] = Array::new()
+    let trrow : Array[TraceDirection] = Array::new()
+    for j = 0; j <= m; j = j + 1 {
+      drow.push(row[j])
+      trrow.push(trow[j])
+    }
+    dp.push(drow)
+    trace.push(trrow)
+  }
+  let mut max_score = 0.0
+  let mut max_i = 0
+  let mut max_j = 0
+  for i = 1; i <= n; i = i + 1 {
+    for j = 1; j <= m; j = j + 1 {
+      let c1 = seq1.unsafe_get(i - 1).unsafe_to_char().to_string()
+      let c2 = seq2.unsafe_get(j - 1).unsafe_to_char().to_string()
+      let sub_score = matrix.get_score_case_insensitive(c1, c2).to_double()
+      let diag = dp[i - 1][j - 1] + sub_score
+      let up = dp[i - 1][j] + gap_penalty
+      let left = dp[i][j - 1] + gap_penalty
+      let (val, dir) = if diag >= up && diag >= left && diag > 0.0 {
+        (diag, TraceDirection::Diag)
+      } else if up >= left && up > 0.0 {
+        (up, TraceDirection::Up)
+      } else if left > 0.0 {
+        (left, TraceDirection::Left)
+      } else {
+        (0.0, TraceDirection::Stop)
+      }
+      dp[i][j] = val
+      trace[i][j] = dir
+      if val > max_score {
+        max_score = val
+        max_i = i
+        max_j = j
+      }
+    }
+  }
+  let r1 = StringBuilder::new()
+  let r2 = StringBuilder::new()
+  let mut i = max_i
+  let mut j = max_j
+  while i > 0 && j > 0 {
+    match trace[i][j] {
+      TraceDirection::Stop => break
+      TraceDirection::Diag => {
+        r1.write_char(seq1.unsafe_get(i - 1).unsafe_to_char())
+        r2.write_char(seq2.unsafe_get(j - 1).unsafe_to_char())
+        i = i - 1
+        j = j - 1
+      }
+      TraceDirection::Up => {
+        r1.write_char(seq1.unsafe_get(i - 1).unsafe_to_char())
+        r2.write_char('-')
+        i = i - 1
+      }
+      TraceDirection::Left => {
+        r1.write_char('-')
+        r2.write_char(seq2.unsafe_get(j - 1).unsafe_to_char())
+        j = j - 1
+      }
+    }
+  }
+  let aligned1 = reverse_string(r1.to_string())
+  let aligned2 = reverse_string(r2.to_string())
+  let match_line = build_match_line(aligned1, aligned2)
+  SWResult::{
+    aligned_seq1: aligned1,
+    aligned_seq2: aligned2,
+    match_line,
+    score: max_score,
+    start_pos1: (i, max_i),
+    start_pos2: (j, max_j),
+    score_matrix: dp,
+    trace_matrix: trace,
+  }
+}
+
+///|
+/// Convenience: run Smith-Waterman with BLOSUM62 matrix.
+pub fn smith_waterman_blosum62(
+  seq1 : String,
+  seq2 : String,
+  gap_penalty : Double,
+) -> SWResult {
+  smith_waterman_with_matrix(seq1, seq2, blosum62(), gap_penalty)
+}
+
+///|
+/// Convenience: run Smith-Waterman with PAM250 matrix.
+pub fn smith_waterman_pam250(
+  seq1 : String,
+  seq2 : String,
+  gap_penalty : Double,
+) -> SWResult {
+  smith_waterman_with_matrix(seq1, seq2, pam250(), gap_penalty)
+}
+
+///|
 /// Build the match line: '|' for match, '.' for mismatch, ' ' for gap.
 fn build_match_line(s1 : String, s2 : String) -> String {
   let buf = StringBuilder::new()

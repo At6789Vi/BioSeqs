@@ -20,14 +20,14 @@ pub fn split_by_char(s : String, delim : Int) -> Array[String] {
   i = 0
   while i < n {
     if s.unsafe_get(i).to_int() == delim {
-      result[idx] = s[start:i].to_owned()
+      result[idx] = s[start:i].to_string()
       idx = idx + 1
       start = i + 1
     }
     i = i + 1
   }
   if start < n {
-    result[idx] = s[start:n].to_owned()
+    result[idx] = s[start:n].to_string()
   }
   result
 }
@@ -130,7 +130,11 @@ pub fn char_at(s : String, idx : Int) -> String {
     let mut result = ""
     for i = 0; i < 26; i = i + 1 {
       if c == 'A'.to_int() + i {
-        result = result + ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"][i]
+        result = result +
+          [
+            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
+            "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+          ][i]
         break
       }
     }
@@ -139,7 +143,11 @@ pub fn char_at(s : String, idx : Int) -> String {
     let mut result = ""
     for i = 0; i < 26; i = i + 1 {
       if c == 'a'.to_int() + i {
-        result = result + ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"][i]
+        result = result +
+          [
+            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
+            "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+          ][i]
         break
       }
     }
@@ -153,26 +161,47 @@ pub fn char_at(s : String, idx : Int) -> String {
       }
     }
     result
-  } else if c == ' '.to_int() { " " }
-  else if c == '\t'.to_int() { "\t" }
-  else if c == '\n'.to_int() { "\n" }
-  else if c == '\r'.to_int() { "\r" }
-  else if c == '>'.to_int() { ">" }
-  else if c == '#'.to_int() { "#" }
-  else if c == '/'.to_int() { "/" }
-  else if c == ':'.to_int() { ":" }
-  else if c == ';'.to_int() { ";" }
-  else if c == ','.to_int() { "," }
-  else if c == '('.to_int() { "(" }
-  else if c == ')'.to_int() { ")" }
-  else if c == '.'.to_int() { "." }
-  else if c == '-'.to_int() { "-" }
-  else if c == '_'.to_int() { "_" }
-  else if c == '['.to_int() { "[" }
-  else if c == ']'.to_int() { "]" }
-  else if c == '@'.to_int() { "@" }
-  else if c == '&'.to_int() { "&" }
-  else { c.to_string() }
+  } else if c == ' '.to_int() {
+    " "
+  } else if c == '\t'.to_int() {
+    "\t"
+  } else if c == '\n'.to_int() {
+    "\n"
+  } else if c == '\r'.to_int() {
+    "\r"
+  } else if c == '>'.to_int() {
+    ">"
+  } else if c == '#'.to_int() {
+    "#"
+  } else if c == '/'.to_int() {
+    "/"
+  } else if c == ':'.to_int() {
+    ":"
+  } else if c == ';'.to_int() {
+    ";"
+  } else if c == ','.to_int() {
+    ","
+  } else if c == '('.to_int() {
+    "("
+  } else if c == ')'.to_int() {
+    ")"
+  } else if c == '.'.to_int() {
+    "."
+  } else if c == '-'.to_int() {
+    "-"
+  } else if c == '_'.to_int() {
+    "_"
+  } else if c == '['.to_int() {
+    "["
+  } else if c == ']'.to_int() {
+    "]"
+  } else if c == '@'.to_int() {
+    "@"
+  } else if c == '&'.to_int() {
+    "&"
+  } else {
+    c.to_string()
+  }
 }
 
 ///|
@@ -191,12 +220,12 @@ pub fn starts_with(s : String, pos : Int, prefix : String) -> Bool {
   if pos + prefix.length() > s.length() {
     return false
   }
-  
+
   for i = 0; i < prefix.length(); i = i + 1 {
     if s.unsafe_get(pos + i) != prefix.unsafe_get(i) {
       return false
     }
   }
-  
+
   true
 }

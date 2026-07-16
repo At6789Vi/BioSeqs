@@ -9,7 +9,11 @@ pub struct TreeNode {
 }
 
 ///|
-pub fn tree_node(name : String, branch_length : Double, children : Array[TreeNode]) -> TreeNode {
+pub fn tree_node(
+  name : String,
+  branch_length : Double,
+  children : Array[TreeNode],
+) -> TreeNode {
   TreeNode::{ name, branch_length, children }
 }
 
@@ -17,17 +21,17 @@ pub fn tree_node(name : String, branch_length : Double, children : Array[TreeNod
 pub fn parse_newick(content : String) -> TreeNode {
   let trimmed = content.trim().replace(old=";", new="").to_owned()
   let n = trimmed.length()
-  
+
   if n == 0 {
     return TreeNode::{ name: "", branch_length: 0.0, children: [] }
   }
-  
+
   let leaves : Array[TreeNode] = Array::new()
   let mut i = 0
-  
+
   while i < n {
     let c = char_at(trimmed, i)
-    
+
     if c == "(" || c == ")" || c == "," {
       i = i + 1
     } else if c == ":" {
@@ -49,7 +53,7 @@ pub fn parse_newick(content : String) -> TreeNode {
         token = token + nc
         i = i + 1
       }
-      
+
       let mut length = 0.0
       if i < n && char_at(trimmed, i) == ":" {
         i = i + 1
@@ -62,20 +66,23 @@ pub fn parse_newick(content : String) -> TreeNode {
           num = num + nc
           i = i + 1
         }
-        length = match parse_double(num) { Some(v) => v; None => 0.0 }
+        length = match parse_double(num) {
+          Some(v) => v
+          None => 0.0
+        }
       }
-      
+
       leaves.push(TreeNode::{ name: token, branch_length: length, children: [] })
     }
   }
-  
+
   TreeNode::{ name: "", branch_length: 0.0, children: leaves }
 }
 
 ///|
 pub fn parse_nhx(content : String) -> TreeNode {
   let n = content.length()
-  
+
   let mut cleaned = ""
   let mut i = 0
   while i < n {
@@ -89,7 +96,7 @@ pub fn parse_nhx(content : String) -> TreeNode {
       i = i + 1
     }
   }
-  
+
   parse_newick(cleaned)
 }
 
@@ -103,20 +110,20 @@ pub fn write_newick(node : TreeNode, show_lengths : Bool) -> String {
     result
   } else {
     let mut result = "("
-    
+
     for i = 0; i < node.children.length(); i = i + 1 {
       result = result + write_newick(node.children[i], show_lengths)
       if i < node.children.length() - 1 {
         result = result + ","
       }
     }
-    
+
     result = result + ")" + node.name
-    
+
     if show_lengths && node.branch_length > 0.0 {
       result = result + ":" + node.branch_length.to_string()
     }
-    
+
     result
   }
 }
@@ -125,12 +132,15 @@ pub fn write_newick(node : TreeNode, show_lengths : Bool) -> String {
 pub fn get_leaves(node : TreeNode) -> Array[String] {
   let leaves : Array[String] = Array::new()
   let stack : Array[TreeNode] = Array::new()
-  
+
   stack.push(node)
-  
+
   while stack.length() > 0 {
-    let current = match stack.pop() { Some(v) => v; None => node }
-    
+    let current = match stack.pop() {
+      Some(v) => v
+      None => node
+    }
+
     if current.children.length() == 0 {
       leaves.push(current.name)
     } else {
@@ -139,7 +149,7 @@ pub fn get_leaves(node : TreeNode) -> Array[String] {
       }
     }
   }
-  
+
   leaves
 }
 
@@ -147,12 +157,15 @@ pub fn get_leaves(node : TreeNode) -> Array[String] {
 pub fn get_leaf_count(node : TreeNode) -> Int {
   let mut count = 0
   let stack : Array[TreeNode] = Array::new()
-  
+
   stack.push(node)
-  
+
   while stack.length() > 0 {
-    let current = match stack.pop() { Some(v) => v; None => node }
-    
+    let current = match stack.pop() {
+      Some(v) => v
+      None => node
+    }
+
     if current.children.length() == 0 {
       count = count + 1
     } else {
@@ -161,7 +174,7 @@ pub fn get_leaf_count(node : TreeNode) -> Int {
       }
     }
   }
-  
+
   count
 }
 
@@ -169,18 +182,21 @@ pub fn get_leaf_count(node : TreeNode) -> Int {
 pub fn get_node_count(node : TreeNode) -> Int {
   let mut count = 0
   let stack : Array[TreeNode] = Array::new()
-  
+
   stack.push(node)
-  
+
   while stack.length() > 0 {
-    let current = match stack.pop() { Some(v) => v; None => node }
+    let current = match stack.pop() {
+      Some(v) => v
+      None => node
+    }
     count = count + 1
-    
+
     for i = 0; i < current.children.length(); i = i + 1 {
       stack.push(current.children[i])
     }
   }
-  
+
   count
 }
 
@@ -188,13 +204,16 @@ pub fn get_node_count(node : TreeNode) -> Int {
 pub fn get_tree_depth(node : TreeNode) -> Double {
   let mut max_depth = 0.0
   let stack : Array[(TreeNode, Double)] = Array::new()
-  
+
   stack.push((node, 0.0))
-  
+
   while stack.length() > 0 {
-    let (current, current_depth) = match stack.pop() { Some(v) => v; None => (node, 0.0) }
+    let (current, current_depth) = match stack.pop() {
+      Some(v) => v
+      None => (node, 0.0)
+    }
     let total_depth = current_depth + current.branch_length
-    
+
     if current.children.length() == 0 {
       if total_depth > max_depth {
         max_depth = total_depth
@@ -205,7 +224,7 @@ pub fn get_tree_depth(node : TreeNode) -> Double {
       }
     }
   }
-  
+
   max_depth
 }
 
@@ -213,39 +232,45 @@ pub fn get_tree_depth(node : TreeNode) -> Double {
 pub fn total_branch_length(node : TreeNode) -> Double {
   let mut total = 0.0
   let stack : Array[TreeNode] = Array::new()
-  
+
   stack.push(node)
-  
+
   while stack.length() > 0 {
-    let current = match stack.pop() { Some(v) => v; None => node }
+    let current = match stack.pop() {
+      Some(v) => v
+      None => node
+    }
     total = total + current.branch_length
-    
+
     for i = 0; i < current.children.length(); i = i + 1 {
       stack.push(current.children[i])
     }
   }
-  
+
   total
 }
 
 ///|
 pub fn find_node(node : TreeNode, name : String) -> TreeNode? {
   let stack : Array[TreeNode] = Array::new()
-  
+
   stack.push(node)
-  
+
   while stack.length() > 0 {
-    let current = match stack.pop() { Some(v) => v; None => node }
-    
+    let current = match stack.pop() {
+      Some(v) => v
+      None => node
+    }
+
     if current.name == name {
       return Some(current)
     }
-    
+
     for i = 0; i < current.children.length(); i = i + 1 {
       stack.push(current.children[i])
     }
   }
-  
+
   None
 }
 
@@ -255,26 +280,34 @@ pub fn prune_tree(node : TreeNode, keep_names : Array[String]) -> TreeNode? {
   for i = 0; i < keep_names.length(); i = i + 1 {
     keep_map[keep_names[i]] = true
   }
-  
+
   prune_node(node, keep_map)
 }
 
 ///|
 fn prune_node(n : TreeNode, keep : Map[String, Bool]) -> TreeNode? {
   if n.children.length() == 0 {
-    if keep.get(n.name) is Some(_) { Some(n) } else { None }
+    if keep.get(n.name) is Some(_) {
+      Some(n)
+    } else {
+      None
+    }
   } else {
     let new_children : Array[TreeNode] = Array::new()
-    
+
     for i = 0; i < n.children.length(); i = i + 1 {
       match prune_node(n.children[i], keep) {
         Some(child) => new_children.push(child)
         None => ignore(())
       }
     }
-    
+
     if new_children.length() > 0 {
-      Some(TreeNode::{ name: n.name, branch_length: n.branch_length, children: new_children })
+      Some(TreeNode::{
+        name: n.name,
+        branch_length: n.branch_length,
+        children: new_children,
+      })
     } else {
       None
     }

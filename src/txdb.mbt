@@ -11,7 +11,13 @@ pub struct Gene {
 }
 
 ///|
-pub fn Gene::new(gene_id : String, seqname : String, start : Int, end : Int, strand : Strand) -> Gene {
+pub fn Gene::new(
+  gene_id : String,
+  seqname : String,
+  start : Int,
+  end : Int,
+  strand : Strand,
+) -> Gene {
   Gene::{ gene_id, seqname, start, end, strand }
 }
 
@@ -26,7 +32,14 @@ pub struct Transcript {
 }
 
 ///|
-pub fn Transcript::new(transcript_id : String, gene_id : String, seqname : String, start : Int, end : Int, strand : Strand) -> Transcript {
+pub fn Transcript::new(
+  transcript_id : String,
+  gene_id : String,
+  seqname : String,
+  start : Int,
+  end : Int,
+  strand : Strand,
+) -> Transcript {
   Transcript::{ transcript_id, gene_id, seqname, start, end, strand }
 }
 
@@ -43,8 +56,26 @@ pub struct Exon {
 }
 
 ///|
-pub fn Exon::new(exon_id : String, transcript_id : String, gene_id : String, seqname : String, start : Int, end : Int, strand : Strand, exon_rank : Int) -> Exon {
-  Exon::{ exon_id, transcript_id, gene_id, seqname, start, end, strand, exon_rank }
+pub fn Exon::new(
+  exon_id : String,
+  transcript_id : String,
+  gene_id : String,
+  seqname : String,
+  start : Int,
+  end : Int,
+  strand : Strand,
+  exon_rank : Int,
+) -> Exon {
+  Exon::{
+    exon_id,
+    transcript_id,
+    gene_id,
+    seqname,
+    start,
+    end,
+    strand,
+    exon_rank,
+  }
 }
 
 ///|
@@ -60,8 +91,26 @@ pub struct CDS {
 }
 
 ///|
-pub fn CDS::new(cds_id : String, transcript_id : String, gene_id : String, seqname : String, start : Int, end : Int, strand : Strand, exon_rank : Int) -> CDS {
-  CDS::{ cds_id, transcript_id, gene_id, seqname, start, end, strand, exon_rank }
+pub fn CDS::new(
+  cds_id : String,
+  transcript_id : String,
+  gene_id : String,
+  seqname : String,
+  start : Int,
+  end : Int,
+  strand : Strand,
+  exon_rank : Int,
+) -> CDS {
+  CDS::{
+    cds_id,
+    transcript_id,
+    gene_id,
+    seqname,
+    start,
+    end,
+    strand,
+    exon_rank,
+  }
 }
 
 ///|
@@ -75,7 +124,14 @@ pub struct TxDb {
 }
 
 ///|
-pub fn TxDb::new(genes : Array[Gene], transcripts : Array[Transcript], exons : Array[Exon], cds : Array[CDS], genome : String, organism : String) -> TxDb {
+pub fn TxDb::new(
+  genes : Array[Gene],
+  transcripts : Array[Transcript],
+  exons : Array[Exon],
+  cds : Array[CDS],
+  genome : String,
+  organism : String,
+) -> TxDb {
   TxDb::{ genes, transcripts, exons, cds, genome, organism }
 }
 
@@ -170,7 +226,7 @@ pub fn cds(txdb : TxDb) -> GRanges {
 ///|
 pub fn transcripts_by_gene(txdb : TxDb) -> Map[String, Array[Transcript]] {
   let result = Map([], capacity=32)
-  
+
   let mut i = 0
   while i < txdb.transcripts.length() {
     let tx = txdb.transcripts[i]
@@ -180,14 +236,14 @@ pub fn transcripts_by_gene(txdb : TxDb) -> Map[String, Array[Transcript]] {
     result[tx.gene_id].push(tx)
     i = i + 1
   }
-  
+
   result
 }
 
 ///|
 pub fn exons_by_transcript(txdb : TxDb) -> Map[String, Array[Exon]] {
   let result = Map([], capacity=32)
-  
+
   let mut i = 0
   while i < txdb.exons.length() {
     let exon = txdb.exons[i]
@@ -197,14 +253,14 @@ pub fn exons_by_transcript(txdb : TxDb) -> Map[String, Array[Exon]] {
     result[exon.transcript_id].push(exon)
     i = i + 1
   }
-  
+
   result
 }
 
 ///|
 pub fn exons_by_gene(txdb : TxDb) -> Map[String, Array[Exon]] {
   let result = Map([], capacity=32)
-  
+
   let mut i = 0
   while i < txdb.exons.length() {
     let exon = txdb.exons[i]
@@ -214,14 +270,14 @@ pub fn exons_by_gene(txdb : TxDb) -> Map[String, Array[Exon]] {
     result[exon.gene_id].push(exon)
     i = i + 1
   }
-  
+
   result
 }
 
 ///|
 pub fn cds_by_transcript(txdb : TxDb) -> Map[String, Array[CDS]] {
   let result = Map([], capacity=32)
-  
+
   let mut i = 0
   while i < txdb.cds.length() {
     let c = txdb.cds[i]
@@ -231,7 +287,7 @@ pub fn cds_by_transcript(txdb : TxDb) -> Map[String, Array[CDS]] {
     result[c.transcript_id].push(c)
     i = i + 1
   }
-  
+
   result
 }
 
@@ -240,7 +296,7 @@ pub fn introns_by_transcript(txdb : TxDb) -> Map[String, Array[(Int, Int)]] {
   let result = Map([], capacity=32)
   let exons_map = exons_by_transcript(txdb)
   let keys = exons_map.keys().collect()
-  
+
   let mut i = 0
   while i < keys.length() {
     let tx_id = keys[i]
@@ -255,7 +311,7 @@ pub fn introns_by_transcript(txdb : TxDb) -> Map[String, Array[(Int, Int)]] {
         sorted[j] = exons[j]
         j = j + 1
       }
-      
+
       let mut k = 0
       while k < n - 1 {
         let mut l = k + 1
@@ -269,7 +325,7 @@ pub fn introns_by_transcript(txdb : TxDb) -> Map[String, Array[(Int, Int)]] {
         }
         k = k + 1
       }
-      
+
       let introns : Array[(Int, Int)] = []
       let mut m = 0
       while m < n - 1 {
@@ -284,7 +340,7 @@ pub fn introns_by_transcript(txdb : TxDb) -> Map[String, Array[(Int, Int)]] {
     }
     i = i + 1
   }
-  
+
   result
 }
 
@@ -341,7 +397,7 @@ pub fn sort_exons_by_rank(exons : Array[Exon]) -> Array[Exon] {
     sorted[i] = exons[i]
     i = i + 1
   }
-  
+
   let mut j = 0
   while j < n - 1 {
     let mut k = j + 1
@@ -355,7 +411,7 @@ pub fn sort_exons_by_rank(exons : Array[Exon]) -> Array[Exon] {
     }
     j = j + 1
   }
-  
+
   sorted
 }
 
@@ -368,16 +424,16 @@ pub fn five_prime_utrs(txdb : TxDb) -> GRanges {
     strands: [],
     widths: [],
   }
-  
+
   let exons_map = exons_by_transcript(txdb)
   let cds_map = cds_by_transcript(txdb)
   let keys = exons_map.keys().collect()
-  
+
   let mut i = 0
   while i < keys.length() {
     let tx_id = keys[i]
     let exons = exons_map[tx_id]
-    
+
     if !cds_map.contains(tx_id) {
       i = i + 1
       continue
@@ -387,18 +443,18 @@ pub fn five_prime_utrs(txdb : TxDb) -> GRanges {
       i = i + 1
       continue
     }
-    
+
     let tx_opt = find_transcript_by_id(txdb, tx_id)
     if tx_opt.is_none() {
       i = i + 1
       continue
     }
     let transcript = tx_opt.unwrap()
-    
+
     if transcript.strand == Strand::Plus {
       let cds_start = find_min_cds_start(cds_regions)
       let sorted = sort_exons_by_rank(exons)
-      
+
       let mut j = 0
       while j < sorted.length() {
         let e = sorted[j]
@@ -420,7 +476,7 @@ pub fn five_prime_utrs(txdb : TxDb) -> GRanges {
     } else {
       let cds_end = find_max_cds_end(cds_regions)
       let sorted = sort_exons_by_rank(exons)
-      
+
       let mut j = 0
       while j < sorted.length() {
         let e = sorted[j]
@@ -440,10 +496,10 @@ pub fn five_prime_utrs(txdb : TxDb) -> GRanges {
         j = j + 1
       }
     }
-    
+
     i = i + 1
   }
-  
+
   results
 }
 
@@ -456,16 +512,16 @@ pub fn three_prime_utrs(txdb : TxDb) -> GRanges {
     strands: [],
     widths: [],
   }
-  
+
   let exons_map = exons_by_transcript(txdb)
   let cds_map = cds_by_transcript(txdb)
   let keys = exons_map.keys().collect()
-  
+
   let mut i = 0
   while i < keys.length() {
     let tx_id = keys[i]
     let exons = exons_map[tx_id]
-    
+
     if !cds_map.contains(tx_id) {
       i = i + 1
       continue
@@ -475,18 +531,18 @@ pub fn three_prime_utrs(txdb : TxDb) -> GRanges {
       i = i + 1
       continue
     }
-    
+
     let tx_opt = find_transcript_by_id(txdb, tx_id)
     if tx_opt.is_none() {
       i = i + 1
       continue
     }
     let transcript = tx_opt.unwrap()
-    
+
     if transcript.strand == Strand::Plus {
       let cds_end = find_max_cds_end(cds_regions)
       let sorted = sort_exons_by_rank(exons)
-      
+
       let mut j = 0
       while j < sorted.length() {
         let e = sorted[j]
@@ -508,7 +564,7 @@ pub fn three_prime_utrs(txdb : TxDb) -> GRanges {
     } else {
       let cds_start = find_min_cds_start(cds_regions)
       let sorted = sort_exons_by_rank(exons)
-      
+
       let mut j = 0
       while j < sorted.length() {
         let e = sorted[j]
@@ -528,10 +584,10 @@ pub fn three_prime_utrs(txdb : TxDb) -> GRanges {
         j = j + 1
       }
     }
-    
+
     i = i + 1
   }
-  
+
   results
 }
 
@@ -548,7 +604,7 @@ pub fn promoters(txdb : TxDb, upstream : Int, downstream : Int) -> GRanges {
     let tx = txs[i]
     seqnames[i] = tx.seqname
     strands[i] = tx.strand
-    
+
     if tx.strand == Strand::Plus {
       let p_start = tx.start - upstream
       let p_end = tx.start + downstream - 1
@@ -558,7 +614,7 @@ pub fn promoters(txdb : TxDb, upstream : Int, downstream : Int) -> GRanges {
       let p_end = tx.end + upstream
       ranges[i] = (p_start, p_end)
     }
-    
+
     i = i + 1
   }
 
@@ -569,7 +625,7 @@ pub fn promoters(txdb : TxDb, upstream : Int, downstream : Int) -> GRanges {
 pub fn gene_ids(txdb : TxDb) -> Array[String] {
   let seen = Map([], capacity=32)
   let ids : Array[String] = []
-  
+
   let mut i = 0
   while i < txdb.genes.length() {
     let gene = txdb.genes[i]
@@ -579,7 +635,7 @@ pub fn gene_ids(txdb : TxDb) -> Array[String] {
     }
     i = i + 1
   }
-  
+
   ids
 }
 
@@ -587,7 +643,7 @@ pub fn gene_ids(txdb : TxDb) -> Array[String] {
 pub fn transcript_ids(txdb : TxDb) -> Array[String] {
   let seen = Map([], capacity=32)
   let ids : Array[String] = []
-  
+
   let mut i = 0
   while i < txdb.transcripts.length() {
     let tx = txdb.transcripts[i]
@@ -597,7 +653,7 @@ pub fn transcript_ids(txdb : TxDb) -> Array[String] {
     }
     i = i + 1
   }
-  
+
   ids
 }
 
@@ -605,7 +661,7 @@ pub fn transcript_ids(txdb : TxDb) -> Array[String] {
 pub fn exon_ids(txdb : TxDb) -> Array[String] {
   let seen = Map([], capacity=32)
   let ids : Array[String] = []
-  
+
   let mut i = 0
   while i < txdb.exons.length() {
     let exon = txdb.exons[i]
@@ -615,7 +671,7 @@ pub fn exon_ids(txdb : TxDb) -> Array[String] {
     }
     i = i + 1
   }
-  
+
   ids
 }
 
@@ -625,14 +681,26 @@ pub fn txdb_summary(txdb : TxDb) -> String {
   let tx_count = transcript_ids(txdb).length()
   let exon_count = exon_ids(txdb).length()
   let cds_count = txdb.cds.length()
-  
-  "TxDb object:" + "\n" +
-  "  Genome: " + txdb.genome + "\n" +
-  "  Organism: " + txdb.organism + "\n" +
-  "  Genes: " + gene_count.to_string() + "\n" +
-  "  Transcripts: " + tx_count.to_string() + "\n" +
-  "  Exons: " + exon_count.to_string() + "\n" +
-  "  CDS: " + cds_count.to_string()
+
+  "TxDb object:" +
+  "\n" +
+  "  Genome: " +
+  txdb.genome +
+  "\n" +
+  "  Organism: " +
+  txdb.organism +
+  "\n" +
+  "  Genes: " +
+  gene_count.to_string() +
+  "\n" +
+  "  Transcripts: " +
+  tx_count.to_string() +
+  "\n" +
+  "  Exons: " +
+  exon_count.to_string() +
+  "\n" +
+  "  CDS: " +
+  cds_count.to_string()
 }
 
 ///|
@@ -641,9 +709,9 @@ pub fn parse_gtf(gtf_content : String) -> TxDb {
   let transcripts : Array[Transcript] = []
   let exons : Array[Exon] = []
   let cds_regions : Array[CDS] = []
-  
+
   let lines = split_by_char(gtf_content, '\n'.to_int())
-  
+
   let mut i = 0
   while i < lines.length() {
     let line = lines[i]
@@ -652,13 +720,13 @@ pub fn parse_gtf(gtf_content : String) -> TxDb {
       i = i + 1
       continue
     }
-    
+
     let fields = split_by_char(trimmed, '\t'.to_int())
     if fields.length() < 9 {
       i = i + 1
       continue
     }
-    
+
     let seqname = fields[0]
     let feature_type = fields[2]
     let start_opt = parse_double(fields[3])
@@ -667,105 +735,107 @@ pub fn parse_gtf(gtf_content : String) -> TxDb {
       continue
     }
     let start = start_opt.unwrap().to_int()
-    
+
     let end_opt = parse_double(fields[4])
     if end_opt.is_none() {
       i = i + 1
       continue
     }
     let end = end_opt.unwrap().to_int()
-    
+
     let strand_str = fields[6]
     let attributes = fields[8]
-    
+
     let strand = match strand_str {
       "+" => Strand::Plus
       "-" => Strand::Minus
       _ => Strand::Star
     }
-    
+
     let attr_map = parse_gtf_attributes(attributes)
-    
+
     let gene_id = if attr_map.contains("gene_id") {
       let id = attr_map["gene_id"]
       id.replace(old="\"", new="").replace(old=";", new="")
     } else {
       "unknown"
     }
-    
+
     let transcript_id = if attr_map.contains("transcript_id") {
       let id = attr_map["transcript_id"]
       id.replace(old="\"", new="").replace(old=";", new="")
     } else {
       gene_id
     }
-    
+
     if feature_type == "gene" {
-      genes.push(Gene::{
-        gene_id: gene_id,
-        seqname: seqname,
-        start: start,
-        end: end,
-        strand: strand,
-      })
+      genes.push(Gene::{ gene_id, seqname, start, end, strand })
     } else if feature_type == "transcript" {
       transcripts.push(Transcript::{
-        transcript_id: transcript_id,
-        gene_id: gene_id,
-        seqname: seqname,
-        start: start,
-        end: end,
-        strand: strand,
+        transcript_id,
+        gene_id,
+        seqname,
+        start,
+        end,
+        strand,
       })
     } else if feature_type == "exon" {
       let exon_rank = if attr_map.contains("exon_number") {
         let r = attr_map["exon_number"]
         let cleaned = r.replace(old="\"", new="").replace(old=";", new="")
         let d_opt = parse_double(cleaned)
-        if d_opt.is_some() { d_opt.unwrap().to_int() } else { 1 }
+        if d_opt.is_some() {
+          d_opt.unwrap().to_int()
+        } else {
+          1
+        }
       } else {
         1
       }
-      
+
       exons.push(Exon::{
         exon_id: gene_id + "." + transcript_id + "." + exon_rank.to_string(),
-        transcript_id: transcript_id,
-        gene_id: gene_id,
-        seqname: seqname,
-        start: start,
-        end: end,
-        strand: strand,
-        exon_rank: exon_rank,
+        transcript_id,
+        gene_id,
+        seqname,
+        start,
+        end,
+        strand,
+        exon_rank,
       })
     } else if feature_type == "CDS" {
       let exon_rank = if attr_map.contains("exon_number") {
         let r = attr_map["exon_number"]
         let cleaned = r.replace(old="\"", new="").replace(old=";", new="")
         let d_opt = parse_double(cleaned)
-        if d_opt.is_some() { d_opt.unwrap().to_int() } else { 1 }
+        if d_opt.is_some() {
+          d_opt.unwrap().to_int()
+        } else {
+          1
+        }
       } else {
         1
       }
-      
+
       cds_regions.push(CDS::{
         cds_id: gene_id + "." + transcript_id + ".cds." + exon_rank.to_string(),
-        transcript_id: transcript_id,
-        gene_id: gene_id,
-        seqname: seqname,
-        start: start,
-        end: end,
-        strand: strand,
-        exon_rank: exon_rank,
+        transcript_id,
+        gene_id,
+        seqname,
+        start,
+        end,
+        strand,
+        exon_rank,
       })
     }
-    
+
     i = i + 1
   }
-  
+
   TxDb::{
-    genes: genes,
-    transcripts: transcripts,
-    exons: exons,
+    genes,
+    transcripts,
+    exons,
     cds: cds_regions,
     genome: "unknown",
     organism: "unknown",
@@ -775,7 +845,7 @@ pub fn parse_gtf(gtf_content : String) -> TxDb {
 ///|
 fn parse_gtf_attributes(attr_str : String) -> Map[String, String] {
   let result = Map([], capacity=16)
-  
+
   let pairs = split_by_char(attr_str, ';'.to_int())
   let mut i = 0
   while i < pairs.length() {
@@ -785,20 +855,24 @@ fn parse_gtf_attributes(attr_str : String) -> Map[String, String] {
       i = i + 1
       continue
     }
-    
+
     let parts = split_by_char(trimmed, ' '.to_int())
     if parts.length() >= 2 {
       let key = parts[0]
       let value = if parts.length() > 2 {
-        substring(trimmed, key.length() + 1, trimmed.length() - key.length() - 1)
+        substring(
+          trimmed,
+          key.length() + 1,
+          trimmed.length() - key.length() - 1,
+        )
       } else {
         parts[1]
       }
       result[key] = value
     }
-    
+
     i = i + 1
   }
-  
+
   result
 }

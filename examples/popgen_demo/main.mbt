@@ -1,5 +1,7 @@
 ///|
 /// Population genetics demo.
+///
+/// Run: moon run examples/popgen_demo/main.mbt
 fn main {
   println("=== Population Genetics Demo ===\n")
 
@@ -8,40 +10,40 @@ fn main {
   println("   Genotypes: \{population}")
 
   println("\n2. Allele frequencies:")
-  let allele_freqs = @src.allele_frequencies(population)
-  println("   Alleles: \{allele_freqs.size()}")
+  let allele_freqs = @bio.allele_frequencies(population)
+  println("   Number of alleles: \{allele_freqs.size()}")
 
   println("\n3. Genotype frequencies:")
-  let geno_freqs = @src.genotype_frequencies(population)
-  println("   Genotypes: \{geno_freqs.size()}")
+  let geno_freqs = @bio.genotype_frequencies(population)
+  println("   Number of genotypes: \{geno_freqs.size()}")
 
   println("\n4. Hardy-Weinberg test:")
-  let chi_sq = @src.hardy_weinberg_test(population)
+  let chi_sq = @bio.hardy_weinberg_test(population)
   println("   Chi-squared: \{chi_sq}")
 
   println("\n5. Heterozygosity:")
-  let h_exp = @src.heterozygosity(population)
-  let h_obs = @src.observed_heterozygosity(population)
+  let h_exp = @bio.heterozygosity(population)
+  let h_obs = @bio.observed_heterozygosity(population)
   println("   Expected heterozygosity: \{h_exp}")
   println("   Observed heterozygosity: \{h_obs}")
 
   println("\n6. Inbreeding coefficient:")
-  let f = @src.inbreeding_coefficient(population)
+  let f = @bio.inbreeding_coefficient(population)
   println("   F: \{f}")
 
   println("\n7. Allele richness:")
-  let richness = @src.allele_richness(population)
+  let richness = @bio.allele_richness(population)
   println("   Richness: \{richness}")
 
   println("\n8. FST between populations:")
   let pop1 = ["AA", "Aa", "aa", "AA"]
   let pop2 = ["AA", "AA", "Aa", "Aa"]
-  let fst_val = @src.fst(pop1, pop2)
+  let fst_val = @bio.fst(pop1, pop2)
   println("   FST: \{fst_val}")
 
   println("\n9. Watterson's theta:")
   let sequences = ["ATCG", "ATCA", "ATGG", "ATGT"]
-  let theta = @src.watterson_theta(sequences)
+  let theta = @bio.watterson_theta(sequences)
   println("   Theta: \{theta}")
 
   println("\n=== Demo Complete ===")

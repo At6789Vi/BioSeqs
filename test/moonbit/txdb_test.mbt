@@ -8,7 +8,7 @@ test "txdb_genes" {
     @src.Gene::new("GeneB", "chr2", 200, 600, @src.strand_minus()),
   ]
   let txdb = @src.TxDb::new(genes, [], [], [], "hg19", "Homo sapiens")
-  
+
   let gr = @src.genes(txdb)
   assert_eq(@src.granges_length(gr), 2)
   assert_eq(gr.seqnames[0], "chr1")
@@ -23,7 +23,7 @@ test "txdb_transcripts" {
     @src.Transcript::new("Tx2", "GeneA", "chr1", 110, 490, @src.strand_plus()),
   ]
   let txdb = @src.TxDb::new([], txs, [], [], "hg19", "Homo sapiens")
-  
+
   let gr = @src.transcripts(txdb)
   assert_eq(@src.granges_length(gr), 2)
   assert_eq(gr.seqnames[1], "chr1")
@@ -32,11 +32,29 @@ test "txdb_transcripts" {
 ///|
 test "txdb_exons" {
   let exons = [
-    @src.Exon::new("Ex1", "Tx1", "GeneA", "chr1", 100, 150, @src.strand_plus(), 1),
-    @src.Exon::new("Ex2", "Tx1", "GeneA", "chr1", 200, 300, @src.strand_plus(), 2),
+    @src.Exon::new(
+      "Ex1",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      100,
+      150,
+      @src.strand_plus(),
+      1,
+    ),
+    @src.Exon::new(
+      "Ex2",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      200,
+      300,
+      @src.strand_plus(),
+      2,
+    ),
   ]
   let txdb = @src.TxDb::new([], [], exons, [], "hg19", "Homo sapiens")
-  
+
   let gr = @src.exons(txdb)
   assert_eq(@src.granges_length(gr), 2)
 }
@@ -44,11 +62,29 @@ test "txdb_exons" {
 ///|
 test "txdb_cds" {
   let cds_regions = [
-    @src.CDS::new("CDS1", "Tx1", "GeneA", "chr1", 100, 150, @src.strand_plus(), 1),
-    @src.CDS::new("CDS2", "Tx1", "GeneA", "chr1", 200, 280, @src.strand_plus(), 2),
+    @src.CDS::new(
+      "CDS1",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      100,
+      150,
+      @src.strand_plus(),
+      1,
+    ),
+    @src.CDS::new(
+      "CDS2",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      200,
+      280,
+      @src.strand_plus(),
+      2,
+    ),
   ]
   let txdb = @src.TxDb::new([], [], [], cds_regions, "hg19", "Homo sapiens")
-  
+
   let gr = @src.cds(txdb)
   assert_eq(@src.granges_length(gr), 2)
 }
@@ -61,7 +97,7 @@ test "txdb_transcripts_by_gene" {
     @src.Transcript::new("Tx3", "GeneB", "chr2", 200, 600, @src.strand_minus()),
   ]
   let txdb = @src.TxDb::new([], txs, [], [], "hg19", "Homo sapiens")
-  
+
   let by_gene = @src.transcripts_by_gene(txdb)
   let geneA_txs = by_gene.get("GeneA")
   assert_true(geneA_txs.is_some())
@@ -75,10 +111,17 @@ test "txdb_transcripts_by_gene" {
 test "txdb_promoters" {
   let txs = [
     @src.Transcript::new("Tx1", "GeneA", "chr1", 1000, 2000, @src.strand_plus()),
-    @src.Transcript::new("Tx2", "GeneB", "chr1", 3000, 4000, @src.strand_minus()),
+    @src.Transcript::new(
+      "Tx2",
+      "GeneB",
+      "chr1",
+      3000,
+      4000,
+      @src.strand_minus(),
+    ),
   ]
   let txdb = @src.TxDb::new([], txs, [], [], "hg19", "Homo sapiens")
-  
+
   let prom = @src.promoters(txdb, 200, 50)
   assert_eq(@src.granges_length(prom), 2)
   assert_eq(prom.starts[0], 800)
@@ -92,7 +135,7 @@ test "txdb_gene_ids" {
     @src.Gene::new("GeneB", "chr2", 200, 600, @src.strand_minus()),
   ]
   let txdb = @src.TxDb::new(genes, [], [], [], "hg19", "Homo sapiens")
-  
+
   let ids = @src.gene_ids(txdb)
   assert_eq(ids.length(), 2)
 }
@@ -104,7 +147,7 @@ test "txdb_transcript_ids" {
     @src.Transcript::new("Tx2", "GeneA", "chr1", 110, 490, @src.strand_plus()),
   ]
   let txdb = @src.TxDb::new([], txs, [], [], "hg19", "Homo sapiens")
-  
+
   let ids = @src.transcript_ids(txdb)
   assert_eq(ids.length(), 2)
 }
@@ -112,11 +155,29 @@ test "txdb_transcript_ids" {
 ///|
 test "txdb_exon_ids" {
   let exons = [
-    @src.Exon::new("Ex1", "Tx1", "GeneA", "chr1", 100, 150, @src.strand_plus(), 1),
-    @src.Exon::new("Ex2", "Tx1", "GeneA", "chr1", 200, 300, @src.strand_plus(), 2),
+    @src.Exon::new(
+      "Ex1",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      100,
+      150,
+      @src.strand_plus(),
+      1,
+    ),
+    @src.Exon::new(
+      "Ex2",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      200,
+      300,
+      @src.strand_plus(),
+      2,
+    ),
   ]
   let txdb = @src.TxDb::new([], [], exons, [], "hg19", "Homo sapiens")
-  
+
   let ids = @src.exon_ids(txdb)
   assert_eq(ids.length(), 2)
 }
@@ -124,12 +185,38 @@ test "txdb_exon_ids" {
 ///|
 test "txdb_summary" {
   let genes = [@src.Gene::new("GeneA", "chr1", 100, 500, @src.strand_plus())]
-  let txs = [@src.Transcript::new("Tx1", "GeneA", "chr1", 100, 500, @src.strand_plus())]
-  let exons = [@src.Exon::new("Ex1", "Tx1", "GeneA", "chr1", 100, 150, @src.strand_plus(), 1)]
-  let cds_regions = [@src.CDS::new("CDS1", "Tx1", "GeneA", "chr1", 100, 150, @src.strand_plus(), 1)]
-  
-  let txdb = @src.TxDb::new(genes, txs, exons, cds_regions, "hg19", "Homo sapiens")
-  
+  let txs = [
+    @src.Transcript::new("Tx1", "GeneA", "chr1", 100, 500, @src.strand_plus()),
+  ]
+  let exons = [
+    @src.Exon::new(
+      "Ex1",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      100,
+      150,
+      @src.strand_plus(),
+      1,
+    ),
+  ]
+  let cds_regions = [
+    @src.CDS::new(
+      "CDS1",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      100,
+      150,
+      @src.strand_plus(),
+      1,
+    ),
+  ]
+
+  let txdb = @src.TxDb::new(
+    genes, txs, exons, cds_regions, "hg19", "Homo sapiens",
+  )
+
   let summary = @src.txdb_summary(txdb)
   assert_true(summary.contains("Genes: 1"))
   assert_true(summary.contains("Transcripts: 1"))
@@ -137,14 +224,13 @@ test "txdb_summary" {
 
 ///|
 test "txdb_parse_gtf_basic" {
-  let gtf = 
-    "chr1\tensembl\tgene\t100\t500\t.\t+\t.\tgene_id \"GeneA\"; gene_name \"GeneA\";\n" +
+  let gtf = "chr1\tensembl\tgene\t100\t500\t.\t+\t.\tgene_id \"GeneA\"; gene_name \"GeneA\";\n" +
     "chr1\tensembl\ttranscript\t100\t500\t.\t+\t.\tgene_id \"GeneA\"; transcript_id \"Tx1\";\n" +
     "chr1\tensembl\texon\t100\t150\t.\t+\t.\tgene_id \"GeneA\"; transcript_id \"Tx1\"; exon_number \"1\";\n" +
     "chr1\tensembl\texon\t200\t300\t.\t+\t.\tgene_id \"GeneA\"; transcript_id \"Tx1\"; exon_number \"2\";\n" +
     "chr1\tensembl\tCDS\t100\t150\t.\t+\t0\tgene_id \"GeneA\"; transcript_id \"Tx1\"; exon_number \"1\";\n" +
     "chr1\tensembl\tCDS\t200\t280\t.\t+\t0\tgene_id \"GeneA\"; transcript_id \"Tx1\"; exon_number \"2\";\n"
-  
+
   let txdb = @src.parse_gtf(gtf)
   assert_eq(txdb.genes.length(), 1)
   assert_eq(txdb.transcripts.length(), 1)
@@ -154,13 +240,33 @@ test "txdb_parse_gtf_basic" {
 
 ///|
 test "txdb_introns_by_transcript" {
-  let txs = [@src.Transcript::new("Tx1", "GeneA", "chr1", 100, 300, @src.strand_plus())]
+  let txs = [
+    @src.Transcript::new("Tx1", "GeneA", "chr1", 100, 300, @src.strand_plus()),
+  ]
   let exons = [
-    @src.Exon::new("Ex1", "Tx1", "GeneA", "chr1", 100, 150, @src.strand_plus(), 1),
-    @src.Exon::new("Ex2", "Tx1", "GeneA", "chr1", 200, 300, @src.strand_plus(), 2),
+    @src.Exon::new(
+      "Ex1",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      100,
+      150,
+      @src.strand_plus(),
+      1,
+    ),
+    @src.Exon::new(
+      "Ex2",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      200,
+      300,
+      @src.strand_plus(),
+      2,
+    ),
   ]
   let txdb = @src.TxDb::new([], txs, exons, [], "hg19", "Homo sapiens")
-  
+
   let introns = @src.introns_by_transcript(txdb)
   let tx1_introns = introns.get("Tx1")
   assert_true(tx1_introns.is_some())
@@ -169,17 +275,55 @@ test "txdb_introns_by_transcript" {
 
 ///|
 test "txdb_five_prime_utrs" {
-  let txs = [@src.Transcript::new("Tx1", "GeneA", "chr1", 100, 300, @src.strand_plus())]
+  let txs = [
+    @src.Transcript::new("Tx1", "GeneA", "chr1", 100, 300, @src.strand_plus()),
+  ]
   let exons = [
-    @src.Exon::new("Ex1", "Tx1", "GeneA", "chr1", 100, 150, @src.strand_plus(), 1),
-    @src.Exon::new("Ex2", "Tx1", "GeneA", "chr1", 200, 300, @src.strand_plus(), 2),
+    @src.Exon::new(
+      "Ex1",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      100,
+      150,
+      @src.strand_plus(),
+      1,
+    ),
+    @src.Exon::new(
+      "Ex2",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      200,
+      300,
+      @src.strand_plus(),
+      2,
+    ),
   ]
   let cds_regions = [
-    @src.CDS::new("CDS1", "Tx1", "GeneA", "chr1", 120, 150, @src.strand_plus(), 1),
-    @src.CDS::new("CDS2", "Tx1", "GeneA", "chr1", 200, 280, @src.strand_plus(), 2),
+    @src.CDS::new(
+      "CDS1",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      120,
+      150,
+      @src.strand_plus(),
+      1,
+    ),
+    @src.CDS::new(
+      "CDS2",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      200,
+      280,
+      @src.strand_plus(),
+      2,
+    ),
   ]
   let txdb = @src.TxDb::new([], txs, exons, cds_regions, "hg19", "Homo sapiens")
-  
+
   let utrs = @src.five_prime_utrs(txdb)
   assert_eq(@src.granges_length(utrs), 1)
   assert_eq(utrs.starts[0], 100)
@@ -188,17 +332,55 @@ test "txdb_five_prime_utrs" {
 
 ///|
 test "txdb_three_prime_utrs" {
-  let txs = [@src.Transcript::new("Tx1", "GeneA", "chr1", 100, 300, @src.strand_plus())]
+  let txs = [
+    @src.Transcript::new("Tx1", "GeneA", "chr1", 100, 300, @src.strand_plus()),
+  ]
   let exons = [
-    @src.Exon::new("Ex1", "Tx1", "GeneA", "chr1", 100, 150, @src.strand_plus(), 1),
-    @src.Exon::new("Ex2", "Tx1", "GeneA", "chr1", 200, 300, @src.strand_plus(), 2),
+    @src.Exon::new(
+      "Ex1",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      100,
+      150,
+      @src.strand_plus(),
+      1,
+    ),
+    @src.Exon::new(
+      "Ex2",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      200,
+      300,
+      @src.strand_plus(),
+      2,
+    ),
   ]
   let cds_regions = [
-    @src.CDS::new("CDS1", "Tx1", "GeneA", "chr1", 100, 150, @src.strand_plus(), 1),
-    @src.CDS::new("CDS2", "Tx1", "GeneA", "chr1", 200, 280, @src.strand_plus(), 2),
+    @src.CDS::new(
+      "CDS1",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      100,
+      150,
+      @src.strand_plus(),
+      1,
+    ),
+    @src.CDS::new(
+      "CDS2",
+      "Tx1",
+      "GeneA",
+      "chr1",
+      200,
+      280,
+      @src.strand_plus(),
+      2,
+    ),
   ]
   let txdb = @src.TxDb::new([], txs, exons, cds_regions, "hg19", "Homo sapiens")
-  
+
   let utrs = @src.three_prime_utrs(txdb)
   assert_eq(@src.granges_length(utrs), 1)
   assert_eq(utrs.starts[0], 281)

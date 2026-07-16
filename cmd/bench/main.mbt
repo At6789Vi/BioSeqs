@@ -362,7 +362,9 @@ fn main {
 
   // Newick writing
   ignore(
-    bench("write_newick", iters_find, fn() { ignore(@lib.write_newick(tree, true)) }),
+    bench("write_newick", iters_find, fn() {
+      ignore(@lib.write_newick(tree, true))
+    }),
   )
 
   // Count terminals
@@ -374,9 +376,7 @@ fn main {
 
   // Get terminals
   ignore(
-    bench("Tree::get_leaves", iters_find, fn() {
-      ignore(@lib.get_leaves(tree))
-    }),
+    bench("Tree::get_leaves", iters_find, fn() { ignore(@lib.get_leaves(tree)) }),
   )
 
   // Get nonterminals
@@ -395,20 +395,30 @@ fn main {
 
   // Get tree depth
   ignore(
-    bench("Tree::get_tree_depth", iters_find, fn() { ignore(@lib.get_tree_depth(tree)) }),
+    bench("Tree::get_tree_depth", iters_find, fn() {
+      ignore(@lib.get_tree_depth(tree))
+    }),
   )
 
   // Total branch length
-  ignore(bench("Tree::total_branch_length", iters_find, fn() { ignore(@lib.total_branch_length(tree)) }))
+  ignore(
+    bench("Tree::total_branch_length", iters_find, fn() {
+      ignore(@lib.total_branch_length(tree))
+    }),
+  )
 
   // Get node count
   ignore(
-    bench("Tree::get_node_count", iters_find, fn() { ignore(@lib.get_node_count(tree)) }),
+    bench("Tree::get_node_count", iters_find, fn() {
+      ignore(@lib.get_node_count(tree))
+    }),
   )
 
   // Draw ASCII
   ignore(
-    bench("Tree::write_newick", iters_small, fn() { ignore(@lib.write_newick(tree, true)) }),
+    bench("Tree::write_newick", iters_small, fn() {
+      ignore(@lib.write_newick(tree, true))
+    }),
   )
 
   // Generate a larger tree for more meaningful benchmarks

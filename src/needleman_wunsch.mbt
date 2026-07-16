@@ -324,6 +324,120 @@ pub fn needleman_wunsch_protein(seq1 : String, seq2 : String) -> NWResult {
 }
 
 ///|
+/// Run Needleman-Wunsch global alignment using a substitution matrix.
+///
+/// `seq1`, `seq2` — protein sequences (single-letter code strings).
+/// `matrix` — substitution matrix (e.g., `blosum62()`).
+/// `gap_penalty` — penalty for a gap (typically negative).
+///
+/// Returns an `NWResult` containing aligned sequences, score,
+/// and the full DP matrices.
+pub fn needleman_wunsch_with_matrix(
+  seq1 : String,
+  seq2 : String,
+  matrix : SubstitutionMatrix,
+  gap_penalty : Double,
+) -> NWResult {
+  let n = seq1.length()
+  let m = seq2.length()
+  let dp : Array[Array[Double]] = Array::new()
+  let trace : Array[Array[NWTrace]] = Array::new()
+  for i = 0; i <= n; i = i + 1 {
+    let drow : Array[Double] = Array::new()
+    let trow : Array[NWTrace] = Array::new()
+    for j = 0; j <= m; j = j + 1 {
+      drow.push(0.0)
+      trow.push(NWTrace::Start)
+    }
+    dp.push(drow)
+    trace.push(trow)
+  }
+  for i = 1; i <= n; i = i + 1 {
+    dp[i][0] = i.to_double() * gap_penalty
+    trace[i][0] = NWTrace::Up
+  }
+  for j = 1; j <= m; j = j + 1 {
+    dp[0][j] = j.to_double() * gap_penalty
+    trace[0][j] = NWTrace::Left
+  }
+  for i = 1; i <= n; i = i + 1 {
+    for j = 1; j <= m; j = j + 1 {
+      let c1 = seq1.unsafe_get(i - 1).unsafe_to_char().to_string()
+      let c2 = seq2.unsafe_get(j - 1).unsafe_to_char().to_string()
+      let sub_score = matrix.get_score_case_insensitive(c1, c2).to_double()
+      let diag = dp[i - 1][j - 1] + sub_score
+      let up = dp[i - 1][j] + gap_penalty
+      let left = dp[i][j - 1] + gap_penalty
+      let (val, dir) = if diag >= up && diag >= left {
+        (diag, NWTrace::Diag)
+      } else if up >= left {
+        (up, NWTrace::Up)
+      } else {
+        (left, NWTrace::Left)
+      }
+      dp[i][j] = val
+      trace[i][j] = dir
+    }
+  }
+  let r1 = StringBuilder::new()
+  let r2 = StringBuilder::new()
+  let mut i = n
+  let mut j = m
+  while i > 0 || j > 0 {
+    match trace[i][j] {
+      NWTrace::Diag => {
+        r1.write_char(seq1.unsafe_get(i - 1).unsafe_to_char())
+        r2.write_char(seq2.unsafe_get(j - 1).unsafe_to_char())
+        i = i - 1
+        j = j - 1
+      }
+      NWTrace::Up => {
+        r1.write_char(seq1.unsafe_get(i - 1).unsafe_to_char())
+        r2.write_char('-')
+        i = i - 1
+      }
+      NWTrace::Left => {
+        r1.write_char('-')
+        r2.write_char(seq2.unsafe_get(j - 1).unsafe_to_char())
+        j = j - 1
+      }
+      NWTrace::Start => break
+    }
+  }
+  let aligned1 = nw_reverse_string(r1.to_string())
+  let aligned2 = nw_reverse_string(r2.to_string())
+  let match_line = nw_build_match_line(aligned1, aligned2)
+  NWResult::{
+    aligned_seq1: aligned1,
+    aligned_seq2: aligned2,
+    match_line,
+    score: dp[n][m],
+    score_matrix: dp,
+    trace_matrix: trace,
+  }
+}
+
+///|
+/// Convenience: run Needleman-Wunsch with BLOSUM62 matrix.
+pub fn needleman_wunsch_blosum62(
+  seq1 : String,
+  seq2 : String,
+  gap_penalty : Double,
+) -> NWResult {
+  needleman_wunsch_with_matrix(seq1, seq2, blosum62(), gap_penalty)
+}
+
+///|
+/// Convenience: run Needleman-Wunsch with PAM250 matrix.
+pub fn needleman_wunsch_pam250(
+  seq1 : String,
+  seq2 : String,
+  gap_penalty : Double,
+) -> NWResult {
+  needleman_wunsch_with_matrix(seq1, seq2, pam250(), gap_penalty)
+}
+
+///|
 /// Build the match line: '|' for match, '.' for mismatch, ' ' for gap.
 fn nw_build_match_line(s1 : String, s2 : String) -> String {
   let buf = StringBuilder::new()

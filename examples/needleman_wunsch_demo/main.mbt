@@ -83,8 +83,35 @@ fn main {
   }
   println("")
 
-  // --- 6. Completely different sequences ---
-  println("6. Completely Different (AAAA vs TTTT):")
+  // --- 6. Protein alignment with BLOSUM62 matrix ---
+  println("6. Protein Alignment with BLOSUM62 Matrix:")
+  let prot3 = "MVKLSQVAPFASG"
+  let prot4 = "MVKLSEVAPFSSG"
+  let result6 = @bio.needleman_wunsch_blosum62(prot3, prot4, -1.0)
+  println("   Seq1: \{prot3}")
+  println("   Seq2: \{prot4}")
+  println("   Score: \{result6.score()}")
+  println("   Identity: \{result6.percent_identity()}%")
+  println("   Alignment:")
+  let lines6 = result6.format().split("\n").to_array()
+  for i = 0; i < lines6.length(); i = i + 1 {
+    println("   \{lines6[i]}")
+  }
+  println("")
+
+  // --- 7. Protein alignment with PAM250 matrix ---
+  println("7. Protein Alignment with PAM250 Matrix:")
+  let prot5 = "ACDEFGHIKLMNPQRSTVWY"
+  let prot6 = "ACDEFGHIKLMNPQRSTVWY"
+  let result7 = @bio.needleman_wunsch_pam250(prot5, prot6, -2.0)
+  println("   Seq1: \{prot5}")
+  println("   Seq2: \{prot6}")
+  println("   Score: \{result7.score()}")
+  println("   Identity: \{result7.percent_identity()}%")
+  println("")
+
+  // --- 8. Completely different sequences ---
+  println("8. Completely Different (AAAA vs TTTT):")
   let result6 = @bio.needleman_wunsch_dna("AAAA", "TTTT")
   println("   Score: \{result6.score()}")
   println("   Note: NW forces global alignment, so score is negative")
@@ -94,8 +121,8 @@ fn main {
   println("   \{lines6[2]}")
   println("")
 
-  // --- 7. Long sequence with wrapping ---
-  println("7. Long Sequence Alignment (wrapped at 40 chars):")
+  // --- 9. Long sequence with wrapping ---
+  println("9. Long Sequence Alignment (wrapped at 40 chars):")
   let long1 = "ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG"
   let long2 = "ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG"
   let result7 = @bio.needleman_wunsch_dna(long1, long2)
@@ -106,8 +133,8 @@ fn main {
   println(result7.format_wrapped(40))
   println("")
 
-  // --- 8. Score matrix inspection ---
-  println("8. Score Matrix (5x5):")
+  // --- 10. Score matrix inspection ---
+  println("10. Score Matrix (5x5):")
   let result8 = @bio.needleman_wunsch_dna("ACGT", "ACGT")
   let matrix = result8.score_matrix()
   let rows = if matrix.length() > 5 { 5 } else { matrix.length() }
@@ -127,8 +154,8 @@ fn main {
   }
   println("")
 
-  // --- 9. Empty sequence ---
-  println("9. Empty Sequence (ACGT vs empty):")
+  // --- 11. Empty sequence ---
+  println("11. Empty Sequence (ACGT vs empty):")
   let result9 = @bio.needleman_wunsch_dna("ACGT", "")
   println("   Score: \{result9.score()}")
   let lines9 = result9.format().split("\n").to_array()
