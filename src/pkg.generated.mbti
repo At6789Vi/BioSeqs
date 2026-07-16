@@ -13,6 +13,8 @@ pub let aa_hydrophobicity : Map[UInt16, Double]
 
 pub let aa_polarity : Map[UInt16, Double]
 
+pub fn adjust_p_values(Array[Double], String) -> Array[Double]
+
 pub fn align_motifs(Motif, Motif) -> Double
 
 pub fn align_score(TabularMSA) -> Double
@@ -54,6 +56,8 @@ pub fn base64_decode(String) -> String
 pub fn bed_to_granges(Array[BedRecord]) -> GRanges
 
 pub fn bgzf_decompress(String) -> String raise BgzfError
+
+pub fn blast_to_searchio(Array[BlastRecord]) -> Array[QueryResult]
 
 pub fn blosum45() -> SubstitutionMatrix
 
@@ -123,17 +127,23 @@ pub fn compute_overlap_graph(Array[String], Int) -> Map[Int, Array[(Int, Int)]]
 
 pub fn consensus_sequence(Alignment) -> String
 
+pub fn contrasts_fit(EBayesResult, Matrix) -> EBayesResult
+
 pub fn correct_errors(Array[String], Int) -> Array[String]
 
 pub fn cosine_distance(Array[Double], Array[Double]) -> Double
 
 pub fn count_codons(String) -> Map[String, Int]
 
+pub fn count_hsps(QueryResult) -> Int
+
 pub fn count_kmers(String, Int) -> Map[String, Int]
 
 pub fn count_matrix(Array[String]) -> Array[Array[Int]]
 
 pub fn count_overlaps(GRanges, GRanges) -> Array[Int]
+
+pub fn coverage(GAlignments) -> Array[Coverage]
 
 pub fn crc32(String) -> Int
 
@@ -189,6 +199,8 @@ pub fn deseq(DESeqDataSet) -> DESeqResults
 
 pub fn deseq_dataset(Array[Array[Int]], Array[String], Array[String], Array[Array[Double]]) -> DESeqDataSet
 
+pub fn detect_variant_type(String, String) -> VariantType
+
 pub fn dge_list(Array[Array[Int]], Array[String], Array[String]) -> DGEList
 
 pub fn digest(String, RestrictionEnzyme) -> Array[String]
@@ -208,6 +220,8 @@ pub fn dna_feature_names() -> Array[String]
 pub fn dna_feature_vector(String) -> Array[Double]
 
 pub fn dust_complexity(String) -> Double
+
+pub fn ebayes(MArrayLM, Double) -> EBayesResult
 
 pub fn enzymes_by_overhang(String) -> Array[RestrictionEnzyme]
 
@@ -391,11 +405,25 @@ pub fn letter_frequency_dna(String) -> NucleotideFreq
 
 pub fn list_enzymes() -> Array[String]
 
+pub fn lm_fit(Matrix, Matrix) -> MArrayLM
+
+pub fn lngamma(Double) -> Double
+
 pub fn local_pairwise_align_nucleotide(DNA, DNA) -> (TabularMSA, Double, (Int, Int), (Int, Int))
 
 pub fn local_pairwise_align_protein(Protein, Protein) -> (TabularMSA, Double, (Int, Int), (Int, Int))
 
+pub fn locate_variants(Array[VcfRecord], TxDb) -> Array[VariantAnnotation]
+
+pub fn make_contrasts(Array[Array[Double]], Matrix) -> Matrix
+
 pub fn manhattan_distance(Array[Double], Array[Double]) -> Double
+
+pub fn mat_inverse(Matrix) -> Matrix
+
+pub fn mat_mult(Matrix, Matrix) -> Matrix
+
+pub fn mat_transpose(Matrix) -> Matrix
 
 pub fn matrix_blosum45() -> MatrixType
 
@@ -475,6 +503,8 @@ pub fn parse_blast_tabular(String) -> BlastRecord?
 
 pub fn parse_blast_xml(String) -> BlastRecord?
 
+pub fn parse_blat_psl(String) -> Array[QueryResult]
+
 pub fn parse_cigar(String) -> Array[CigarElement]
 
 pub fn parse_clustal(String) -> MultipleSeqAlignment raise AlignIOError
@@ -501,6 +531,8 @@ pub fn parse_gff(String) -> Array[GffRecord]
 
 pub fn parse_gtf(String) -> TxDb
 
+pub fn parse_hmmer3_tab(String) -> Array[QueryResult]
+
 pub fn parse_int(String) -> Int
 
 pub fn parse_matrix(String) -> SubstitutionMatrix?
@@ -525,9 +557,17 @@ pub fn parse_vcf(String) -> VcfFile
 
 pub fn parse_wig(String) -> Array[WigRecord]
 
+pub fn pbeta(Double, Double, Double) -> Double
+
 pub fn percent_identity(String, String) -> Double
 
+pub fn pf(Double, Double, Double) -> Double
+
+pub fn pileup(GAlignments, @hashmap.HashMap[String, String]) -> Array[PileupElement]
+
 pub fn position_specific_features(String, Int) -> Array[Double]
+
+pub fn predict_coding(Array[VcfRecord], TxDb, @hashmap.HashMap[String, String]) -> Array[CodingPrediction]
 
 pub fn predict_genes(HMM, String) -> Array[String]
 
@@ -542,6 +582,8 @@ pub fn prune_tree(TreeNode, Array[String]) -> TreeNode?
 pub fn pssm_from_pwm(Array[Array[Double]], Array[Double]) -> Array[Array[Double]]
 
 pub fn pwm_from_counts(Array[Array[Int]], Double) -> Array[Array[Double]]
+
+pub fn qf(Double, Double, Double) -> Double
 
 pub fn restriction_enzyme(String, String, Int, String, String) -> RestrictionEnzyme
 
@@ -651,6 +693,8 @@ pub fn substring(String, Int, Int) -> String
 
 pub fn suffix_array(String) -> Array[Int]
 
+pub fn summarize_overlaps(GAlignments, GRanges, Array[String]) -> Array[OverlapSummary]
+
 pub fn summarized_experiment(Map[String, Array[Array[Double]]], Array[(String, Int, Int)], Array[Map[String, String]], Map[String, String]) -> SummarizedExperiment
 
 pub fn tajima_d(Array[String]) -> Double
@@ -662,6 +706,10 @@ pub fn tm_gc(String) -> Double
 pub fn tm_nn(String) -> Double
 
 pub fn tm_wallace(String) -> Double
+
+pub fn top_hits(QueryResult, Int, Double) -> Array[Hit]
+
+pub fn top_table(EBayesResult, Int, Int, String) -> Array[TopTableRow]
 
 pub fn top_tags(DEGEResults, Int) -> DEGEResults
 
@@ -677,6 +725,8 @@ pub fn transcripts(TxDb) -> GRanges
 
 pub fn transcripts_by_gene(TxDb) -> Map[String, Array[Transcript]]
 
+pub fn translate_codon(String) -> String
+
 pub fn tree_node(String, Double, Array[TreeNode]) -> TreeNode
 
 pub fn trinucleotide_frequency(String, Bool) -> Map[String, Double]
@@ -690,6 +740,16 @@ pub fn txdb(Array[Gene], Array[Transcript], Array[Exon], Array[CDS], String, Str
 pub fn txdb_summary(TxDb) -> String
 
 pub fn update_centroids(Array[Array[Double]], Array[Int], Int) -> Array[Array[Double]]
+
+pub fn variant_summary(Array[VcfRecord], Array[VariantAnnotation]) -> VariantSummary
+
+pub fn variant_summary_with_coding(Array[VcfRecord], Array[CodingPrediction]) -> VariantSummary
+
+pub fn vec_dot(Array[Double], Array[Double]) -> Double
+
+pub fn vec_ss(Array[Double]) -> Double
+
+pub fn voom(Matrix, Matrix) -> Matrix
 
 pub fn watterson_theta(Array[String]) -> Double
 
@@ -1070,6 +1130,24 @@ pub struct ClusterResult {
   cluster_labels : Array[Int]
 }
 
+pub struct CodingPrediction {
+  chrom : String
+  pos : Int
+  ref_allele : String
+  alt_allele : String
+  gene_id : String
+  transcript_id : String
+  cds_pos : Int
+  codon_pos : Int
+  original_codon : String
+  mutated_codon : String
+  original_aa : String
+  mutated_aa : String
+  aa_change : String
+  consequence : String
+}
+pub fn CodingPrediction::new(String, Int, String, String, String, String, Int, Int, String, String, String, String, String, String) -> Self
+
 pub struct CodonUsageResult {
   codon_counts : Map[String, Int]
   rscu : Map[String, Double]
@@ -1097,6 +1175,12 @@ pub fn CompoundLocation::operator(Self) -> String
 pub fn CompoundLocation::parts(Self) -> Array[FeatureLocation]
 pub fn CompoundLocation::repr(Self) -> String
 pub fn CompoundLocation::str(Self) -> String
+
+pub struct Coverage {
+  seqname : String
+  positions : Array[Int]
+  depths : Array[Int]
+}
 
 pub struct CramBlock {
   content_type : CramContentType
@@ -1293,6 +1377,24 @@ pub fn DeBruijnGraph::outgoing(Self, String) -> Array[String]
 pub fn DeBruijnGraph::start_nodes(Self) -> Array[String]
 pub fn DeBruijnGraph::to_string(Self) -> String
 
+pub struct EBayesResult {
+  coefficients : Matrix
+  stdev_unscaled : Matrix
+  sigma : Array[Double]
+  df_residual : Int
+  design : Matrix
+  t : Matrix
+  p_value : Matrix
+  lods : Matrix
+  f : Array[Double]
+  f_p_value : Array[Double]
+  df_total : Int
+  proportion : Double
+  prior_df : Double
+  prior_var : Double
+}
+pub fn EBayesResult::new(Matrix, Matrix, Array[Double], Int, Matrix, Matrix, Matrix, Matrix, Array[Double], Array[Double], Int, Double, Double, Double) -> Self
+
 pub struct Exon {
   exon_id : String
   transcript_id : String
@@ -1370,6 +1472,22 @@ pub fn FeatureLocation::start_int(Self) -> Int
 pub fn FeatureLocation::str(Self) -> String
 pub fn FeatureLocation::strand(Self) -> Int?
 
+pub struct GAlignments {
+  seqnames : Array[String]
+  starts : Array[Int]
+  ends : Array[Int]
+  strands : Array[Strand]
+  widths : Array[Int]
+  qnames : Array[String]
+  mapqs : Array[Int]
+  flags : Array[Int]
+}
+pub fn GAlignments::filter_by_mapq(Self, Int) -> Self
+pub fn GAlignments::filter_by_strand(Self, Strand) -> Self
+pub fn GAlignments::length(Self) -> Int
+pub fn GAlignments::new(Array[String], Array[Int], Array[Int], Array[Strand], Array[String], Array[Int], Array[Int]) -> Self
+pub fn GAlignments::to_granges(Self) -> GRanges
+
 pub struct GRanges {
   seqnames : Array[String]
   starts : Array[Int]
@@ -1411,6 +1529,43 @@ pub fn HMM::baum_welch(Self, Array[String], Int, Double) -> Self
 pub fn HMM::forward(Self, Array[String]) -> Double
 pub fn HMM::new(Array[String], Array[String], Map[String, Double], Map[String, Map[String, Double]], Map[String, Map[String, Double]]) -> Self
 pub fn HMM::viterbi(Self, Array[String]) -> Array[String]
+
+pub struct HSP {
+  hit_id : String
+  hit_def : String
+  fragments : Array[HSPFragment]
+  bitscore : Double
+  evalue : Double
+  score : Double
+}
+pub fn HSP::new(String, String, Array[HSPFragment], Double, Double, Double) -> Self
+
+pub struct HSPFragment {
+  query_start : Int
+  query_end : Int
+  hit_start : Int
+  hit_end : Int
+  query_strand : Strand
+  hit_strand : Strand
+  aln_span : Int
+  gap_num : Int
+  bitscore : Double
+  evalue : Double
+  query_seq : String
+  hit_seq : String
+  match_seq : String
+}
+pub fn HSPFragment::new(Int, Int, Int, Int, Strand, Strand, Int, Int, Double, Double, String, String, String) -> Self
+
+pub struct Hit {
+  id : String
+  description : String
+  accession : String
+  hsps : Array[HSP]
+  bitscore : Double
+  evalue : Double
+}
+pub fn Hit::new(String, String, String, Array[HSP], Double, Double) -> Self
 
 type HuffmanDecoder
 
@@ -1463,6 +1618,29 @@ pub fn LCPArray::lcp(Self) -> Array[Int]
 pub fn LCPArray::len(Self) -> Int
 pub fn LCPArray::max_lcp(Self) -> Int
 pub fn LCPArray::new(SuffixArray) -> Self
+
+pub struct MArrayLM {
+  coefficients : Matrix
+  stdev_unscaled : Matrix
+  sigma : Array[Double]
+  df_residual : Int
+  design : Matrix
+  effects : Matrix
+  fit : Matrix
+}
+pub fn MArrayLM::new(Matrix, Matrix, Array[Double], Int, Matrix, Matrix, Matrix) -> Self
+
+pub struct Matrix {
+  rows : Int
+  cols : Int
+  data : Array[Double]
+}
+pub fn Matrix::from_2d(Int, Int, Array[Array[Double]]) -> Self
+pub fn Matrix::get(Self, Int, Int) -> Double
+pub fn Matrix::identity(Int) -> Self
+pub fn Matrix::new(Int, Int, Array[Double]) -> Self
+pub fn Matrix::set(Self, Int, Int, Double) -> Unit
+pub fn Matrix::zeros(Int, Int) -> Self
 
 pub enum MatrixType {
   BLOSUM62
@@ -1580,6 +1758,24 @@ pub fn Overlap::new(Int, Int, Int) -> Self
 pub fn Overlap::overlap_len(Self) -> Int
 pub fn Overlap::to(Self) -> Int
 
+pub struct OverlapSummary {
+  feature_id : String
+  mut count : Int
+  mut sum_width : Int
+  mut mean_width : Double
+  mut coverage_fraction : Double
+}
+pub fn OverlapSummary::new(String, Int, Int, Double, Double) -> Self
+
+pub struct PileupElement {
+  seqname : String
+  position : Int
+  mut depth : Int
+  ref_base : String
+  alts : Array[String]
+  alt_counts : Array[Int]
+}
+
 pub enum Position {
   ExactPosition(Int)
   WithinPosition(Int, Int, Int)
@@ -1623,6 +1819,17 @@ pub fn ProteinAnalysis::molecular_weight(Self) -> Double
 pub fn ProteinAnalysis::new(String) -> Self
 pub fn ProteinAnalysis::predict_signal_peptide(Self) -> SignalPeptideResult
 pub fn ProteinAnalysis::secondary_structure(Self) -> (Double, Double, Double)
+
+pub struct QueryResult {
+  id : String
+  description : String
+  seq_len : Int
+  hits : Array[Hit]
+  program : String
+  version : String
+  target : String
+}
+pub fn QueryResult::new(String, String, Int, Array[Hit], String, String, String) -> Self
 
 pub struct RNA {
   seq : Seq
@@ -1915,6 +2122,16 @@ pub fn TabularMSA::get_alignment_length(Self) -> Int
 pub fn TabularMSA::new(Array[SeqRecord], String) -> Self
 pub fn TabularMSA::num_records(Self) -> Int
 
+pub struct TopTableRow {
+  log_fc : Double
+  ave_exp : Double
+  t : Double
+  p_value : Double
+  adj_p_value : Double
+  b : Double
+}
+pub fn TopTableRow::new(Double, Double, Double, Double, Double, Double) -> Self
+
 pub enum TraceDirection {
   Stop
   Diag
@@ -1969,6 +2186,46 @@ pub struct TxDb {
   organism : String
 }
 pub fn TxDb::new(Array[Gene], Array[Transcript], Array[Exon], Array[CDS], String, String) -> Self
+
+pub struct VariantAnnotation {
+  chrom : String
+  pos : Int
+  ref_allele : String
+  alt_allele : String
+  variant_type : VariantType
+  gene_id : String
+  gene_name : String
+  transcript_id : String
+  exon_id : String
+  cds_position : Int
+  aa_change : String
+  codon_change : String
+  consequence : String
+}
+pub fn VariantAnnotation::new(String, Int, String, String, VariantType, String, String, String, String, Int, String, String, String) -> Self
+
+pub struct VariantSummary {
+  mut total_variants : Int
+  mut snp_count : Int
+  mut insertion_count : Int
+  mut deletion_count : Int
+  mut indel_count : Int
+  mut coding_variants : Int
+  mut non_coding_variants : Int
+  mut synonymous_count : Int
+  mut missense_count : Int
+  mut nonsense_count : Int
+  gene_ids : Array[String]
+  gene_counts : Array[Int]
+}
+pub fn VariantSummary::new() -> Self
+
+pub enum VariantType {
+  SNP
+  Insertion
+  Deletion
+  Indel
+}
 
 pub struct VcfFile {
   meta_headers : Array[VcfMetaHeader]
