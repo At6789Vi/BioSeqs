@@ -8,7 +8,9 @@ fn main {
   println("\n1. ESearch - Search PubMed:")
   let results = @bio.esearch(@bio.entrez_db_pubmed(), "CRISPR")
   for result in results {
-    println("   ID: \{result.id}, Title: \{result.title}, Score: \{result.score}")
+    println(
+      "   ID: \{result.id}, Title: \{result.title}, Score: \{result.score}",
+    )
   }
 
   println("\n2. EFetch - Fetch PubMed article:")

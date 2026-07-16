@@ -13,7 +13,12 @@ pub struct AlignmentColumn {
 
 ///|
 /// Construct AlignmentColumn.
-pub fn AlignmentColumn::new(column_index~ : Int, counts~ : Map[Char, Int], gap_count~ : Int, total_count~ : Int) -> AlignmentColumn {
+pub fn AlignmentColumn::new(
+  column_index~ : Int,
+  counts~ : Map[Char, Int],
+  gap_count~ : Int,
+  total_count~ : Int,
+) -> AlignmentColumn {
   AlignmentColumn::{ column_index, counts, gap_count, total_count }
 }
 
@@ -74,21 +79,26 @@ pub fn AlignmentColumn::shannon_entropy(self : AlignmentColumn) -> Double {
   let nf = self.total_count.to_double()
   for kv in self.counts {
     let p = kv.1.to_double() / nf
-    entropy = entropy - p * (@math.log2(p))
+    entropy = entropy - p * @math.log2(p)
   }
   entropy
 }
 
 ///|
 /// Check if this column is conserved (all residues are the same).
-pub fn AlignmentColumn::is_conserved(self : AlignmentColumn, min_conservation? : Double = 1.0) -> Bool {
+pub fn AlignmentColumn::is_conserved(
+  self : AlignmentColumn,
+  min_conservation? : Double = 1.0,
+) -> Bool {
   self.consensus_fraction() >= min_conservation
 }
 
 ///|
 /// Calculate column statistics for a multiple sequence alignment.
 /// alignments: Array of sequences (all must be same length).
-pub fn calc_column_statistics(alignments : Array[String]) -> Array[AlignmentColumn] {
+pub fn calc_column_statistics(
+  alignments : Array[String],
+) -> Array[AlignmentColumn] {
   if alignments.length() == 0 {
     return []
   }
@@ -113,12 +123,14 @@ pub fn calc_column_statistics(alignments : Array[String]) -> Array[AlignmentColu
       }
       row_idx = row_idx + 1
     }
-    result.push(AlignmentColumn::new(
-      column_index=col_idx,
-      counts=counts,
-      gap_count=gap_count,
-      total_count=n_seqs - gap_count,
-    ))
+    result.push(
+      AlignmentColumn::new(
+        column_index=col_idx,
+        counts~,
+        gap_count~,
+        total_count=n_seqs - gap_count,
+      ),
+    )
     col_idx = col_idx + 1
   }
   result
@@ -138,7 +150,10 @@ pub fn alignment_consensus(alignments : Array[String]) -> String {
 ///|
 /// Generate a majority sequence (only positions with >= 50% consensus).
 /// Non-majority positions are replaced with ambiguity character.
-pub fn majority_sequence(alignments : Array[String], ambiguity_char? : Char = 'N') -> String {
+pub fn majority_sequence(
+  alignments : Array[String],
+  ambiguity_char? : Char = 'N',
+) -> String {
   let cols = calc_column_statistics(alignments)
   let mut result = ""
   for col in cols {
@@ -153,7 +168,10 @@ pub fn majority_sequence(alignments : Array[String], ambiguity_char? : Char = 'N
 ///|
 /// Generate a strict consensus sequence (only 100% conserved positions).
 /// Non-conserved positions are replaced with ambiguity character.
-pub fn strict_consensus(alignments : Array[String], ambiguity_char? : Char = 'N') -> String {
+pub fn strict_consensus(
+  alignments : Array[String],
+  ambiguity_char? : Char = 'N',
+) -> String {
   let cols = calc_column_statistics(alignments)
   let mut result = ""
   for col in cols {
@@ -220,7 +238,9 @@ pub fn entropy_profile(alignments : Array[String]) -> Array[Double] {
 
 ///|
 /// Calculate the percentage identity between all pairs of sequences.
-pub fn pairwise_identity(alignments : Array[String]) -> Array[(String, String, Double)] {
+pub fn pairwise_identity(
+  alignments : Array[String],
+) -> Array[(String, String, Double)] {
   let result : Array[(String, String, Double)] = Array::new()
   let n = alignments.length()
   let mut i = 0
@@ -327,22 +347,13 @@ pub fn gc_content_profile(alignments : Array[String]) -> Array[Double] {
 ///|
 /// Create a demo multiple sequence alignment.
 pub fn create_demo_alignment() -> Array[String] {
-  [
-    "ATCGATCGATCG",
-    "ATCGATCGATCG",
-    "ATCGATCGATCG",
-    "ATCGATCGATCG",
-  ]
+  ["ATCGATCGATCG", "ATCGATCGATCG", "ATCGATCGATCG", "ATCGATCGATCG"]
 }
 
 ///|
 /// Create a demo alignment with some variation.
 pub fn create_demo_alignment_varied() -> Array[String] {
   [
-    "ATCGATCGATCG",
-    "ATCGATCGATCG",
-    "ATCGATGGATCG",
-    "ATCGATCGATCA",
-    "ATCGATCGATCG",
+    "ATCGATCGATCG", "ATCGATCGATCG", "ATCGATGGATCG", "ATCGATCGATCA", "ATCGATCGATCG",
   ]
 }

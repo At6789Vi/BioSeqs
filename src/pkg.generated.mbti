@@ -31,6 +31,8 @@ pub fn alignio_write(Array[MultipleSeqAlignment], String) -> String raise AlignI
 
 pub fn alignment(Array[(String, String)], String, String) -> Alignment
 
+pub fn alignment_consensus(Array[String]) -> String
+
 pub fn alignment_length(Alignment) -> Int
 
 pub fn allele_frequencies(Array[String]) -> Map[String, Double]
@@ -40,6 +42,8 @@ pub fn allele_richness(Array[String]) -> Int
 pub fn ambiguity_codes(String) -> String
 
 pub fn amino_acid_composition(String) -> Map[UInt16, Double]
+
+pub fn anchors_overlap(Anchor, Anchor) -> Bool
 
 pub fn assemble_sequences(Array[String], Int) -> String?
 
@@ -54,6 +58,8 @@ pub fn at_content(String) -> Double
 pub fn at_skew(String) -> Double
 
 pub fn average_linkage_clustering(Array[Array[Double]], Double) -> ClusterResult
+
+pub fn average_pairwise_identity(Array[String]) -> Double
 
 pub fn avg_charge(String) -> Double
 
@@ -93,9 +99,13 @@ pub fn calc_ca_distance_matrix(Chain) -> Array[Array[Double]]
 
 pub fn calc_chain_dihedrals(Chain) -> Array[(Int, Double?, Double?, Double?)]
 
+pub fn calc_column_statistics(Array[String]) -> Array[AlignmentColumn]
+
 pub fn calc_contact_map(Chain, threshold? : Double) -> Array[Array[Bool]]
 
 pub fn calc_dihedral(Vector3, Vector3, Vector3, Vector3) -> Double
+
+pub fn calc_dnds_nei_gojobori(String, String) -> DnDsResult
 
 pub fn calc_norm_factors(DGEList) -> DGEList
 
@@ -118,6 +128,8 @@ pub fn cds_by_transcript(TxDb) -> Map[String, Array[CDS]]
 pub fn chaos_game_representation(String) -> (Double, Double)
 
 pub fn char_at(String, Int) -> String
+
+pub fn classify_codon_substitution(String, String) -> CodonSubstitution
 
 pub fn classify_ramachandran(Double, Double) -> RamachandranRegion
 
@@ -145,17 +157,29 @@ pub fn codon_reverse_complement(String) -> String
 
 pub fn codon_rscu(Map[String, Int]) -> Map[String, Double]
 
+pub fn codon_sub_nonsynonymous() -> CodonSubstitution
+
+pub fn codon_sub_synonymous() -> CodonSubstitution
+
+pub fn codon_sub_unknown() -> CodonSubstitution
+
+pub fn codon_to_aa(String) -> String
+
 pub fn codon_translate(String) -> String
 
 pub fn codon_usage(String) -> Map[String, Int]
 
 pub fn codon_usage_analysis(String) -> CodonUsageResult
 
+pub fn codon_usage_bias(String) -> Map[String, Double]
+
 pub fn codon_usage_with_ref(String, String) -> CodonUsageResult
 
 pub fn column(String, DataType, Array[DataValue]) -> Column
 
 pub fn column_consensus(Alignment, Int) -> String
+
+pub fn compare_genome_builds(String, String) -> Bool
 
 pub fn complete_linkage_clustering(Array[Array[Double]], Double) -> ClusterResult
 
@@ -169,6 +193,8 @@ pub fn compute_pm_mm_difference(ProbeSet) -> Array[Array[Double]]
 
 pub fn consensus_sequence(Alignment) -> String
 
+pub fn conservation_profile(Array[String]) -> Array[Double]
+
 pub fn contrasts_fit(EBayesResult, Matrix) -> EBayesResult
 
 pub fn correct_errors(Array[String], Int) -> Array[String]
@@ -176,6 +202,10 @@ pub fn correct_errors(Array[String], Int) -> Array[String]
 pub fn cosine_distance(Array[Double], Array[Double]) -> Double
 
 pub fn count_by_year(Array[MedlineRecord]) -> Array[(String, Int)]
+
+pub fn count_codon_sites(String) -> (Double, Double)
+
+pub fn count_codon_substitutions(String, String) -> CodonSubCounts
 
 pub fn count_codons(String) -> Map[String, Int]
 
@@ -187,15 +217,27 @@ pub fn count_matrix(Array[String]) -> Array[Array[Int]]
 
 pub fn count_overlaps(GRanges, GRanges) -> Array[Int]
 
+pub fn count_parsimony_informative_sites(Array[String]) -> Int
+
 pub fn count_secondary_structure(Array[(Int, SSType)]) -> Map[String, Int]
 
 pub fn coverage(GAlignments) -> Array[Coverage]
 
 pub fn crc32(String) -> Int
 
+pub fn create_binned_interactions(String, Array[(Int, Int)], Array[Array[Int]]) -> InteractionSet
+
+pub fn create_demo_alignment() -> Array[String]
+
+pub fn create_demo_alignment_varied() -> Array[String]
+
+pub fn create_demo_codon_alignment() -> Array[String]
+
 pub fn create_demo_data() -> RUVSeqData
 
 pub fn create_demo_genome() -> BSGenome
+
+pub fn create_demo_positive_selection() -> Array[String]
 
 pub fn create_demo_structure() -> Structure
 
@@ -210,6 +252,8 @@ pub fn create_human_mart() -> BioMartDataset
 pub fn create_motif(String, Array[String]) -> Motif
 
 pub fn create_mouse_mart() -> BioMartDataset
+
+pub fn create_multi_omics(Array[Array[Double]], Array[String], Array[String], Array[Array[Double]], Array[String], Array[String], Array[String]) -> MultiAssayExperiment
 
 pub fn data_type_bool() -> DataType
 
@@ -287,9 +331,33 @@ pub fn dust_score(String) -> Double
 
 pub fn ebayes(MArrayLM, Double) -> EBayesResult
 
+pub fn efetch(EntrezDB, String) -> String
+
+pub fn effective_number_of_codons(String) -> Double
+
+pub fn egquery(String) -> Array[(String, Int)]
+
+pub fn einfo() -> Map[String, String]
+
+pub fn entrez_db_gene() -> EntrezDB
+
+pub fn entrez_db_nucleotide() -> EntrezDB
+
+pub fn entrez_db_protein() -> EntrezDB
+
+pub fn entrez_db_pubmed() -> EntrezDB
+
+pub fn entrez_db_snp() -> EntrezDB
+
+pub fn entrez_db_taxonomy() -> EntrezDB
+
+pub fn entropy_profile(Array[String]) -> Array[Double]
+
 pub fn enzymes_by_overhang(String) -> Array[RestrictionEnzyme]
 
 pub fn enzymes_by_site_length(Int, Int) -> Array[RestrictionEnzyme]
+
+pub fn esearch(EntrezDB, String, retmax? : Int) -> Array[SearchResult]
 
 pub fn estimate_dispersion(DGEList) -> Double
 
@@ -317,6 +385,8 @@ pub fn filter_cells(Array[Array[Double]], QCMetrics, Int, Int, Int, Double) -> A
 
 pub fn filter_enrichment(Array[GOEnrichmentResult], Double, Int) -> Array[GOEnrichmentResult]
 
+pub fn find_conserved_positions(Array[String], min_conservation? : Double) -> Array[(Int, Char, Double)]
+
 pub fn find_cut_sites(String, RestrictionEnzyme) -> Array[Int]
 
 pub fn find_layout_path(Array[String], Int) -> Array[Int]
@@ -334,6 +404,8 @@ pub fn find_overlaps(GRanges, GRanges) -> Array[(Int, Int)]
 pub fn find_transcript_by_id(TxDb, String) -> Transcript?
 
 pub fn find_variable_genes(Array[Array[Double]], Int) -> Array[Int]
+
+pub fn find_variable_positions(Array[String], max_conservation? : Double) -> Array[(Int, Double)]
 
 pub fn fishers_exact_test(Int, Int, Int, Int) -> Double
 
@@ -355,6 +427,8 @@ pub fn gc_content_by_position(String, Int) -> Array[Double]
 
 pub fn gc_content_percent(String) -> Double
 
+pub fn gc_content_profile(Array[String]) -> Array[Double]
+
 pub fn gc_skew(String) -> Double
 
 pub fn gcg(String) -> Int
@@ -365,6 +439,12 @@ pub fn generate_consensus(Array[String], Array[Int]) -> String
 
 pub fn genes(TxDb) -> GRanges
 
+pub fn genome_hg19() -> GenomeInfoDb
+
+pub fn genome_hg38() -> GenomeInfoDb
+
+pub fn genome_mm10() -> GenomeInfoDb
+
 pub fn genotype_frequencies(Array[String]) -> Map[String, Double]
 
 pub fn get_author_count(MedlineRecord) -> Int
@@ -372,6 +452,8 @@ pub fn get_author_count(MedlineRecord) -> Int
 pub fn get_enzyme_by_name(String) -> RestrictionEnzyme?
 
 pub fn get_first_author(MedlineRecord) -> String
+
+pub fn get_gene_info(String, organism? : String) -> GeneRecord?
 
 pub fn get_leaf_count(TreeNode) -> Int
 
@@ -386,6 +468,8 @@ pub fn get_publication_year(MedlineRecord) -> String
 pub fn get_sequence(Alignment, String) -> String?
 
 pub fn get_standard_code() -> Map[String, Array[String]]
+
+pub fn get_taxonomy(String) -> TaxonomyRecord?
 
 pub fn get_tree_depth(TreeNode) -> Double
 
@@ -491,9 +575,13 @@ pub fn is_protein(String) -> Bool
 
 pub fn is_rna(String) -> Bool
 
+pub fn is_stop_codon(String) -> Bool
+
 pub fn iupac_match(String, String) -> Array[(Int, Int)]
 
 pub fn iupac_reverse_complement(String) -> String
+
+pub fn jukes_cantor_correction(Double) -> Double
 
 pub fn kegg_compound_in_pathway(KEGGCompound, String) -> Bool
 
@@ -522,6 +610,8 @@ pub fn local_pairwise_align_protein(Protein, Protein) -> (TabularMSA, Double, (I
 pub fn locate_variants(Array[VcfRecord], TxDb) -> Array[VariantAnnotation]
 
 pub fn log_normalize(Array[Array[Double]], Array[Double]?) -> Array[Array[Double]]
+
+pub fn majority_sequence(Array[String], ambiguity_char? : Char) -> String
 
 pub fn make_contrasts(Array[Array[Double]], Matrix) -> Matrix
 
@@ -589,9 +679,15 @@ pub fn olc_assemble(Array[String], Int) -> String
 
 pub fn oligonucleotide_frequency(String, Int, Bool) -> Map[String, Double]
 
+pub fn organism_from_build(String) -> String
+
 pub fn overlap_graph_to_dot(Array[String], Int) -> String
 
+pub fn pairwise_dnds(Array[String]) -> Array[(String, String, DnDsResult)]
+
 pub fn pairwise_fst(Array[Array[String]]) -> Array[Array[Double]]
+
+pub fn pairwise_identity(Array[String]) -> Array[(String, String, Double)]
 
 pub fn pam250() -> SubstitutionMatrix
 
@@ -637,6 +733,8 @@ pub fn parse_fastq(String) -> Array[SeqRecord] raise SeqIOError
 
 pub fn parse_genbank(String) -> Array[SeqRecord]
 
+pub fn parse_gene(String) -> GeneRecord?
+
 pub fn parse_gff(String) -> Array[GffRecord]
 
 pub fn parse_gtf(String) -> TxDb
@@ -669,11 +767,15 @@ pub fn parse_phylip(String) -> MultipleSeqAlignment raise AlignIOError
 
 pub fn parse_phylip_sequential(String) -> MultipleSeqAlignment raise AlignIOError
 
+pub fn parse_pubmed(String) -> PubmedArticle?
+
 pub fn parse_sam(String) -> SamFile
 
 pub fn parse_semicolon_list(String) -> Array[String]
 
 pub fn parse_stockholm(String) -> Alignment
+
+pub fn parse_taxonomy(String) -> TaxonomyRecord?
 
 pub fn parse_vcf(String) -> VcfFile
 
@@ -785,6 +887,8 @@ pub fn seqio_to_dict(Array[SeqRecord]) -> Map[String, SeqRecord]
 
 pub fn seqio_write(Array[SeqRecord], String) -> String raise SeqIOError
 
+pub fn sequence_identity(String, String) -> Double
+
 pub fn sequence_signature(String, k? : Int) -> Map[String, Double]
 
 pub fn sequence_similarity(String, String, k? : Int) -> Double
@@ -853,6 +957,8 @@ pub fn strand_star() -> Strand
 
 pub fn strand_to_char(Strand) -> String
 
+pub fn strict_consensus(Array[String], ambiguity_char? : Char) -> String
+
 pub fn string_to_bytes(String) -> Array[Int]
 
 pub fn substring(String, Int, Int) -> String
@@ -866,6 +972,8 @@ pub fn summarize_probeset(ProbeSet, String) -> Array[Double]
 pub fn summarized_experiment(Map[String, Array[Array[Double]]], Array[(String, Int, Int)], Array[Map[String, String]], Map[String, String]) -> SummarizedExperiment
 
 pub fn superimpose(Array[AtomCoordinate], Array[AtomCoordinate]) -> (Array[AtomCoordinate], Double)
+
+pub fn supported_genome_builds() -> Array[String]
 
 pub fn tajima_d(Array[String]) -> Double
 
@@ -886,6 +994,8 @@ pub fn top_tags(DEGEResults, Int) -> DEGEResults
 pub fn total_branch_length(TreeNode) -> Double
 
 pub fn total_clusters(ClusterResult) -> Int
+
+pub fn total_codon_sites(String) -> (Double, Double)
 
 pub fn train_gene_hmm(HMM, Array[String], Int) -> HMM
 
@@ -1005,6 +1115,19 @@ pub struct Alignment {
   description : String
 }
 
+pub struct AlignmentColumn {
+  column_index : Int
+  counts : Map[Char, Int]
+  gap_count : Int
+  total_count : Int
+}
+pub fn AlignmentColumn::consensus(Self) -> Char
+pub fn AlignmentColumn::consensus_fraction(Self) -> Double
+pub fn AlignmentColumn::is_conserved(Self, min_conservation? : Double) -> Bool
+pub fn AlignmentColumn::majority(Self) -> Char?
+pub fn AlignmentColumn::new(column_index~ : Int, counts~ : Map[Char, Int], gap_count~ : Int, total_count~ : Int) -> Self
+pub fn AlignmentColumn::shannon_entropy(Self) -> Double
+
 pub struct AminoAcidFreq {
   a : Int
   c : Int
@@ -1028,6 +1151,14 @@ pub struct AminoAcidFreq {
   y : Int
   other : Int
 }
+
+pub struct Anchor {
+  chrom : String
+  start : Int
+  end : Int
+}
+pub fn Anchor::new(chrom~ : String, start~ : Int, end~ : Int) -> Self
+pub fn Anchor::width(Self) -> Int
 
 pub struct Atom {
   name : String
@@ -1309,6 +1440,13 @@ pub struct CDS {
 }
 pub fn CDS::new(String, String, String, String, Int, Int, Strand, Int) -> Self
 
+pub struct Centromere {
+  chrom : String
+  start : Int
+  end : Int
+}
+pub fn Centromere::new(chrom~ : String, start~ : Int, end~ : Int) -> Self
+
 pub struct Chain {
   id : Char
   residues : Array[Residue]
@@ -1319,6 +1457,14 @@ pub fn Chain::get_id(Self) -> Char
 pub fn Chain::get_num_residues(Self) -> Int
 pub fn Chain::get_residues(Self) -> Array[Residue]
 pub fn Chain::new(id~ : Char, residues? : Array[Residue]) -> Self
+
+pub struct ChromInfo {
+  name : String
+  length : Int
+  is_circular : Bool
+  genome : String
+}
+pub fn ChromInfo::new(name~ : String, length~ : Int, is_circular? : Bool, genome? : String) -> Self
 
 pub struct CigarElement {
   op : CigarOp
@@ -1389,6 +1535,19 @@ pub struct CodingPrediction {
   consequence : String
 }
 pub fn CodingPrediction::new(String, Int, String, String, String, String, Int, Int, String, String, String, String, String, String) -> Self
+
+pub struct CodonSubCounts {
+  synonymous : Int
+  nonsynonymous : Int
+  total : Int
+}
+pub fn CodonSubCounts::new(synonymous~ : Int, nonsynonymous~ : Int, total~ : Int) -> Self
+
+pub enum CodonSubstitution {
+  Synonymous
+  NonSynonymous
+  Unknown
+} derive(Eq, Show)
 
 pub struct CodonUsageResult {
   codon_counts : Map[String, Int]
@@ -1626,6 +1785,15 @@ pub struct DihedralAngles {
 }
 pub fn DihedralAngles::new(phi? : Double?, psi? : Double?, omega? : Double?) -> Self
 
+pub struct DnDsResult {
+  dn : Double
+  ds : Double
+  dnds : Double
+  dn_std : Double?
+  ds_std : Double?
+}
+pub fn DnDsResult::new(dn~ : Double, ds~ : Double, dnds~ : Double, dn_std? : Double?, ds_std? : Double?) -> Self
+
 pub struct EBayesResult {
   coefficients : Matrix
   stdev_unscaled : Matrix
@@ -1644,6 +1812,17 @@ pub struct EBayesResult {
 }
 pub fn EBayesResult::new(Matrix, Matrix, Array[Double], Int, Matrix, Matrix, Matrix, Matrix, Array[Double], Array[Double], Int, Double, Double, Double) -> Self
 
+pub enum EntrezDB {
+  Pubmed
+  Nucleotide
+  Protein
+  Gene
+  SNP
+  Taxonomy
+} derive(Eq, Show)
+pub fn EntrezDB::from_string(String) -> Self
+pub fn EntrezDB::to_string(Self) -> String
+
 pub struct Exon {
   exon_id : String
   transcript_id : String
@@ -1655,6 +1834,17 @@ pub struct Exon {
   exon_rank : Int
 }
 pub fn Exon::new(String, String, String, String, Int, Int, Strand, Int) -> Self
+
+pub struct Experiment {
+  name : String
+  assay_type : String
+  data : Array[Array[Double]]
+  row_names : Array[String]
+  col_names : Array[String]
+}
+pub fn Experiment::ncol(Self) -> Int
+pub fn Experiment::new(name~ : String, assay_type~ : String, data~ : Array[Array[Double]], row_names~ : Array[String], col_names~ : Array[String]) -> Self
+pub fn Experiment::nrow(Self) -> Int
 
 pub struct FMIndex {
   bwt_str : String
@@ -1737,6 +1927,16 @@ pub fn GAlignments::length(Self) -> Int
 pub fn GAlignments::new(Array[String], Array[Int], Array[Int], Array[Strand], Array[String], Array[Int], Array[Int]) -> Self
 pub fn GAlignments::to_granges(Self) -> GRanges
 
+pub struct GInteraction {
+  anchor1 : Anchor
+  anchor2 : Anchor
+  count : Int
+}
+pub fn GInteraction::distance(Self) -> Int?
+pub fn GInteraction::is_inter_chromosomal(Self) -> Bool
+pub fn GInteraction::is_intra_chromosomal(Self) -> Bool
+pub fn GInteraction::new(anchor1~ : Anchor, anchor2~ : Anchor, count? : Int) -> Self
+
 pub struct GOEnrichmentResult {
   go_id : String
   term_name : String
@@ -1776,6 +1976,39 @@ pub struct Gene {
   strand : Strand
 }
 pub fn Gene::new(String, String, Int, Int, Strand) -> Self
+
+pub struct GeneRecord {
+  gene_id : String
+  symbol : String
+  description : String
+  organism : String
+  chromosome : String
+  start : Int
+  end : Int
+  strand : String
+}
+pub fn GeneRecord::new(gene_id~ : String, symbol~ : String, description~ : String, organism~ : String, chromosome~ : String, start~ : Int, end~ : Int, strand~ : String) -> Self
+
+pub struct GenomeInfoDb {
+  genome_build : String
+  organism : String
+  chrom_infos : Array[ChromInfo]
+  centromeres : Array[Centromere]
+}
+pub fn GenomeInfoDb::add_centromere(Self, String, Int, Int) -> Self
+pub fn GenomeInfoDb::add_chrom(Self, String, Int, is_circular? : Bool) -> Self
+pub fn GenomeInfoDb::centromere(Self, String) -> Centromere?
+pub fn GenomeInfoDb::filter_chromosomes(Self, String) -> Array[String]
+pub fn GenomeInfoDb::genome_length(Self) -> Int
+pub fn GenomeInfoDb::get_arm(Self, String, Int) -> String
+pub fn GenomeInfoDb::is_circular(Self, String) -> Bool?
+pub fn GenomeInfoDb::new(genome_build~ : String, organism? : String) -> Self
+pub fn GenomeInfoDb::non_standard_chromosomes(Self) -> Array[String]
+pub fn GenomeInfoDb::num_chromosomes(Self) -> Int
+pub fn GenomeInfoDb::seqLength(Self, String) -> Int?
+pub fn GenomeInfoDb::seqnames(Self) -> Array[String]
+pub fn GenomeInfoDb::standard_chromosomes(Self) -> Array[String]
+pub fn GenomeInfoDb::summary(Self) -> String
 
 pub struct GffRecord {
   seqid : String
@@ -1858,6 +2091,25 @@ pub struct IRanges {
   ends : Array[Int]
   widths : Array[Int]
 }
+
+pub struct InteractionSet {
+  interactions : Array[GInteraction]
+  bin_size : Int
+}
+pub fn InteractionSet::anchors(Self) -> Array[Anchor]
+pub fn InteractionSet::distance_distribution(Self, Int) -> Array[(Int, Int)]
+pub fn InteractionSet::filter_by_count(Self, Int) -> Self
+pub fn InteractionSet::inter_chromosomal(Self) -> Self
+pub fn InteractionSet::inter_fraction(Self) -> Double
+pub fn InteractionSet::interaction_matrix(Self, Array[String]) -> Array[Array[Int]]
+pub fn InteractionSet::interactions(Self) -> Array[GInteraction]
+pub fn InteractionSet::interactions_on_chrom(Self, String) -> Self
+pub fn InteractionSet::intra_chromosomal(Self) -> Self
+pub fn InteractionSet::new(interactions~ : Array[GInteraction], bin_size? : Int) -> Self
+pub fn InteractionSet::num_interactions(Self) -> Int
+pub fn InteractionSet::summary(Self) -> String
+pub fn InteractionSet::top_interactions(Self, Int) -> Array[GInteraction]
+pub fn InteractionSet::total_count(Self) -> Int
 
 pub struct KEGGCompound {
   entry : String
@@ -2027,6 +2279,30 @@ pub struct MotifHit {
 }
 pub fn MotifHit::new(Int, Double, String, String) -> Self
 
+pub struct MultiAssayExperiment {
+  experiments : Array[Experiment]
+  sample_map : SampleMap
+  col_data : Array[(String, Map[String, String])]
+  metadata : Map[String, String]
+}
+pub fn MultiAssayExperiment::add_metadata(Self, String, String) -> Self
+pub fn MultiAssayExperiment::assay(Self, String) -> Array[Array[Double]]?
+pub fn MultiAssayExperiment::colnames(Self, String) -> Array[String]?
+pub fn MultiAssayExperiment::common_samples(Self) -> Array[String]
+pub fn MultiAssayExperiment::dims(Self) -> Array[(String, Int, Int)]
+pub fn MultiAssayExperiment::experiment_names(Self) -> Array[String]
+pub fn MultiAssayExperiment::get_experiment(Self, String) -> Experiment?
+pub fn MultiAssayExperiment::get_metadata(Self, String) -> String?
+pub fn MultiAssayExperiment::new(experiments~ : Array[Experiment], sample_map~ : SampleMap, col_data~ : Array[(String, Map[String, String])], metadata? : Map[String, String]) -> Self
+pub fn MultiAssayExperiment::num_experiments(Self) -> Int
+pub fn MultiAssayExperiment::num_samples(Self) -> Int
+pub fn MultiAssayExperiment::primary_ids(Self) -> Array[String]
+pub fn MultiAssayExperiment::rownames(Self, String) -> Array[String]?
+pub fn MultiAssayExperiment::sample_col_data(Self, String) -> Map[String, String]?
+pub fn MultiAssayExperiment::subset_by_experiment(Self, Array[String]) -> Self
+pub fn MultiAssayExperiment::subset_by_sample(Self, Array[String]) -> Self
+pub fn MultiAssayExperiment::summary(Self) -> String
+
 pub struct MultipleSeqAlignment {
   records : Array[SeqRecord]
   annotations : Map[String, String]
@@ -2176,6 +2452,17 @@ pub fn ProteinAnalysis::molecular_weight(Self) -> Double
 pub fn ProteinAnalysis::new(String) -> Self
 pub fn ProteinAnalysis::predict_signal_peptide(Self) -> SignalPeptideResult
 pub fn ProteinAnalysis::secondary_structure(Self) -> (Double, Double, Double)
+
+pub struct PubmedArticle {
+  pmid : String
+  title : String
+  abstract : String
+  authors : Array[String]
+  journal : String
+  publication_date : String
+  keywords : Array[String]
+}
+pub fn PubmedArticle::new(pmid~ : String, title~ : String, abstract~ : String, authors~ : Array[String], journal~ : String, publication_date~ : String, keywords~ : Array[String]) -> Self
 
 pub struct QCMetrics {
   n_umi : Array[Double]
@@ -2361,6 +2648,14 @@ pub fn SamRecord::is_secondary(Self) -> Bool
 pub fn SamRecord::is_supplementary(Self) -> Bool
 pub fn SamRecord::is_unmapped(Self) -> Bool
 
+pub struct SampleMap {
+  assays : Array[String]
+  primary_ids : Array[String]
+  colnames : Array[String]
+}
+pub fn SampleMap::new(assays~ : Array[String], primary_ids~ : Array[String], colnames~ : Array[String]) -> Self
+pub fn SampleMap::primary_ids(Self) -> Array[String]
+
 pub struct Scoring {
   match_reward : Double
   mismatch_penalty : Double
@@ -2369,6 +2664,13 @@ pub struct Scoring {
 pub fn Scoring::default_dna() -> Self
 pub fn Scoring::default_protein() -> Self
 pub fn Scoring::new(Double, Double, Double) -> Self
+
+pub struct SearchResult {
+  id : String
+  title : String
+  score : Double
+}
+pub fn SearchResult::new(id~ : String, title~ : String, score~ : Double) -> Self
 
 pub struct Seq {
   data : String
@@ -2543,6 +2845,16 @@ pub fn TabularMSA::from_dna(Array[DNA]) -> Self
 pub fn TabularMSA::get_alignment_length(Self) -> Int
 pub fn TabularMSA::new(Array[SeqRecord], String) -> Self
 pub fn TabularMSA::num_records(Self) -> Int
+
+pub struct TaxonomyRecord {
+  tax_id : String
+  scientific_name : String
+  common_name : String
+  rank : String
+  lineage : Array[String]
+  genetic_code : Int
+}
+pub fn TaxonomyRecord::new(tax_id~ : String, scientific_name~ : String, common_name~ : String, rank~ : String, lineage~ : Array[String], genetic_code~ : Int) -> Self
 
 pub struct TopTableRow {
   log_fc : Double

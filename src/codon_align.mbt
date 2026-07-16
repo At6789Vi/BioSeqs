@@ -5,9 +5,9 @@
 ///|
 /// Codon substitution type.
 pub enum CodonSubstitution {
-  Synonymous       // dS - no amino acid change
-  NonSynonymous    // dN - amino acid change
-  Unknown          // ambiguous or stop codon
+  Synonymous // dS - no amino acid change
+  NonSynonymous // dN - amino acid change
+  Unknown // ambiguous or stop codon
 } derive(Eq, Show)
 
 ///|
@@ -38,23 +38,33 @@ pub struct CodonSubCounts {
 
 ///|
 /// Construct CodonSubCounts.
-pub fn CodonSubCounts::new(synonymous~ : Int, nonsynonymous~ : Int, total~ : Int) -> CodonSubCounts {
+pub fn CodonSubCounts::new(
+  synonymous~ : Int,
+  nonsynonymous~ : Int,
+  total~ : Int,
+) -> CodonSubCounts {
   CodonSubCounts::{ synonymous, nonsynonymous, total }
 }
 
 ///|
 /// dN/dS ratio result.
 pub struct DnDsResult {
-  dn : Double       // non-synonymous substitution rate
-  ds : Double       // synonymous substitution rate
-  dnds : Double     // dn/ds ratio
-  dn_std : Double?  // standard deviation of dn
-  ds_std : Double?  // standard deviation of ds
+  dn : Double // non-synonymous substitution rate
+  ds : Double // synonymous substitution rate
+  dnds : Double // dn/ds ratio
+  dn_std : Double? // standard deviation of dn
+  ds_std : Double? // standard deviation of ds
 }
 
 ///|
 /// Construct DnDsResult.
-pub fn DnDsResult::new(dn~ : Double, ds~ : Double, dnds~ : Double, dn_std? : Double? = None, ds_std? : Double? = None) -> DnDsResult {
+pub fn DnDsResult::new(
+  dn~ : Double,
+  ds~ : Double,
+  dnds~ : Double,
+  dn_std? : Double? = None,
+  ds_std? : Double? = None,
+) -> DnDsResult {
   DnDsResult::{ dn, ds, dnds, dn_std, ds_std }
 }
 
@@ -62,71 +72,137 @@ pub fn DnDsResult::new(dn~ : Double, ds~ : Double, dnds~ : Double, dn_std? : Dou
 /// Translate a codon to amino acid (NCBI table 1).
 pub fn codon_to_aa(codon : String) -> String {
   let c = codon
-  if c == "AAA" || c == "aaa" { "K" }
-  else if c == "AAC" || c == "aac" { "N" }
-  else if c == "AAG" || c == "aag" { "K" }
-  else if c == "AAT" || c == "aat" { "N" }
-  else if c == "ACA" || c == "aca" { "T" }
-  else if c == "ACC" || c == "acc" { "T" }
-  else if c == "ACG" || c == "acg" { "T" }
-  else if c == "ACT" || c == "act" { "T" }
-  else if c == "AGA" || c == "aga" { "R" }
-  else if c == "AGC" || c == "agc" { "S" }
-  else if c == "AGG" || c == "agg" { "R" }
-  else if c == "AGT" || c == "agt" { "S" }
-  else if c == "ATA" || c == "ata" { "I" }
-  else if c == "ATC" || c == "atc" { "I" }
-  else if c == "ATG" || c == "atg" { "M" }
-  else if c == "ATT" || c == "att" { "I" }
-  else if c == "CAA" || c == "caa" { "Q" }
-  else if c == "CAC" || c == "cac" { "H" }
-  else if c == "CAG" || c == "cag" { "Q" }
-  else if c == "CAT" || c == "cat" { "H" }
-  else if c == "CCA" || c == "cca" { "P" }
-  else if c == "CCC" || c == "ccc" { "P" }
-  else if c == "CCG" || c == "ccg" { "P" }
-  else if c == "CCT" || c == "cct" { "P" }
-  else if c == "CGA" || c == "cga" { "R" }
-  else if c == "CGC" || c == "cgc" { "R" }
-  else if c == "CGG" || c == "cgg" { "R" }
-  else if c == "CGT" || c == "cgt" { "R" }
-  else if c == "CTA" || c == "cta" { "L" }
-  else if c == "CTC" || c == "ctc" { "L" }
-  else if c == "CTG" || c == "ctg" { "L" }
-  else if c == "CTT" || c == "ctt" { "L" }
-  else if c == "GAA" || c == "gaa" { "E" }
-  else if c == "GAC" || c == "gac" { "D" }
-  else if c == "GAG" || c == "gag" { "E" }
-  else if c == "GAT" || c == "gat" { "D" }
-  else if c == "GCA" || c == "gca" { "A" }
-  else if c == "GCC" || c == "gcc" { "A" }
-  else if c == "GCG" || c == "gcg" { "A" }
-  else if c == "GCT" || c == "gct" { "A" }
-  else if c == "GGA" || c == "gga" { "G" }
-  else if c == "GGC" || c == "ggc" { "G" }
-  else if c == "GGG" || c == "ggg" { "G" }
-  else if c == "GGT" || c == "ggt" { "G" }
-  else if c == "GTA" || c == "gta" { "V" }
-  else if c == "GTC" || c == "gtc" { "V" }
-  else if c == "GTG" || c == "gtg" { "V" }
-  else if c == "GTT" || c == "gtt" { "V" }
-  else if c == "TAA" || c == "taa" { "*" }
-  else if c == "TAC" || c == "tac" { "Y" }
-  else if c == "TAG" || c == "tag" { "*" }
-  else if c == "TAT" || c == "tat" { "Y" }
-  else if c == "TCA" || c == "tca" { "S" }
-  else if c == "TCC" || c == "tcc" { "S" }
-  else if c == "TCG" || c == "tcg" { "S" }
-  else if c == "TCT" || c == "tct" { "S" }
-  else if c == "TGA" || c == "tga" { "*" }
-  else if c == "TGC" || c == "tgc" { "C" }
-  else if c == "TGG" || c == "tgg" { "W" }
-  else if c == "TGT" || c == "tgt" { "C" }
-  else if c == "TTA" || c == "tta" { "L" }
-  else if c == "TTC" || c == "ttc" { "F" }
-  else if c == "TTG" || c == "ttg" { "L" }
-  else if c == "TTT" || c == "ttt" { "F" }
-  else { "?" }
+  if c == "AAA" || c == "aaa" {
+    "K"
+  } else if c == "AAC" || c == "aac" {
+    "N"
+  } else if c == "AAG" || c == "aag" {
+    "K"
+  } else if c == "AAT" || c == "aat" {
+    "N"
+  } else if c == "ACA" || c == "aca" {
+    "T"
+  } else if c == "ACC" || c == "acc" {
+    "T"
+  } else if c == "ACG" || c == "acg" {
+    "T"
+  } else if c == "ACT" || c == "act" {
+    "T"
+  } else if c == "AGA" || c == "aga" {
+    "R"
+  } else if c == "AGC" || c == "agc" {
+    "S"
+  } else if c == "AGG" || c == "agg" {
+    "R"
+  } else if c == "AGT" || c == "agt" {
+    "S"
+  } else if c == "ATA" || c == "ata" {
+    "I"
+  } else if c == "ATC" || c == "atc" {
+    "I"
+  } else if c == "ATG" || c == "atg" {
+    "M"
+  } else if c == "ATT" || c == "att" {
+    "I"
+  } else if c == "CAA" || c == "caa" {
+    "Q"
+  } else if c == "CAC" || c == "cac" {
+    "H"
+  } else if c == "CAG" || c == "cag" {
+    "Q"
+  } else if c == "CAT" || c == "cat" {
+    "H"
+  } else if c == "CCA" || c == "cca" {
+    "P"
+  } else if c == "CCC" || c == "ccc" {
+    "P"
+  } else if c == "CCG" || c == "ccg" {
+    "P"
+  } else if c == "CCT" || c == "cct" {
+    "P"
+  } else if c == "CGA" || c == "cga" {
+    "R"
+  } else if c == "CGC" || c == "cgc" {
+    "R"
+  } else if c == "CGG" || c == "cgg" {
+    "R"
+  } else if c == "CGT" || c == "cgt" {
+    "R"
+  } else if c == "CTA" || c == "cta" {
+    "L"
+  } else if c == "CTC" || c == "ctc" {
+    "L"
+  } else if c == "CTG" || c == "ctg" {
+    "L"
+  } else if c == "CTT" || c == "ctt" {
+    "L"
+  } else if c == "GAA" || c == "gaa" {
+    "E"
+  } else if c == "GAC" || c == "gac" {
+    "D"
+  } else if c == "GAG" || c == "gag" {
+    "E"
+  } else if c == "GAT" || c == "gat" {
+    "D"
+  } else if c == "GCA" || c == "gca" {
+    "A"
+  } else if c == "GCC" || c == "gcc" {
+    "A"
+  } else if c == "GCG" || c == "gcg" {
+    "A"
+  } else if c == "GCT" || c == "gct" {
+    "A"
+  } else if c == "GGA" || c == "gga" {
+    "G"
+  } else if c == "GGC" || c == "ggc" {
+    "G"
+  } else if c == "GGG" || c == "ggg" {
+    "G"
+  } else if c == "GGT" || c == "ggt" {
+    "G"
+  } else if c == "GTA" || c == "gta" {
+    "V"
+  } else if c == "GTC" || c == "gtc" {
+    "V"
+  } else if c == "GTG" || c == "gtg" {
+    "V"
+  } else if c == "GTT" || c == "gtt" {
+    "V"
+  } else if c == "TAA" || c == "taa" {
+    "*"
+  } else if c == "TAC" || c == "tac" {
+    "Y"
+  } else if c == "TAG" || c == "tag" {
+    "*"
+  } else if c == "TAT" || c == "tat" {
+    "Y"
+  } else if c == "TCA" || c == "tca" {
+    "S"
+  } else if c == "TCC" || c == "tcc" {
+    "S"
+  } else if c == "TCG" || c == "tcg" {
+    "S"
+  } else if c == "TCT" || c == "tct" {
+    "S"
+  } else if c == "TGA" || c == "tga" {
+    "*"
+  } else if c == "TGC" || c == "tgc" {
+    "C"
+  } else if c == "TGG" || c == "tgg" {
+    "W"
+  } else if c == "TGT" || c == "tgt" {
+    "C"
+  } else if c == "TTA" || c == "tta" {
+    "L"
+  } else if c == "TTC" || c == "ttc" {
+    "F"
+  } else if c == "TTG" || c == "ttg" {
+    "L"
+  } else if c == "TTT" || c == "ttt" {
+    "F"
+  } else {
+    "?"
+  }
 }
 
 ///|
@@ -138,7 +214,10 @@ pub fn is_stop_codon(codon : String) -> Bool {
 
 ///|
 /// Classify a codon substitution.
-pub fn classify_codon_substitution(codon1 : String, codon2 : String) -> CodonSubstitution {
+pub fn classify_codon_substitution(
+  codon1 : String,
+  codon2 : String,
+) -> CodonSubstitution {
   if codon1.length() != 3 || codon2.length() != 3 {
     return Unknown
   }
@@ -155,7 +234,10 @@ pub fn classify_codon_substitution(codon1 : String, codon2 : String) -> CodonSub
 
 ///|
 /// Count synonymous and non-synonymous substitutions in aligned sequences.
-pub fn count_codon_substitutions(seq1 : String, seq2 : String) -> CodonSubCounts {
+pub fn count_codon_substitutions(
+  seq1 : String,
+  seq2 : String,
+) -> CodonSubCounts {
   let n = if seq1.length() < seq2.length() {
     seq1.length()
   } else {
@@ -177,8 +259,8 @@ pub fn count_codon_substitutions(seq1 : String, seq2 : String) -> CodonSubCounts
     i = i + 1
   }
   CodonSubCounts::new(
-    synonymous=synonymous,
-    nonsynonymous=nonsynonymous,
+    synonymous~,
+    nonsynonymous~,
     total=synonymous + nonsynonymous,
   )
 }
@@ -267,7 +349,7 @@ pub fn jukes_cantor_correction(p : Double) -> Double {
   if p >= 1.0 {
     return 0.0
   }
-  let corrected = -3.0 / 4.0 * (@math.ln(1.0 - 4.0 * p / 3.0))
+  let corrected = -3.0 / 4.0 * @math.ln(1.0 - 4.0 * p / 3.0)
   if corrected.is_nan() {
     0.0
   } else {
@@ -318,12 +400,14 @@ pub fn calc_dnds_nei_gojobori(seq1 : String, seq2 : String) -> DnDsResult {
   } else {
     d_n / d_s
   }
-  DnDsResult::new(dn=d_n, ds=d_s, dnds=dnds)
+  DnDsResult::new(dn=d_n, ds=d_s, dnds~)
 }
 
 ///|
 /// Calculate dN/dS for all pairs of sequences.
-pub fn pairwise_dnds(sequences : Array[String]) -> Array[(String, String, DnDsResult)] {
+pub fn pairwise_dnds(
+  sequences : Array[String],
+) -> Array[(String, String, DnDsResult)] {
   let result : Array[(String, String, DnDsResult)] = Array::new()
   let n = sequences.length()
   let mut i = 0
@@ -384,14 +468,12 @@ pub fn codon_usage_bias(seq : String) -> Map[String, Double] {
 fn get_synonymous_codons(aa : String) -> Array[String] {
   let result : Array[String] = Array::new()
   let codons = [
-    "AAA", "AAC", "AAG", "AAT", "ACA", "ACC", "ACG", "ACT",
-    "AGA", "AGC", "AGG", "AGT", "ATA", "ATC", "ATG", "ATT",
-    "CAA", "CAC", "CAG", "CAT", "CCA", "CCC", "CCG", "CCT",
-    "CGA", "CGC", "CGG", "CGT", "CTA", "CTC", "CTG", "CTT",
-    "GAA", "GAC", "GAG", "GAT", "GCA", "GCC", "GCG", "GCT",
-    "GGA", "GGC", "GGG", "GGT", "GTA", "GTC", "GTG", "GTT",
-    "TAA", "TAC", "TAG", "TAT", "TCA", "TCC", "TCG", "TCT",
-    "TGA", "TGC", "TGG", "TGT", "TTA", "TTC", "TTG", "TTT",
+    "AAA", "AAC", "AAG", "AAT", "ACA", "ACC", "ACG", "ACT", "AGA", "AGC", "AGG",
+    "AGT", "ATA", "ATC", "ATG", "ATT", "CAA", "CAC", "CAG", "CAT", "CCA", "CCC",
+    "CCG", "CCT", "CGA", "CGC", "CGG", "CGT", "CTA", "CTC", "CTG", "CTT", "GAA",
+    "GAC", "GAG", "GAT", "GCA", "GCC", "GCG", "GCT", "GGA", "GGC", "GGG", "GGT",
+    "GTA", "GTC", "GTG", "GTT", "TAA", "TAC", "TAG", "TAT", "TCA", "TCC", "TCG",
+    "TCT", "TGA", "TGC", "TGG", "TGT", "TTA", "TTC", "TTG", "TTT",
   ]
   for codon in codons {
     if codon_to_aa(codon) == aa {
@@ -474,23 +556,14 @@ fn count_codon_in_sequence(seq : String, codon : String) -> Int {
 ///|
 /// Create a demo codon alignment.
 pub fn create_demo_codon_alignment() -> Array[String] {
-  [
-    "ATGTCTGAAATG",
-    "ATGTCTGAAATG",
-    "ATGTCTGAGATG",
-    "ATGTCCGAAATG",
-  ]
+  ["ATGTCTGAAATG", "ATGTCTGAAATG", "ATGTCTGAGATG", "ATGTCCGAAATG"]
 }
 
 ///|
 /// Create a demo alignment with positive selection.
 pub fn create_demo_positive_selection() -> Array[String] {
   [
-    "ATGTCTGAATAA",
-    "ATGTCTGAATAA",
-    "ATGTCTGAGTAA",
-    "ATGTCTGAGTAA",
-    "ATGTCCGAGTAA",
+    "ATGTCTGAATAA", "ATGTCTGAATAA", "ATGTCTGAGTAA", "ATGTCTGAGTAA", "ATGTCCGAGTAA",
     "ATGTCCGAGTAA",
   ]
 }

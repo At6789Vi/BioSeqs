@@ -5,12 +5,7 @@
 fn main {
   println("=== Bio.Align.AlignInfo Demo ===")
 
-  let seqs = [
-    "ATCGATCGATCG",
-    "ATGGATCGATCG",
-    "ATCGATCGATCA",
-    "ATCGATCGATCG",
-  ]
+  let seqs = ["ATCGATCGATCG", "ATGGATCGATCG", "ATCGATCGATCA", "ATCGATCGATCG"]
 
   println("\n1. Input sequences:")
   let mut i = 0
