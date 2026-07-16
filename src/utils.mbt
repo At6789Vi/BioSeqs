@@ -54,7 +54,7 @@ pub fn parse_int(s : String) -> Int {
 }
 
 ///|
-/// Parse double from String.
+/// Parse double from String, supporting scientific notation (e.g., 1e-50, 1e-30).
 pub fn parse_double(s : String) -> Double? {
   if s == "." || s.length() == 0 {
     return None
@@ -78,6 +78,9 @@ pub fn parse_double(s : String) -> Double? {
       i = i + 1
       continue
     }
+    if c == 'e'.to_int() || c == 'E'.to_int() {
+      break
+    }
     if c < zero || c > zero + 9 {
       break
     }
@@ -91,8 +94,29 @@ pub fn parse_double(s : String) -> Double? {
     i = i + 1
   }
 
+  let mut exponent = 0
+  let mut exp_sign = 1
+  if i < n && (s.unsafe_get(i).to_int() == 'e'.to_int() || s.unsafe_get(i).to_int() == 'E'.to_int()) {
+    i = i + 1
+    if i < n && s.unsafe_get(i).to_int() == '-'.to_int() {
+      exp_sign = -1
+      i = i + 1
+    } else if i < n && s.unsafe_get(i).to_int() == '+'.to_int() {
+      i = i + 1
+    }
+    while i < n {
+      let c = s.unsafe_get(i).to_int()
+      if c < zero || c > zero + 9 {
+        break
+      }
+      exponent = exponent * 10 + (c - zero)
+      i = i + 1
+    }
+    exponent = exponent * exp_sign
+  }
+
   if i > 0 || (sign < 0.0 && i > 1) {
-    Some(sign * result)
+    Some(sign * result * @math.pow(10.0, exponent.to_double()))
   } else {
     None
   }
