@@ -777,6 +777,8 @@ pub fn parse_comma_list(String) -> Array[String]
 
 pub fn parse_cram(String) -> CramFile raise CramError
 
+pub fn parse_cram_base64(String) -> CramFile raise CramError
+
 pub fn parse_double(String) -> Double?
 
 pub fn parse_fai(String) -> FastaIndex raise FastaIndexError
@@ -902,6 +904,10 @@ pub fn ruvg(RUVSeqData, Array[String], Int) -> RUVFactors
 pub fn ruvs(RUVSeqData, Int) -> RUVFactors
 
 pub fn sample_ballgown() -> Ballgown
+
+pub fn sample_cram_content() -> String
+
+pub fn sample_cram_file() -> CramFile?
 
 pub fn sample_dna_sequence() -> String
 
@@ -1116,6 +1122,8 @@ pub fn trinucleotide_frequency(String, Bool) -> Map[String, Double]
 pub fn tripeptide_composition(String) -> Map[String, Double]
 
 pub fn try_parse_bam_base64(String) -> BamFile?
+
+pub fn try_parse_cram_base64(String) -> CramFile?
 
 pub fn txdb(Array[Gene], Array[Transcript], Array[Exon], Array[CDS], String, String) -> TxDb
 
@@ -1740,115 +1748,74 @@ pub struct Coverage {
   depths : Array[Int]
 }
 
-pub struct CramBlock {
-  content_type : CramContentType
-  compression_method : CramCompressionMethod
-  compressed_size : Int
-  raw_size : Int
-  data : String
-}
-
-pub struct CramCompressionHeader {
-  version : Int
-  reference_id : Int
-  num_ref_bases : Int
-  ref_seq_id : Int
-  ref_start : Int
-  ref_end : Int
-  num_slices : Int
-}
-
-pub enum CramCompressionMethod {
-  NoCompression
+pub enum CramCompression {
   Gzip
   Bzip2
   Lzma
-  Rans
-  Bgzf
-}
-
-pub enum CramContentType {
-  CompressionHeader
-  SliceHeader
-  CoreData
-  ExternalData
-  FileHeader
-  ReferenceSequence
-  Mapping
-  Info
-  QualityScore
-  TagData
-  ReadFeatures
-  InsertSize
-  SubstitutionMatrix
-  DeletionMatrix
-  InsertionMatrix
-  Padding
+  None
   Unknown(Int)
 }
 
 pub struct CramFile {
-  header : BamHeader
+  header : CramHeader
   records : Array[CramRecord]
 }
+pub fn CramFile::get_reference_length(Self, String) -> Int?
 pub fn CramFile::get_reference_names(Self) -> Array[String]
+pub fn CramFile::len(Self) -> Int
 pub fn CramFile::num_references(Self) -> Int
-pub fn CramFile::to_sam(Self) -> String
+pub fn CramFile::to_bam(Self) -> BamFile
 
-pub struct CramFileDefinition {
-  major_version : Int
-  minor_version : Int
-  flags : Int
+pub struct CramHeader {
+  version : CramVersion
+  reference_count : Int
+  references : Array[CramReference]
+  compression : CramCompression
+  stream_count : Int
+  stream_info : Array[String]
+  sam_header : String
 }
 
-pub enum CramReadFeature {
-  Substitution(Int, Int)
-  Insertion(Int, String)
-  Deletion(Int, Int)
-  SkippedBases(Int, Int)
-  HardClip(Int, Int)
-  SoftClip(Int, String)
-  Padding(Int, Int)
-  QualityScore(Int, String)
-  ModifiedBase(Int, String)
-  ModifiedQuality(Int, String)
-  UnknownFeature(Int)
-}
-
-pub struct CramRecord {
-  seq_id : Int
-  alignment_start : Int
-  read_length : Int
+pub struct CramReadFeatures {
   read_group : Int
   flags : Int
   mapping_quality : Int
-  mate_seq_id : Int
-  mate_alignment_start : Int
-  template_size : Int
-  num_reads : Int
-  read_number : Int
-  fragment_length : Int
-  qname : String
-  cigar : FixedArray[BamCigarElement]
-  seq : String
-  qual : String
-  tags : Array[(String, String)]
-  read_features : FixedArray[CramReadFeature]
+  read_name : String
+  cigar : Array[BamCigarElement]
+  sequence : String
+  quality : String
+  tags : Array[CramTag]
 }
-pub fn CramRecord::get_end(Self) -> Int
-pub fn CramRecord::get_reference_name(Self, BamHeader) -> String
-pub fn CramRecord::is_mapped(Self) -> Bool
-pub fn CramRecord::is_paired(Self) -> Bool
-pub fn CramRecord::is_reverse(Self) -> Bool
-pub fn CramRecord::to_sam_string(Self, BamHeader) -> String
 
-pub struct CramSliceHeader {
-  alignment_start : Int
-  alignment_span : Int
-  num_records : Int
-  num_blocks : Int
-  reference_id : Int
-  landmark : Int
+pub struct CramRecord {
+  ref_id : Int
+  pos : Int
+  read_features : CramReadFeatures
+}
+pub fn CramRecord::get_reference_name(Self, CramHeader) -> String
+pub fn CramRecord::is_paired(Self) -> Bool
+pub fn CramRecord::is_proper_pair(Self) -> Bool
+pub fn CramRecord::is_read1(Self) -> Bool
+pub fn CramRecord::is_read2(Self) -> Bool
+pub fn CramRecord::is_reverse(Self) -> Bool
+pub fn CramRecord::is_unmapped(Self) -> Bool
+pub fn CramRecord::to_bam_record(Self) -> BamRecord
+
+pub struct CramReference {
+  name : String
+  length : Int
+  md5 : String
+  uri : String
+}
+
+pub struct CramTag {
+  key : String
+  value : String
+}
+
+pub struct CramVersion {
+  major : Int
+  minor : Int
 }
 
 pub struct DEGEResults {

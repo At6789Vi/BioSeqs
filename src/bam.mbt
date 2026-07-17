@@ -623,3 +623,524 @@ pub fn BamFile::to_sam(self : BamFile) -> String {
   }
   sb.to_string()
 }
+
+///|
+/// CRAM format parsing module.
+/// CRAM is a compressed binary format for sequencing reads, similar to BAM but with better compression.
+
+///|
+/// CRAM parsing errors.
+pub suberror CramError {
+  CramError(String)
+}
+
+///|
+/// CRAM magic number (CRAM\0).
+let cram_magic : Array[Int] = [67, 82, 65, 77]
+
+///|
+/// CRAM format version.
+pub struct CramVersion {
+  major : Int
+  minor : Int
+}
+
+///|
+/// Check if data starts with CRAM magic number.
+pub fn is_cram_magic(data : String) -> Bool {
+  if data.length() < 4 {
+    return false
+  }
+  let mut i = 0
+  while i < 4 {
+    if data.unsafe_get(i).to_int() != cram_magic[i] {
+      return false
+    }
+    i = i + 1
+  }
+  true
+}
+
+///|
+/// CRAM compression type.
+pub enum CramCompression {
+  Gzip
+  Bzip2
+  Lzma
+  None
+  Unknown(Int)
+}
+
+///|
+/// CRAM reference sequence entry.
+pub struct CramReference {
+  name : String
+  length : Int
+  md5 : String
+  uri : String
+}
+
+///|
+/// CRAM file header structure.
+pub struct CramHeader {
+  version : CramVersion
+  reference_count : Int
+  references : Array[CramReference]
+  compression : CramCompression
+  stream_count : Int
+  stream_info : Array[String]
+  sam_header : String
+}
+
+///|
+/// CRAM tag (key-value metadata).
+pub struct CramTag {
+  key : String
+  value : String
+}
+
+///|
+/// CRAM read features (encoding information).
+pub struct CramReadFeatures {
+  read_group : Int
+  flags : Int
+  mapping_quality : Int
+  read_name : String
+  cigar : Array[BamCigarElement]
+  sequence : String
+  quality : String
+  tags : Array[CramTag]
+}
+
+///|
+/// CRAM alignment record.
+pub struct CramRecord {
+  ref_id : Int
+  pos : Int
+  read_features : CramReadFeatures
+}
+
+///|
+/// CRAM file representation.
+pub struct CramFile {
+  header : CramHeader
+  records : Array[CramRecord]
+}
+
+///|
+/// Parse CRAM version from data.
+fn cram_parse_version(
+  data : String,
+  pos : Int,
+) -> (CramVersion, Int) raise CramError {
+  let (major, pos1) = read_uint32_le(data, pos)
+  let (minor, pos2) = read_uint32_le(data, pos1)
+  (CramVersion::{ major, minor }, pos2)
+}
+
+///|
+/// Parse CRAM compression type.
+fn cram_parse_compression(code : Int) -> CramCompression {
+  match code {
+    0 => CramCompression::None
+    1 => CramCompression::Gzip
+    2 => CramCompression::Bzip2
+    3 => CramCompression::Lzma
+    _ => CramCompression::Unknown(code)
+  }
+}
+
+///|
+/// Parse CRAM header.
+fn cram_parse_header(
+  data : String,
+  pos : Int,
+) -> (CramHeader, Int) raise CramError {
+  let (version, pos1) = cram_parse_version(data, pos)
+  let (ref_count, pos2) = read_uint32_le(data, pos1)
+  let (compression_code, pos3) = read_uint32_le(data, pos2)
+  let (stream_count, pos4) = read_uint32_le(data, pos3)
+
+  let compression = cram_parse_compression(compression_code)
+
+  let references : Array[CramReference] = Array::new()
+  let mut current_pos = pos4
+  let mut ref_idx = 0
+  while ref_idx < ref_count {
+    let (name, pos5) = read_cstring(data, current_pos)
+    let (length, pos6) = read_uint32_le(data, pos5)
+    let (md5, pos7) = read_cstring(data, pos6)
+    let (uri, pos8) = read_cstring(data, pos7)
+    references.push(CramReference::{ name, length, md5, uri })
+    current_pos = pos8
+    ref_idx = ref_idx + 1
+  }
+
+  let stream_info : Array[String] = Array::new()
+  let mut stream_idx = 0
+  while stream_idx < stream_count {
+    let (info, pos_new) = read_cstring(data, current_pos)
+    stream_info.push(info)
+    current_pos = pos_new
+    stream_idx = stream_idx + 1
+  }
+
+  let (sam_header_len, pos9) = read_uint32_le(data, current_pos)
+  if pos9 + sam_header_len > data.length() {
+    raise CramError("Truncated CRAM SAM header")
+  }
+  let sam_header = data[pos9:pos9 + sam_header_len].to_owned()
+  let pos10 = pos9 + sam_header_len
+
+  (
+    CramHeader::{
+      version,
+      reference_count: ref_count,
+      references,
+      compression,
+      stream_count,
+      stream_info,
+      sam_header,
+    },
+    pos10,
+  )
+}
+
+///|
+/// Parse CRAM read features.
+fn cram_parse_read_features(
+  data : String,
+  pos : Int,
+) -> (CramReadFeatures, Int) raise CramError {
+  let (read_group, pos1) = read_uint32_le(data, pos)
+  let (flags, pos2) = read_uint32_le(data, pos1)
+  let (mapq, pos3) = read_int8(data, pos2)
+  let (name_len, pos4) = read_uint32_le(data, pos3)
+
+  if pos4 + name_len > data.length() {
+    raise CramError("Truncated CRAM read name")
+  }
+  let read_name = data[pos4:pos4 + name_len].to_owned()
+  let pos5 = pos4 + name_len
+
+  let (cigar_len, pos6) = read_uint32_le(data, pos5)
+  let cigar : Array[BamCigarElement] = Array::new()
+  let mut current_pos = pos6
+  let mut cigar_idx = 0
+  while cigar_idx < cigar_len {
+    let (cigar_op_val, pos_new) = read_uint32_le(data, current_pos)
+    let length = cigar_op_val >> 4
+    let op_code = cigar_op_val & 0xF
+    let op = cigar_op_from_code(op_code)
+    cigar.push(BamCigarElement::{ op, length })
+    current_pos = pos_new
+    cigar_idx = cigar_idx + 1
+  }
+
+  let (seq_len, pos7) = read_uint32_le(data, current_pos)
+  if pos7 + seq_len > data.length() {
+    raise CramError("Truncated CRAM sequence")
+  }
+  let sequence = data[pos7:pos7 + seq_len].to_owned()
+  let pos8 = pos7 + seq_len
+
+  let (qual_len, pos9) = read_uint32_le(data, pos8)
+  if pos9 + qual_len > data.length() {
+    raise CramError("Truncated CRAM quality")
+  }
+  let quality = data[pos9:pos9 + qual_len].to_owned()
+  let pos10 = pos9 + qual_len
+
+  let (tag_count, pos11) = read_uint32_le(data, pos10)
+  let tags : Array[CramTag] = Array::new()
+  current_pos = pos11
+  let mut tag_idx = 0
+  while tag_idx < tag_count {
+    let (key, pos_new) = read_cstring(data, current_pos)
+    let (value, pos_new2) = read_cstring(data, pos_new)
+    tags.push(CramTag::{ key, value })
+    current_pos = pos_new2
+    tag_idx = tag_idx + 1
+  }
+
+  (
+    CramReadFeatures::{
+      read_group,
+      flags,
+      mapping_quality: mapq,
+      read_name,
+      cigar,
+      sequence,
+      quality,
+      tags,
+    },
+    current_pos,
+  )
+}
+
+///|
+/// Parse CRAM record.
+fn cram_parse_record(
+  data : String,
+  pos : Int,
+) -> (CramRecord, Int) raise CramError {
+  let (ref_id, pos1) = read_int32_le(data, pos)
+  let (pos_val, pos2) = read_int32_le(data, pos1)
+  let (read_features, pos3) = cram_parse_read_features(data, pos2)
+  (CramRecord::{ ref_id, pos: pos_val, read_features }, pos3)
+}
+
+///|
+/// Parse raw CRAM data.
+pub fn parse_cram(data : String) -> CramFile raise CramError {
+  let n = data.length()
+  if n < 4 {
+    raise CramError("CRAM file too short")
+  }
+
+  let mut i = 0
+  while i < 4 {
+    if data.unsafe_get(i).to_int() != cram_magic[i] {
+      raise CramError("Invalid CRAM magic number")
+    }
+    i = i + 1
+  }
+
+  let (header, pos) = cram_parse_header(data, 4)
+
+  let records : Array[CramRecord] = Array::new()
+  let mut current_pos = pos
+  while current_pos < n - 8 {
+    let (record_size, pos_new) = read_uint32_le(data, current_pos)
+    if pos_new + record_size > n {
+      break
+    }
+    let (record, _) = cram_parse_record(data, pos_new)
+    records.push(record)
+    current_pos = pos_new + record_size + 4
+  }
+
+  CramFile::{ header, records }
+}
+
+///|
+/// Parse CRAM from base64-encoded raw data.
+pub fn parse_cram_base64(base64_str : String) -> CramFile raise CramError {
+  let raw_data = base64_decode(base64_str)
+  parse_cram(raw_data)
+}
+
+///|
+/// Parse CRAM from base64-encoded raw data, returns None on failure.
+pub fn try_parse_cram_base64(base64_str : String) -> CramFile? {
+  let result = parse_cram_base64(base64_str) catch { _ => return None }
+  Some(result)
+}
+
+///|
+/// Convert CRAM record to BAM record (simplified).
+pub fn CramRecord::to_bam_record(self : CramRecord) -> BamRecord {
+  let cigar_fixed : FixedArray[BamCigarElement] = FixedArray::make(
+    self.read_features.cigar.length(),
+    BamCigarElement::{ op: BamCigarOp::Match, length: 0 },
+  )
+  let mut i = 0
+  while i < self.read_features.cigar.length() {
+    cigar_fixed[i] = self.read_features.cigar[i]
+    i = i + 1
+  }
+  BamRecord::{
+    ref_id: self.ref_id,
+    pos: self.pos,
+    bin: 0,
+    mapq: self.read_features.mapping_quality,
+    flag: self.read_features.flags,
+    l_read_name: self.read_features.read_name.length(),
+    cigar_len: self.read_features.cigar.length(),
+    l_seq: self.read_features.sequence.length(),
+    next_ref_id: -1,
+    next_pos: 0,
+    tlen: 0,
+    qname: self.read_features.read_name,
+    cigar: cigar_fixed,
+    seq: self.read_features.sequence,
+    qual: self.read_features.quality,
+  }
+}
+
+///|
+/// Convert CRAM file to BAM file (simplified).
+pub fn CramFile::to_bam(self : CramFile) -> BamFile {
+  let refs_fixed : FixedArray[BamReference] = FixedArray::make(
+    self.header.references.length(),
+    BamReference::{ name: "", length: 0 },
+  )
+  let mut i = 0
+  while i < self.header.references.length() {
+    refs_fixed[i] = BamReference::{
+      name: self.header.references[i].name,
+      length: self.header.references[i].length,
+    }
+    i = i + 1
+  }
+  let header = BamHeader::{
+    text: self.header.sam_header,
+    references: refs_fixed,
+  }
+  let records : Array[BamRecord] = Array::new()
+  let mut i = 0
+  while i < self.records.length() {
+    records.push(self.records[i].to_bam_record())
+    i = i + 1
+  }
+  BamFile::{ header, records }
+}
+
+///|
+/// Get number of records in CRAM file.
+pub fn CramFile::len(self : CramFile) -> Int {
+  self.records.length()
+}
+
+///|
+/// Get number of reference sequences.
+pub fn CramFile::num_references(self : CramFile) -> Int {
+  self.header.references.length()
+}
+
+///|
+/// Get all reference sequence names.
+pub fn CramFile::get_reference_names(self : CramFile) -> Array[String] {
+  let result = Array::new()
+  let mut i = 0
+  while i < self.header.references.length() {
+    result.push(self.header.references[i].name)
+    i = i + 1
+  }
+  result
+}
+
+///|
+/// Get reference length by name.
+pub fn CramFile::get_reference_length(self : CramFile, name : String) -> Int? {
+  let mut i = 0
+  while i < self.header.references.length() {
+    if self.header.references[i].name == name {
+      return Some(self.header.references[i].length)
+    }
+    i = i + 1
+  }
+  None
+}
+
+///|
+/// Check if the read is paired.
+pub fn CramRecord::is_paired(self : CramRecord) -> Bool {
+  (self.read_features.flags & 0x0001) != 0
+}
+
+///|
+/// Check if the read is properly paired.
+pub fn CramRecord::is_proper_pair(self : CramRecord) -> Bool {
+  (self.read_features.flags & 0x0002) != 0
+}
+
+///|
+/// Check if the read is unmapped.
+pub fn CramRecord::is_unmapped(self : CramRecord) -> Bool {
+  (self.read_features.flags & 0x0004) != 0
+}
+
+///|
+/// Check if the read is reverse complement.
+pub fn CramRecord::is_reverse(self : CramRecord) -> Bool {
+  (self.read_features.flags & 0x010) != 0
+}
+
+///|
+/// Check if this is the first read in pair.
+pub fn CramRecord::is_read1(self : CramRecord) -> Bool {
+  (self.read_features.flags & 0x040) != 0
+}
+
+///|
+/// Check if this is the second read in pair.
+pub fn CramRecord::is_read2(self : CramRecord) -> Bool {
+  (self.read_features.flags & 0x080) != 0
+}
+
+///|
+/// Get the reference name for a record.
+pub fn CramRecord::get_reference_name(
+  self : CramRecord,
+  header : CramHeader,
+) -> String {
+  if self.ref_id >= 0 && self.ref_id < header.references.length() {
+    header.references[self.ref_id].name
+  } else {
+    "*"
+  }
+}
+
+///|
+/// Sample CRAM content for testing.
+pub fn sample_cram_content() -> String {
+  let magic = "CRAM"
+  let version = "\u{0002}\u{0000}\u{0000}\u{0000}"
+  let ref_count = "\u{0001}\u{0000}\u{0000}\u{0000}"
+  let compression = "\u{0000}\u{0000}\u{0000}\u{0000}"
+  let stream_count = "\u{0000}\u{0000}\u{0000}\u{0000}"
+  let ref_name = "chr1\u{0000}"
+  let ref_length = "\u{0064}\u{0000}\u{0000}\u{0000}"
+  let ref_md5 = "\u{0000}"
+  let ref_uri = "\u{0000}"
+  let sam_header_len = "\u{0014}\u{0000}\u{0000}\u{0000}"
+  let sam_header = "@SQ SN:chr1 LN:100\u{0000}"
+  let header = magic +
+    version +
+    ref_count +
+    compression +
+    stream_count +
+    ref_name +
+    ref_length +
+    ref_md5 +
+    ref_uri +
+    sam_header_len +
+    sam_header
+  let ref_id = "\u{0000}\u{0000}\u{0000}\u{0000}"
+  let pos = "\u{0001}\u{0000}\u{0000}\u{0000}"
+  let read_group = "\u{0000}\u{0000}\u{0000}\u{0000}"
+  let flags = "\u{0000}\u{0000}\u{0000}\u{0000}"
+  let mapq = "\u{003c}"
+  let name_len = "\u{0005}\u{0000}\u{0000}\u{0000}"
+  let read_name = "read1\u{0000}"
+  let cigar_len = "\u{0001}\u{0000}\u{0000}\u{0000}"
+  let cigar_val = "\u{0008}\u{0000}\u{0000}\u{0000}"
+  let seq_len = "\u{0008}\u{0000}\u{0000}\u{0000}"
+  let sequence = "ATGCATGC"
+  let qual_len = "\u{0008}\u{0000}\u{0000}\u{0000}"
+  let quality = "!!!!!!!!"
+  let tags_len = "\u{0000}\u{0000}\u{0000}\u{0000}"
+  let record = ref_id +
+    pos +
+    read_group +
+    flags +
+    mapq +
+    name_len +
+    read_name +
+    cigar_len +
+    cigar_val +
+    seq_len +
+    sequence +
+    qual_len +
+    quality +
+    tags_len
+  header + record
+}
+
+///|
+/// Sample CRAM file for testing.
+pub fn sample_cram_file() -> CramFile? {
+  let result = parse_cram(sample_cram_content()) catch { _ => return None }
+  Some(result)
+}

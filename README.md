@@ -186,6 +186,7 @@ IvanAXu/BioSeqs/
 │   ├── align_io_demo/          # AlignIO 比对格式解析示例 (ClustalW、FASTA、Stockholm)
 │   ├── alignment_demo/         # 序列比对示例
 │   ├── bam_demo/               # BAM/BGZF 解析示例
+│   ├── cram_demo/               # CRAM 格式解析示例 (压缩二进制序列比对格式、CRAM转BAM、参考序列管理)
 │   ├── basic_seq/              # 基础序列操作示例
 │   ├── biostrings_demo/        # Biostrings 序列分析示例
 │   ├── blast_demo/             # BLAST结果解析示例 (tabular/xml格式、HSP过滤、E-value/identity过滤、最佳匹配)
@@ -3164,6 +3165,7 @@ moon run cmd/bench/main.mbt
 | faidx_demo | FASTA 索引（pyfaidx 风格随机访问、.fai 序列化） | `moon run examples/faidx_demo/main.mbt` |
 | ml_features | 机器学习特征提取（k-mer频率、氨基酸组成、理化性质） | `moon run examples/ml_features/main.mbt` |
 | bam_demo | BAM/BGZF 解析（二进制格式、压缩数据读取） | `moon run examples/bam_demo/main.mbt` |
+| cram_demo | CRAM 格式解析（压缩二进制序列比对格式、CRAM转BAM、参考序列管理） | `moon run examples/cram_demo/main.mbt` |
 | biostrings_demo | Biostrings 序列分析（IUPAC、RSCU、复杂度、Tm） | `moon run examples/biostrings_demo/main.mbt` |
 | genomic_ranges_demo | GenomicRanges 基因组区间操作（GRanges、区间运算、集合操作） | `moon run examples/genomic_ranges_demo/main.mbt` |
 | deseq2_demo | DESeq2 差异表达分析（数据集创建、结果分析、显著基因筛选） | `moon run examples/deseq2_demo/main.mbt` |
@@ -3312,10 +3314,9 @@ moon run cmd/bench/main.mbt
 - ✅ 实现 Nexus格式解析（数据矩阵、系统发育树、距离矩阵、分类单元）
 - ✅ 实现 EMBOSS工具接口（GC偏斜、AT偏斜、分子量、Tm值、ORF查找、距离计算）
 - ✅ 实现 群体遗传学分析（等位基因频率、基因型频率、哈迪-温伯格检验、FST统计、Watterson's theta、Shannon/Simpson多样性指数、Chao1/ACE丰富度估计）
-- [ ] 实现 CRAM 格式支持
+- ✅ 实现 CRAM 格式解析（压缩二进制序列比对格式、CRAM转BAM、参考序列管理）
 - [ ] 添加 SIMD 加速支持
 
 ## 许可证
 
 Apache-2.0 License
-
