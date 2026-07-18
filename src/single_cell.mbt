@@ -209,7 +209,10 @@ fn matmul_vec(m : Array[Array[Double]], v : Array[Double]) -> Array[Double] {
 ///|
 fn transpose(m : Array[Array[Double]]) -> Array[Array[Double]] {
   let rows = m.length()
-  let cols = if rows > 0 { m[0].length() } else { 0 }
+  if rows == 0 {
+    return []
+  }
+  let cols = m[0].length()
 
   let result : Array[Array[Double]] = Array::new()
   let mut i = 0
@@ -217,7 +220,11 @@ fn transpose(m : Array[Array[Double]]) -> Array[Array[Double]] {
     let row : Array[Double] = Array::new()
     let mut j = 0
     while j < rows {
-      row.push(m[j][i])
+      if i < m[j].length() {
+        row.push(m[j][i])
+      } else {
+        row.push(0.0)
+      }
       j = j + 1
     }
     result.push(row)
