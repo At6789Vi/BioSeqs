@@ -760,7 +760,7 @@ pub fn sce_compute_pca(
     eigenvalues.push(eigenvalue)
     i = i + 1
   }
-  let projected = sce_matmul(sce_transpose(centered), sce_transpose(components))
+  let projected = sce_matmul(sce_transpose(centered), components)
   let total_var = {
     let mut s = 0.0
     let mut x = 0
