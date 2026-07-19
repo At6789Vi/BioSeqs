@@ -27,6 +27,34 @@ pub fn adjacency(WGCNAData, Double) -> WGCNAData
 
 pub fn adjust_p_values(Array[Double], String) -> Array[Double]
 
+pub fn af_count_by_biotype(Array[Annotation]) -> Map[String, Int]
+
+pub fn af_count_by_chromosome(Array[Annotation]) -> Map[String, Int]
+
+pub fn af_create_example_annotations() -> Array[Annotation]
+
+pub fn af_evaluate_condition(Annotation, FilterCondition) -> Bool
+
+pub fn af_filter(Array[Annotation], Array[FilterCondition]) -> Array[Annotation]
+
+pub fn af_filter_biotype(Array[Annotation], String) -> Array[Annotation]
+
+pub fn af_filter_biotype_in(Array[Annotation], Array[String]) -> Array[Annotation]
+
+pub fn af_filter_by_multiple_conditions(Array[Annotation], Array[FilterCondition], String) -> Array[Annotation]
+
+pub fn af_filter_chromosome(Array[Annotation], String) -> Array[Annotation]
+
+pub fn af_filter_description_contains(Array[Annotation], String) -> Array[Annotation]
+
+pub fn af_filter_region(Array[Annotation], String, Int, Int) -> Array[Annotation]
+
+pub fn af_filter_strand(Array[Annotation], String) -> Array[Annotation]
+
+pub fn af_filter_summary(Array[Annotation]) -> String
+
+pub fn af_filter_symbol_pattern(Array[Annotation], String) -> Array[Annotation]
+
 pub fn affy_batch_from_matrix(Array[String], Array[Array[Array[Double]]], Array[String]) -> AffyBatch
 
 pub fn affy_batch_summarize(AffyBatch, String) -> Array[Array[Double]]
@@ -255,11 +283,141 @@ pub fn cds(TxDb) -> GRanges
 
 pub fn cds_by_transcript(TxDb) -> Map[String, Array[CDS]]
 
+pub fn ch_add_annotation(HeatmapResult, HeatmapAnnotation) -> HeatmapResult
+
+pub fn ch_annotate_cols(HeatmapData, Array[HeatmapAnnotation]) -> String
+
+pub fn ch_annotate_rows(HeatmapData, Array[HeatmapAnnotation]) -> String
+
+pub fn ch_cluster_cols(Array[Array[Double]], String) -> Array[Int]
+
+pub fn ch_cluster_rows(Array[Array[Double]], String) -> Array[Int]
+
+pub fn ch_col_scale(Array[Array[Double]], Bool) -> Array[Array[Double]]
+
+pub fn ch_col_split(HeatmapData, Array[String]) -> HeatmapResult
+
+pub fn ch_colorscale(Double, Double, Double, ColorMap) -> String
+
+pub fn ch_cosine_distance(Array[Double], Array[Double]) -> Double
+
+pub fn ch_create_annotation(HeatmapAnnotation) -> HeatmapAnnotationResult
+
+pub fn ch_create_example_annotation() -> HeatmapAnnotation
+
+pub fn ch_create_example_colormap() -> ColorMap
+
+pub fn ch_create_example_data() -> HeatmapData
+
+pub fn ch_create_example_options() -> HeatmapOptions
+
+pub fn ch_distance_matrix(Array[Array[Double]], String) -> Array[Array[Double]]
+
+pub fn ch_draw_heatmap(HeatmapData, HeatmapOptions) -> HeatmapResult
+
+pub fn ch_euclidean_distance(Array[Double], Array[Double]) -> Double
+
+pub fn ch_exp(Double) -> Double
+
+pub fn ch_hclust(Array[Array[Double]], String) -> Array[Int]
+
+pub fn ch_legend(ColorMap, String) -> String
+
+pub fn ch_ln(Double) -> Double
+
+pub fn ch_max(Array[Double]) -> Double
+
+pub fn ch_mean(Array[Double]) -> Double
+
+pub fn ch_merge_heatmaps(Array[HeatmapResult]) -> String
+
+pub fn ch_min(Array[Double]) -> Double
+
+pub fn ch_pad_right(String, Int) -> String
+
+pub fn ch_pearson_distance(Array[Double], Array[Double]) -> Double
+
+pub fn ch_row_scale(Array[Array[Double]], Bool) -> Array[Array[Double]]
+
+pub fn ch_row_split(HeatmapData, Array[String]) -> HeatmapResult
+
+pub fn ch_scale_matrix(Array[Array[Double]], String, Bool) -> Array[Array[Double]]
+
+pub fn ch_sqrt(Double) -> Double
+
+pub fn ch_std(Array[Double]) -> Double
+
+pub fn ch_summary(HeatmapResult) -> String
+
+pub fn ch_variance(Array[Double]) -> Double
+
 pub fn chao1(Array[Int]) -> Double
 
 pub fn chaos_game_representation(String) -> (Double, Double)
 
 pub fn char_at(String, Int) -> String
+
+pub fn chromvar_annotate_peaks(PeakSet, String) -> PeakSet
+
+pub fn chromvar_bias_correct(Array[Array[Double]], Array[Double]) -> Array[Array[Double]]
+
+pub fn chromvar_cluster_cells(Array[Array[Double]], String) -> Array[Int]
+
+pub fn chromvar_compute_deviations(ChromVARData, Array[ChromVARMotif], BiasCorrection) -> DeviationResult
+
+pub fn chromvar_create_example_data() -> ChromVARData
+
+pub fn chromvar_create_example_motifs() -> Array[ChromVARMotif]
+
+pub fn chromvar_create_example_peak_set() -> PeakSet
+
+pub fn chromvar_deviation_score(Array[Double], Array[Int], Array[Int]) -> Double
+
+pub fn chromvar_differential_deviation(Array[Array[Double]], Array[Int]) -> Array[(Double, Double)]
+
+pub fn chromvar_enrichment_analysis(ChromVARData, Array[ChromVARMotif], Array[String]) -> Array[MotifEnrichment]
+
+pub fn chromvar_entropy(Array[Double]) -> Double
+
+pub fn chromvar_exp(Double) -> Double
+
+pub fn chromvar_filter_peaks(ChromVARData, Int, Int) -> ChromVARData
+
+pub fn chromvar_find_highly_variable_motifs(Array[Array[Double]], Double) -> Array[String]
+
+pub fn chromvar_gc_content(Array[String]) -> Array[Double]
+
+pub fn chromvar_get_motif_peaks(String, Array[(String, Array[Int])]) -> Array[Int]
+
+pub fn chromvar_kldiv(Array[Double], Array[Double]) -> Double
+
+pub fn chromvar_ln(Double) -> Double
+
+pub fn chromvar_mean(Array[Double]) -> Double
+
+pub fn chromvar_median(Array[Double]) -> Double
+
+pub fn chromvar_motif_match(PeakSet, Array[ChromVARMotif]) -> Array[(String, Array[Int])]
+
+pub fn chromvar_normalize(Array[Array[Double]], String) -> Array[Array[Double]]
+
+pub fn chromvar_permutation_test(Array[Array[Double]], Int) -> Array[Double]
+
+pub fn chromvar_plot_deviations(DeviationResult, String) -> String
+
+pub fn chromvar_score_motif(Array[Array[Double]], String) -> Double
+
+pub fn chromvar_sqrt(Double) -> Double
+
+pub fn chromvar_std(Array[Double]) -> Double
+
+pub fn chromvar_summary(ChromVARData, DeviationResult) -> String
+
+pub fn chromvar_variability(Array[Array[Double]]) -> Array[VariabilityResult]
+
+pub fn chromvar_variance(Array[Double]) -> Double
+
+pub fn chromvar_z_score(Array[Array[Double]]) -> Array[Array[Double]]
 
 pub fn classify_codon_substitution(String, String) -> CodonSubstitution
 
@@ -432,6 +590,28 @@ pub fn create_multi_omics(Array[Array[Double]], Array[String], Array[String], Ar
 pub fn create_pathway_graph() -> Graph
 
 pub fn create_wgcna_data(Array[Array[Double]], Array[String], Array[String]) -> WGCNAData
+
+pub fn da_col_means(DelayedArray) -> Array[Double]
+
+pub fn da_col_sums(DelayedArray) -> Array[Double]
+
+pub fn da_compute(DelayedArray) -> Array[Array[Double]]
+
+pub fn da_create_example_data() -> DelayedArray
+
+pub fn da_row_means(DelayedArray) -> Array[Double]
+
+pub fn da_row_sums(DelayedArray) -> Array[Double]
+
+pub fn da_slice(DelayedArray, Array[Int], Array[Int]) -> DelayedArray
+
+pub fn da_subset_cols(DelayedArray, Array[Int]) -> DelayedArray
+
+pub fn da_subset_rows(DelayedArray, Array[Int]) -> DelayedArray
+
+pub fn da_summary(DelayedArray) -> String
+
+pub fn da_transpose(DelayedArray) -> DelayedArray
 
 pub fn data_type_bool() -> DataType
 
@@ -1001,6 +1181,64 @@ pub fn gravy_score(String) -> Double
 
 pub fn group_by_top_level(ReactomeResult) -> Map[String, Array[ReactomePathway]]
 
+pub fn gsva_cdf(Double, Double, Double) -> Double
+
+pub fn gsva_compute_enrichment(Array[Array[Double]], Array[GSVAGeneSet], Array[String]) -> Array[GSVAEnrichment]
+
+pub fn gsva_create_example_data() -> GSVAData
+
+pub fn gsva_create_example_gene_sets() -> Array[GSVAGeneSet]
+
+pub fn gsva_create_example_scores() -> GSVAScores
+
+pub fn gsva_differential_analysis(Array[Array[Double]], Array[Int]) -> Array[(Double, Double)]
+
+pub fn gsva_exp(Double) -> Double
+
+pub fn gsva_filter_gene_sets(Array[GSVAGeneSet], Array[String], Int, Int) -> Array[GSVAGeneSet]
+
+pub fn gsva_gsea_score(Array[Double], Array[Int], Int) -> Double
+
+pub fn gsva_heatmap(GSVAScores) -> String
+
+pub fn gsva_leading_edge(Array[Array[Double]], GSVAGeneSet, Array[String]) -> Array[String]
+
+pub fn gsva_ln(Double) -> Double
+
+pub fn gsva_mean(Array[Double]) -> Double
+
+pub fn gsva_median(Array[Double]) -> Double
+
+pub fn gsva_normalize_scores(Array[Array[Double]], String) -> Array[Array[Double]]
+
+pub fn gsva_percent_rank(Array[Double]) -> Array[Double]
+
+pub fn gsva_permutation_test(Array[Array[Double]], Array[Int], Int) -> Array[Double]
+
+pub fn gsva_plot_scores(GSVAScores, String) -> String
+
+pub fn gsva_rank_genes(Array[Array[Double]], String) -> Array[Array[Double]]
+
+pub fn gsva_run(GSVAData, Array[GSVAGeneSet], GSVAParams) -> GSVAScores
+
+pub fn gsva_score_gsva(Array[Array[Double]], GSVAGeneSet, Array[String], String) -> Array[Double]
+
+pub fn gsva_score_plage(Array[Array[Double]], GSVAGeneSet, Array[String]) -> Array[Double]
+
+pub fn gsva_score_ssgsea(Array[Array[Double]], GSVAGeneSet, Array[String]) -> Array[Double]
+
+pub fn gsva_score_zscore(Array[Array[Double]], GSVAGeneSet, Array[String]) -> Array[Double]
+
+pub fn gsva_sqrt(Double) -> Double
+
+pub fn gsva_statistics(Array[Array[Double]]) -> GSVAStat
+
+pub fn gsva_std(Array[Double]) -> Double
+
+pub fn gsva_summarize(GSVAScores) -> String
+
+pub fn gsva_variance(Array[Double]) -> Double
+
 pub fn hamming_distance(String, String) -> Int
 
 pub fn hardy_weinberg_test(Array[String]) -> Double
@@ -1509,6 +1747,26 @@ pub fn scater_normalize_cpm(Array[Array[Int]]) -> Array[Array[Double]]
 
 pub fn scater_run_pca(Array[Array[Double]], Int) -> Array[Array[Double]]
 
+pub fn scdf_compute_distance(Array[Double], Array[Double]) -> Double
+
+pub fn scdf_compute_doublet_score(SingleCellData, Int) -> Array[DoubletScore]
+
+pub fn scdf_compute_eigenvalues(Array[Array[Double]]) -> Array[Double]
+
+pub fn scdf_compute_pca(SingleCellData, Int) -> Array[Array[Double]]
+
+pub fn scdf_create_example_data() -> SingleCellData
+
+pub fn scdf_detect_doublets(SingleCellData, Double) -> Array[String]
+
+pub fn scdf_doublet_summary(Array[DoubletScore]) -> String
+
+pub fn scdf_filter_doublets(SingleCellData, Double) -> SingleCellData
+
+pub fn scdf_find_nearest_neighbors(SingleCellData, Int, Int) -> Array[(String, Double)]
+
+pub fn scdf_sort_by_distance(Array[(String, Double)]) -> Array[(String, Double)]
+
 pub fn sce_compute_deconv_size_factors(Array[Array[Double]]) -> Array[Double]
 
 pub fn sce_compute_library_size_factors(Array[Array[Double]]) -> Array[Double]
@@ -1968,6 +2226,18 @@ pub struct AnnotatedDataFrame {
 }
 pub fn AnnotatedDataFrame::new(Map[String, Array[String]], Map[String, String]) -> Self
 
+pub struct Annotation {
+  gene_id : String
+  symbol : String
+  description : String
+  chromosome : String
+  start : Int
+  end : Int
+  strand : String
+  biotype : String
+}
+pub fn Annotation::new(String, String, String, String, Int, Int, String, String) -> Self
+
 pub struct AnnotationDb {
   gene_info : Map[String, GeneInfo]
   id_maps : Map[String, Map[String, String]]
@@ -2002,6 +2272,13 @@ pub struct AnnotationResult {
   annotations : Array[PeakAnnotation]
   summary : Map[String, Int]
 }
+
+pub enum AnnotationType {
+  RowAnnotation
+  ColumnAnnotation
+  CellAnnotation
+}
+pub fn AnnotationType::to_string(Self) -> String
 
 pub struct Atom {
   name : String
@@ -2223,6 +2500,14 @@ pub struct BgTranscript {
 }
 pub fn BgTranscript::new(String, String, String, String, String, Int, Array[Double], Array[Double]) -> Self
 
+pub struct BiasCorrection {
+  bias_factors : Array[Array[Double]]
+  correction_method : String
+  gc_correction : Bool
+  fragment_length_correction : Bool
+}
+pub fn BiasCorrection::new() -> Self
+
 pub struct BioMartDataset {
   name : String
   description : String
@@ -2425,6 +2710,25 @@ pub struct ChromInfo {
 }
 pub fn ChromInfo::new(name~ : String, length~ : Int, is_circular? : Bool, genome? : String) -> Self
 
+pub struct ChromVARData {
+  counts : Array[Array[Double]]
+  peak_set : PeakSet
+  cell_names : Array[String]
+  motifs : Array[ChromVARMotif]
+  gc_content : Array[Double]
+}
+pub fn ChromVARData::new(Array[Array[Double]], PeakSet, Array[String]) -> Self
+pub fn ChromVARData::to_string(Self) -> String
+
+pub struct ChromVARMotif {
+  name : String
+  pwm : Array[Array[Double]]
+  consensus : String
+  family : String
+}
+pub fn ChromVARMotif::new(String, Array[Array[Double]], String) -> Self
+pub fn ChromVARMotif::to_string(Self) -> String
+
 pub struct CigarElement {
   op : CigarOp
   length : Int
@@ -2537,6 +2841,14 @@ pub struct CodonUsageResult {
   optimal_codons : Map[String, Double]
 }
 pub fn CodonUsageResult::new(Map[String, Int], Map[String, Double], Double, Double, Double, Map[String, Double]) -> Self
+
+pub struct ColorMap {
+  colors : Array[String]
+  breaks : Array[Double]
+  na_color : String
+}
+pub fn ColorMap::new(Array[String], Array[Double]) -> Self
+pub fn ColorMap::to_string(Self) -> String
 
 pub struct Column {
   name : String
@@ -2863,6 +3175,26 @@ pub struct DeResult {
 }
 pub fn DeResult::new(String, String, String, Double, Double, Double, Double) -> Self
 
+pub struct DelayedArray {
+  data : Array[Array[Double]]
+  dim : Array[Int]
+  delayed_ops : Array[String]
+  chunk_size : Int
+}
+pub fn DelayedArray::dim(Self) -> Array[Int]
+pub fn DelayedArray::ncol(Self) -> Int
+pub fn DelayedArray::new(Array[Array[Double]]) -> Self
+pub fn DelayedArray::nrow(Self) -> Int
+
+pub struct DeviationResult {
+  deviations : Array[Array[Double]]
+  motif_names : Array[String]
+  cell_names : Array[String]
+  z_scores : Array[Array[Double]]
+  p_values : Array[Array[Double]]
+}
+pub fn DeviationResult::to_string(Self) -> String
+
 pub struct DiffExprResult {
   gene : Array[String]
   pseudotime : Array[Double]
@@ -2892,6 +3224,13 @@ pub struct DnDsResult {
   ds_std : Double?
 }
 pub fn DnDsResult::new(dn~ : Double, ds~ : Double, dnds~ : Double, dn_std? : Double?, ds_std? : Double?) -> Self
+
+pub struct DoubletScore {
+  cell_name : String
+  score : Double
+  is_doublet : Bool
+}
+pub fn DoubletScore::new(String, Double, Bool) -> Self
 
 pub struct DropletStats {
   total_counts : Array[Double]
@@ -3111,6 +3450,13 @@ pub enum FileType {
 }
 pub fn FileType::to_string(Self) -> String
 
+pub struct FilterCondition {
+  field : String
+  operator : String
+  value : String
+}
+pub fn FilterCondition::new(String, String, String) -> Self
+
 pub struct FlowFrame {
   exprs : Array[Array[Double]]
   params : Array[ParameterDescription]
@@ -3256,6 +3602,61 @@ pub struct GRanges {
   ends : Array[Int]
   strands : Array[Strand]
   widths : Array[Int]
+}
+
+pub struct GSVAData {
+  expression : Array[Array[Double]]
+  gene_names : Array[String]
+  sample_names : Array[String]
+  gene_sets : Array[GSVAGeneSet]
+}
+pub fn GSVAData::new(Array[Array[Double]], Array[String], Array[String]) -> Self
+pub fn GSVAData::to_string(Self) -> String
+
+pub struct GSVAEnrichment {
+  gene_set_name : String
+  enrichment_score : Double
+  normalized_enrichment_score : Double
+  pvalue : Double
+  fdr : Double
+  leading_edge : Array[String]
+}
+pub fn GSVAEnrichment::to_string(Self) -> String
+
+pub struct GSVAGeneSet {
+  name : String
+  genes : Array[String]
+  description : String
+}
+pub fn GSVAGeneSet::new(String, Array[String], String) -> Self
+pub fn GSVAGeneSet::to_string(Self) -> String
+
+pub struct GSVAParams {
+  method : String
+  kcdf : String
+  min_size : Int
+  max_size : Int
+  abs_ranking : Bool
+  verbose : Bool
+}
+pub fn GSVAParams::new() -> Self
+pub fn GSVAParams::to_string(Self) -> String
+
+pub struct GSVAScores {
+  scores : Array[Array[Double]]
+  gene_set_names : Array[String]
+  sample_names : Array[String]
+  method : String
+  params : Map[String, String]
+}
+pub fn GSVAScores::to_string(Self) -> String
+
+pub struct GSVAStat {
+  mean_score : Array[Double]
+  sd_score : Array[Double]
+  median_score : Array[Double]
+  min_score : Array[Double]
+  max_score : Array[Double]
 }
 
 pub struct Gate {
@@ -3419,6 +3820,8 @@ pub enum GraphType {
   Undirected
   Directed
 }
+pub fn GraphType::new_directed() -> Self
+pub fn GraphType::new_undirected() -> Self
 pub fn GraphType::to_string(Self) -> String
 
 pub struct HMM {
@@ -3460,6 +3863,58 @@ pub struct HSPFragment {
   match_seq : String
 }
 pub fn HSPFragment::new(Int, Int, Int, Int, Strand, Strand, Int, Int, Double, Double, String, String, String) -> Self
+
+pub struct HeatmapAnnotation {
+  annot_type : AnnotationType
+  labels : Array[String]
+  colors : Array[String]
+  values : Array[Double]
+}
+pub fn HeatmapAnnotation::new(AnnotationType, Array[String], Array[String]) -> Self
+pub fn HeatmapAnnotation::to_string(Self) -> String
+
+pub struct HeatmapAnnotationResult {
+  row_annot : String
+  col_annot : String
+  legend : String
+}
+
+pub struct HeatmapData {
+  matrix : Array[Array[Double]]
+  row_names : Array[String]
+  col_names : Array[String]
+  row_dend : Array[Array[Double]]
+  col_dend : Array[Array[Double]]
+}
+pub fn HeatmapData::new(Array[Array[Double]], Array[String], Array[String]) -> Self
+pub fn HeatmapData::to_string(Self) -> String
+
+pub struct HeatmapOptions {
+  row_title : String
+  col_title : String
+  show_row_names : Bool
+  show_col_names : Bool
+  show_legend : Bool
+  row_cluster : Bool
+  col_cluster : Bool
+  cluster_method : String
+  scale : String
+  center : Bool
+  na_color : String
+  border_color : String
+  row_gap : Int
+  col_gap : Int
+}
+pub fn HeatmapOptions::new() -> Self
+
+pub struct HeatmapResult {
+  text : String
+  row_order : Array[Int]
+  col_order : Array[Int]
+  row_clusters : Array[Int]
+  col_clusters : Array[Int]
+}
+pub fn HeatmapResult::to_string(Self) -> String
 
 pub struct Hit {
   id : String
@@ -3767,6 +4222,16 @@ pub struct Motif {
 }
 pub fn Motif::new(String, Array[Array[Double]], Array[String], Array[String]) -> Self
 
+pub struct MotifEnrichment {
+  motif_name : String
+  enrichment_score : Double
+  p_value : Double
+  fdr : Double
+  n_peaks : Int
+  n_target_peaks : Int
+}
+pub fn MotifEnrichment::to_string(Self) -> String
+
 pub struct MotifHit {
   position : Int
   score : Double
@@ -3976,6 +4441,14 @@ pub enum PeakFormat {
   MacsXls
 } derive(Eq)
 pub fn PeakFormat::to_string(Self) -> String
+
+pub struct PeakSet {
+  peaks : Array[(String, Int, Int)]
+  names : Array[String]
+  annotation : Array[(String, String)]
+}
+pub fn PeakSet::new(Array[(String, Int, Int)], Array[String]) -> Self
+pub fn PeakSet::to_string(Self) -> String
 
 pub struct PileupElement {
   seqname : String
@@ -4478,6 +4951,13 @@ pub struct SimpleSCE {
 }
 pub fn SimpleSCE::new(Array[Array[Array[Double]]], Array[Array[String]], Array[Array[String]]) -> Self
 
+pub struct SingleCellData {
+  counts : Array[Array[Double]]
+  cell_names : Array[String]
+  gene_names : Array[String]
+}
+pub fn SingleCellData::new(Array[Array[Double]], Array[String], Array[String]) -> Self
+
 pub struct SingleCellExperiment {
   assays : Map[String, Array[Array[Double]]]
   row_data : Map[String, Array[String]]
@@ -4781,6 +5261,14 @@ pub struct TxImportData {
   tx_names : Array[String]
   sample_names : Array[String]
   gene_names : Array[String]
+}
+
+pub struct VariabilityResult {
+  motif_name : String
+  variability_score : Double
+  mean_deviation : Double
+  sd_deviation : Double
+  rank : Int
 }
 
 pub struct VariantAnnotation {

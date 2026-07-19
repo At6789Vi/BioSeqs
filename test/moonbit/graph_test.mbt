@@ -7,7 +7,7 @@ test "graph_create_example" {
 
 ///|
 test "graph_add_node_and_edge" {
-  let graph = @src.Graph::new("Test Graph", @src.GraphType::Undirected)
+  let graph = @src.Graph::new("Test Graph", @src.GraphType::new_undirected())
   @src.graph_add_node(graph, @src.Node::new("A", "Node A"))
   @src.graph_add_node(graph, @src.Node::new("B", "Node B"))
   @src.graph_add_edge_by_id(graph, "A", "B", 1.0)

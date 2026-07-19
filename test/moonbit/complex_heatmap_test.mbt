@@ -144,19 +144,19 @@ test "ch_utils" {
   let arr = [1.0, 2.0, 3.0, 4.0, 5.0]
   let mean_val = @src.ch_mean(arr)
   assert_eq(mean_val, 3.0)
-  
+
   let var_val = @src.ch_variance(arr)
   assert_true(var_val > 0.0)
-  
+
   let std_val = @src.ch_std(arr)
   assert_true(std_val > 0.0)
-  
+
   let min_val = @src.ch_min(arr)
   assert_eq(min_val, 1.0)
-  
+
   let max_val = @src.ch_max(arr)
   assert_eq(max_val, 5.0)
-  
+
   let sqrt_val = @src.ch_sqrt(16.0)
   assert_eq(sqrt_val, 4.0)
 }

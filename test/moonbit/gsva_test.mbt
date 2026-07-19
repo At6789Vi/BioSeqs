@@ -32,7 +32,11 @@ test "gsva_run" {
 test "gsva_score_ssgsea" {
   let data = @src.gsva_create_example_data()
   let gene_sets = @src.gsva_create_example_gene_sets()
-  let ssgsea_scores = @src.gsva_score_ssgsea(data.expression, gene_sets[0], data.gene_names)
+  let ssgsea_scores = @src.gsva_score_ssgsea(
+    data.expression,
+    gene_sets[0],
+    data.gene_names,
+  )
   assert_eq(ssgsea_scores.length(), 10)
 }
 
@@ -40,7 +44,11 @@ test "gsva_score_ssgsea" {
 test "gsva_score_zscore" {
   let data = @src.gsva_create_example_data()
   let gene_sets = @src.gsva_create_example_gene_sets()
-  let zscore_scores = @src.gsva_score_zscore(data.expression, gene_sets[0], data.gene_names)
+  let zscore_scores = @src.gsva_score_zscore(
+    data.expression,
+    gene_sets[0],
+    data.gene_names,
+  )
   assert_eq(zscore_scores.length(), 10)
 }
 
@@ -48,7 +56,11 @@ test "gsva_score_zscore" {
 test "gsva_score_plage" {
   let data = @src.gsva_create_example_data()
   let gene_sets = @src.gsva_create_example_gene_sets()
-  let plage_scores = @src.gsva_score_plage(data.expression, gene_sets[0], data.gene_names)
+  let plage_scores = @src.gsva_score_plage(
+    data.expression,
+    gene_sets[0],
+    data.gene_names,
+  )
   assert_eq(plage_scores.length(), 10)
 }
 
@@ -56,7 +68,12 @@ test "gsva_score_plage" {
 test "gsva_score_gsva" {
   let data = @src.gsva_create_example_data()
   let gene_sets = @src.gsva_create_example_gene_sets()
-  let gsva_scores = @src.gsva_score_gsva(data.expression, gene_sets[0], data.gene_names, "Gaussian")
+  let gsva_scores = @src.gsva_score_gsva(
+    data.expression,
+    gene_sets[0],
+    data.gene_names,
+    "Gaussian",
+  )
   assert_eq(gsva_scores.length(), 10)
 }
 
@@ -122,16 +139,16 @@ test "gsva_utils" {
   let arr = [1.0, 2.0, 3.0, 4.0, 5.0]
   let mean_val = @src.gsva_mean(arr)
   assert_eq(mean_val, 3.0)
-  
+
   let var_val = @src.gsva_variance(arr)
   assert_true(var_val > 0.0)
-  
+
   let std_val = @src.gsva_std(arr)
   assert_true(std_val > 0.0)
-  
+
   let median_val = @src.gsva_median(arr)
   assert_eq(median_val, 3.0)
-  
+
   let sqrt_val = @src.gsva_sqrt(16.0)
   assert_eq(sqrt_val, 4.0)
 }

@@ -41,6 +41,16 @@ pub enum GraphType {
 }
 
 ///|
+pub fn GraphType::new_undirected() -> GraphType {
+  Undirected
+}
+
+///|
+pub fn GraphType::new_directed() -> GraphType {
+  Directed
+}
+
+///|
 pub fn graph_type_is_undirected(gt : GraphType) -> Bool {
   match gt {
     Undirected => true

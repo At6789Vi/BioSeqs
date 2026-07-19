@@ -69,7 +69,9 @@ test "chromvar_differential_deviation" {
 test "chromvar_enrichment_analysis" {
   let data = @src.chromvar_create_example_data()
   let motifs = @src.chromvar_create_example_motifs()
-  let enrichment = @src.chromvar_enrichment_analysis(data, motifs, ["Group A", "Group B"])
+  let enrichment = @src.chromvar_enrichment_analysis(data, motifs, [
+    "Group A", "Group B",
+  ])
   assert_eq(enrichment.length(), 3)
 }
 
