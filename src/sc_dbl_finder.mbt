@@ -108,16 +108,18 @@ pub fn scdf_sort_by_distance(
   distances : Array[(String, Double)],
 ) -> Array[(String, Double)] {
   let sorted = distances.copy()
+  let n = sorted.length()
+  if n <= 1 {
+    return sorted
+  }
+  
   let mut i = 0
-  while i < sorted.length() - 1 {
-    let mut j = i + 1
-    while j < sorted.length() {
-      if sorted[i].1 > sorted[j].1 {
-        let temp = sorted[i]
-        sorted[i] = sorted[j]
-        sorted[j] = temp
-      }
-      j = j + 1
+  while i < n - 1 {
+    let min_idx = scdf_find_min(sorted, i, n)
+    if min_idx != i {
+      let temp = sorted[i]
+      sorted[i] = sorted[min_idx]
+      sorted[min_idx] = temp
     }
     i = i + 1
   }
@@ -125,11 +127,27 @@ pub fn scdf_sort_by_distance(
 }
 
 ///|
+fn scdf_find_min(
+  arr : Array[(String, Double)],
+  start : Int,
+  end : Int,
+) -> Int {
+  let mut min_idx = start
+  let mut i = start + 1
+  while i < end {
+    if arr[i].1 < arr[min_idx].1 {
+      min_idx = i
+    }
+    i = i + 1
+  }
+  min_idx
+}
+
+///|
 pub fn scdf_detect_doublets(
-  data : SingleCellData,
+  scores : Array[DoubletScore],
   threshold : Double,
 ) -> Array[String] {
-  let scores = scdf_compute_doublet_score(data, 10)
   let doublets : Array[String] = Array::new()
 
   let mut i = 0
@@ -187,9 +205,8 @@ pub fn scdf_doublet_summary(scores : Array[DoubletScore]) -> String {
 ///|
 pub fn scdf_filter_doublets(
   data : SingleCellData,
-  threshold : Double,
+  scores : Array[DoubletScore],
 ) -> SingleCellData {
-  let scores = scdf_compute_doublet_score(data, 10)
   let new_counts : Array[Array[Double]] = Array::new()
   let new_cell_names : Array[String] = Array::new()
 
@@ -297,7 +314,7 @@ pub fn scdf_compute_eigenvalues(matrix : Array[Array[Double]]) -> Array[Double] 
     }
 
     let mut iteration = 0
-    while iteration < 100 {
+    while iteration < 50 {
       let new_v : Array[Double] = Array::new()
       let mut j = 0
       while j < n {

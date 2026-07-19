@@ -15,13 +15,13 @@ fn main {
     "Doublet scores computed for " + scores.length().to_string() + " cells",
   )
 
-  let doublets = @bio.scdf_detect_doublets(data, 0.3)
+  let doublets = @bio.scdf_detect_doublets(scores, 0.3)
   println("Detected doublets: " + doublets.length().to_string())
 
   let summary = @bio.scdf_doublet_summary(scores)
   println(summary)
 
-  let filtered = @bio.scdf_filter_doublets(data, 0.3)
+  let filtered = @bio.scdf_filter_doublets(data, scores)
   println(
     "After filtering: " + filtered.cell_names.length().to_string() + " cells",
   )

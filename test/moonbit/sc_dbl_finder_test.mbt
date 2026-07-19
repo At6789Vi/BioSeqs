@@ -30,7 +30,8 @@ test "scdf_find_nearest_neighbors" {
 ///|
 test "scdf_detect_doublets" {
   let data = @src.scdf_create_example_data()
-  let doublets = @src.scdf_detect_doublets(data, 0.3)
+  let scores = @src.scdf_compute_doublet_score(data, 10)
+  let doublets = @src.scdf_detect_doublets(scores, 0.3)
   assert_true(doublets.length() >= 0)
 }
 
@@ -45,7 +46,8 @@ test "scdf_doublet_summary" {
 ///|
 test "scdf_filter_doublets" {
   let data = @src.scdf_create_example_data()
-  let filtered = @src.scdf_filter_doublets(data, 0.3)
+  let scores = @src.scdf_compute_doublet_score(data, 10)
+  let filtered = @src.scdf_filter_doublets(data, scores)
   assert_eq(filtered.gene_names.length(), 10)
 }
 
