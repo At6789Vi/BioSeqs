@@ -399,4 +399,164 @@ fn main {
 
   println("7. Summary")
   println(@bio.summarize_wgcna(wgcna_with_modules))
+  println("")
+
+  println("\n")
+  println("=== Batchelor Single-cell Batch Correction Example ===")
+  println("Inspired by Bioconductor batchelor package")
+  println("")
+
+  println("1. Generate simulated single-cell data with batch effects")
+  let (batches, batch_names) = @bio.batchelor_create_example_data(2, 50, 200, 2.0)
+  let mut idx = 0
+  while idx < batches.length() {
+    println("   \{batch_names[idx]}: \{batches[idx].length().to_string()} cells, \{batches[idx][0].length().to_string()} genes")
+    idx = idx + 1
+  }
+  println("")
+
+  println("2. Evaluate batch mixing before correction")
+  let raw_data : Array[Array[Double]] = Array::new()
+  for cell in batches[0] {
+    raw_data.push(cell)
+  }
+  for cell in batches[1] {
+    raw_data.push(cell)
+  }
+  let raw_batch_indices : Array[Int] = Array::new()
+  let mut bi = 0
+  while bi < 50 {
+    raw_batch_indices.push(0)
+    bi = bi + 1
+  }
+  bi = 0
+  while bi < 50 {
+    raw_batch_indices.push(1)
+    bi = bi + 1
+  }
+  let raw_score = @bio.compute_batch_mixing_score(raw_data, raw_batch_indices)
+  println("   Batch mixing score (higher = better): \{raw_score.to_string()}")
+  println("")
+
+  println("3. Method 1: rescaleBatches")
+  let rescale_result = @bio.rescale_batches(batches, batch_names)
+  let rescale_score = @bio.compute_batch_mixing_score(rescale_result.corrected, rescale_result.batch_indices)
+  println("   Corrected cells: \{rescale_result.corrected.length().to_string()}")
+  println("   Batch mixing score: \{rescale_score.to_string()}")
+  println("   Improvement: +\{((rescale_score - raw_score) / raw_score * 100.0).to_string()}%")
+  println("")
+
+  println("4. Method 2: fastMNN")
+  let fastmnn_result = @bio.fast_mnn(batches, batch_names, 5, 20)
+  let fastmnn_score = @bio.compute_batch_mixing_score(fastmnn_result.corrected, fastmnn_result.batch_indices)
+  println("   Corrected dimensions: \{fastmnn_result.corrected.length().to_string()} cells, \{fastmnn_result.corrected[0].length().to_string()} PCs")
+  println("   Number of MNN pairs: \{fastmnn_result.mnn_pairs.length().to_string()}")
+  println("   Batch mixing score: \{fastmnn_score.to_string()}")
+  println("   Improvement: +\{((fastmnn_score - raw_score) / raw_score * 100.0).to_string()}%")
+  println("")
+
+  println("5. Find Mutual Nearest Neighbors")
+  let mnn_pairs = @bio.find_mutual_nearest_neighbors(batches[0], batches[1], 5)
+  println("   MNN pairs found: \{mnn_pairs.length().to_string()}")
+  if mnn_pairs.length() > 0 {
+    println("   First 3 pairs:")
+    let mut pi = 0
+    while pi < 3 && pi < mnn_pairs.length() {
+      let pair = mnn_pairs[pi]
+      println("     (Batch_0 cell \{pair.0.to_string()}, Batch_1 cell \{pair.1.to_string()})")
+      pi = pi + 1
+    }
+  }
+  println("")
+
+  println("6. Comparison")
+  println("   Method           | Score")
+  println("   -----------------|------")
+  println("   Raw data         | \{raw_score.to_string()}")
+  println("   rescaleBatches   | \{rescale_score.to_string()}")
+  println("   fastMNN          | \{fastmnn_score.to_string()}")
+  println("")
+
+  println("\n")
+  println("=== Seurat Single-cell RNA-seq Analysis Example ===")
+  println("Inspired by Bioconductor Seurat package")
+  println("")
+
+  println("1. Create simulated single-cell data")
+  let seurat_obj = @bio.seurat_create_example_data()
+  println("   Cells: \{seurat_obj.col_names.length().to_string()}")
+  println("   Genes: \{seurat_obj.row_names.length().to_string()}")
+  println("")
+
+  println("2. Normalize data")
+  let seurat_normalized = @bio.normalize_total(seurat_obj)
+  println("   Normalization completed")
+  println("")
+
+  println("3. Find highly variable genes")
+  let seurat_hvg = @bio.find_variable_features(seurat_normalized)
+  println("   HVGs found: \{seurat_hvg.var_features.length().to_string()}")
+  println("")
+
+  println("4. Scale data")
+  let seurat_scaled = @bio.scale_data(seurat_hvg)
+  println("   Scaling completed")
+  println("")
+
+  println("5. Run PCA")
+  let seurat_pca = @bio.run_pca(seurat_scaled)
+  println("   Number of PCs: \{seurat_pca.pca[0].length().to_string()}")
+  let mut pc_idx = 0
+  while pc_idx < 3 && pc_idx < seurat_pca.var_explained.length() {
+    println("   PC\{(pc_idx + 1).to_string()}: \{(seurat_pca.var_explained[pc_idx] * 100.0).to_string()}% variance")
+    pc_idx = pc_idx + 1
+  }
+  println("")
+
+  println("6. Find nearest neighbors")
+  let seurat_neighbors = @bio.find_neighbors(seurat_pca)
+  println("   Neighbors per cell: \{seurat_neighbors.neighbors[0].length().to_string()}")
+  println("")
+
+  println("7. Find clusters")
+  let seurat_clusters = @bio.find_clusters(seurat_neighbors)
+  
+  let unique_clusters : Array[Int] = Array::new()
+  for c in seurat_clusters.clusters {
+    let mut exists = false
+    for u in unique_clusters {
+      if u == c {
+        exists = true
+        break
+      }
+    }
+    if !exists {
+      unique_clusters.push(c)
+    }
+  }
+  println("   Number of clusters: \{unique_clusters.length().to_string()}")
+  println("")
+
+  println("8. Run UMAP")
+  let seurat_umap = @bio.run_umap(seurat_pca)
+  println("   UMAP completed with 2 dimensions")
+  println("")
+
+  println("9. Find marker genes")
+  let markers = @bio.find_all_markers(seurat_clusters)
+  println("   Markers found: \{markers.length().to_string()}")
+  
+  if markers.length() > 0 {
+    let top_markers = @bio.get_top_markers(markers, 3)
+    println("   Top 3 markers:")
+    let mut mi = 0
+    while mi < top_markers.length() {
+      let marker = top_markers[mi]
+      println("     \{marker.gene}: log2FC=\{marker.avg_log2_fc.to_string()}, padj=\{marker.adjusted_p_value.to_string()}")
+      mi = mi + 1
+    }
+  }
+  println("")
+
+  println("=== All examples completed! ===")
 }
